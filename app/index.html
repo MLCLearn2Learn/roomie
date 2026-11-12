@@ -3353,23 +3353,27 @@ document.addEventListener('change',e=>{ const t=e.target; if(!t.dataset||!t.data
 setTimeout(applyDock,0);
 
 /* ---- v1.1: welcome tour ---- */
-function tourSteps(){ const tools=S.mode==='tools';
+function tourSteps(){ const tools=S.mode==='tools', ex=S.studentsAreExample;
   const s=[
-   {t:'Hi, I’m Roomie!',b:'I run the routines, timers and fun bits on your board, so you can teach. This quick tour shows you where everything is. It takes about a minute.'},
-   {sel:'#classBtn',t:'Your class',b:'Tap your class name for the seating plan, pick a name, groups, rotations, Mystery Hero and your class list.'}];
-  if(tools) s.push({sel:'#stage .card',t:'Your toolkit',b:'Everything is a big button here. Tap one to start it, and tap Back or Done to come home again. Nothing changes by itself in toolkit mode.'});
+   {t:'Hi, I’m Roomie!',b:'I run the routines, timers and fun bits on your board, so you can teach instead of repeating yourself. This tour shows you where everything is. It takes about a minute.'},
+   {sel:'#classBtn',t:'Your class',b:'Tap your class name for the seating plan, helpers, pick a name, groups, rotations, Mystery Hero and your class list.'}];
+  if(tools) s.push({sel:'#stage .card',t:'Your toolkit',b:'Everything is a big button here. Tap one to start it, and tap Back or Home to come back. Nothing changes by itself in toolkit mode.'});
   else s.push(
-   {sel:'#strip',t:'Today',b:'Your day, down the side. Roomie changes over by itself when each block starts. Tap any subject to see what’s planned, run its routine or edit it.'},
-   {sel:'#stage .card',t:'The main screen',b:'This is what the class sees: the routine, what to get out, expectations and the countdown. It updates by itself all day.'});
+   {sel:'#strip',t:'Today',b:'Your day, down the side. Roomie changes over by itself when each block starts. Tap any subject to see what’s planned, run its routine or change it.'},
+   {sel:'#stage .card',t:'The main screen',b:'This is what the class sees: the routine, what to get out, how to work and the countdown. It updates by itself all day. After school it turns into “Today in Roomie”: points, check-ins and tomorrow’s plan.'});
   s.push(
-   {sel:'#stage .feel, #stage .side',t:'Feelings check-in',b:'Students tap how they feel on their way in. It only counts, never names. Tap Teacher view to see the numbers.'},
+   {sel:'#stage .feel, #stage .side',t:'Feelings check-in',b:'Students tap how they feel on their way in, and after recess and lunch. It only counts, never names, and shows you if anyone would like a chat.'},
+   {sel:'section.card.sm:has(.journey), [data-tool="point"]',t:'Class goal',b:'Every +1 point moves Roomie towards your class reward. All-time points also level me up: I earn a medal, a party hat, sunglasses and, one day, a crown!'},
    tools?{sel:'.dacts',t:'Always here',b:'Give a class point, calm the room with Reset, or get everyone’s eyes on you with Attention.'}
-        :{sel:'.dtools',t:'Your tools',b:'Brain breaks, tickets, thinking routines, quiz games, pack up and more. Use them any time, planned or not.'},
+        :{sel:'.dtools',t:'Your tools',b:'Brain breaks, tickets, thinking routines, quiz games, pack up and more. Use them any time. You can hide the ones you don’t use in Look & colours → Your dock.'},
    ...(tools?[]:[{sel:'.dacts',t:'Always here',b:'Give a class point, calm the room with Reset, or get everyone’s eyes on you with Attention.'}]),
-   {sel:'.top [data-tool="float"]',t:'Float over your slides',b:'Teaching from slides or a video? Tap this and I’ll float in a small window on top, with the countdown. Drag me anywhere.'},
-   {sel:'#lookBtn',t:'Look & colours',b:'Change colours, my colour, and where your timetable sits.'},
-   {sel:'#setupBtn',t:'Setup',b:'Add your class list, plan your day, set your routines and choose whole-day or toolkit mode. Try the Demo clock to watch a whole day in minutes.'},
-   {t:'You’re ready!',b:'Start by adding your class list in Setup. You can take this tour again any time from the ? button at the top.',end:true});
+   {sel:'.top [data-tool="remote"]',t:'Your phone is the remote',b:'Scan a code with your phone and walk the room: Attention, timers, points, brain breaks and quiet name picks, right from your pocket.'},
+   {sel:'#micBtn',t:'“Hey Roomie”',b:'Turn on voice and say things like “Hey Roomie, time for a brain break” or “Hey Roomie, set a timer for five minutes”. It listens on this computer only.'},
+   {sel:'#liveBtn',t:'Student devices',b:'Students can check in, answer tickets, post to a thinking wall and vote from their own devices. No accounts, anonymous by default.'},
+   {sel:'.top [data-tool="float"]',t:'Float over your slides',b:'Teaching from slides or a video? Tap Float and I’ll sit in a small window on top with the countdown and your controls.'},
+   {sel:'#lookBtn',t:'Look & colours',b:'Change colours, my colour, where your timetable sits, and which tools are in your dock.'},
+   {sel:'#setupBtn',t:'Setup',b:'Your class, day plan, routines and reminders. “Just tomorrow” changes one day for an assembly or excursion. Coach gives you private lesson feedback. Privacy, backup & move takes your Roomie to another computer with a code.'},
+   {t:'You’re ready!',b:ex?'Let’s make Roomie yours: your class name, your class list and your times. It takes about three minutes. You can take this tour again any time from the ? button.':'That’s everything. You can take this tour again any time from the ? button at the top.',end:true});
   return s; }
 let TOUR=null;
 function startTour(){ closeDMenu&&closeDMenu(); if(typeof closeClassPop==='function') closeClassPop(); if(typeof closeSegPop==='function') closeSegPop(); TOUR={i:0,steps:tourSteps()}; drawTour(); }
@@ -3377,7 +3381,7 @@ function endTour(){ TOUR=null; const r=document.getElementById('tour'); if(r) r.
 function drawTour(){ let r=document.getElementById('tour'); if(!r){ r=document.createElement('div'); r.id='tour'; r.setAttribute('role','dialog'); r.setAttribute('aria-modal','true'); document.body.appendChild(r); }
   const st=TOUR.steps[TOUR.i]; let el=null; if(st.sel) for(const q of st.sel.split(',')){ const e=document.querySelector(q.trim()); if(e&&e.offsetParent!==null){ el=e; break; } }
   const n=TOUR.steps.length, last=TOUR.i===n-1;
-  r.innerHTML='<div class="tourhole'+(el?'':' none')+'"></div><div class="tourcard"><div class="tourbird">'+birdSVG()+'</div><div class="tourtxt"><small>'+(TOUR.i+1)+' of '+n+'</small><b>'+esc(st.t)+'</b><p>'+esc(st.b)+'</p><div class="tourdots">'+TOUR.steps.map((_,k)=>'<i class="'+(k===TOUR.i?'on':'')+'"></i>').join('')+'</div><div class="row"><button class="btn alt sm" type="button" data-tour="skip">'+(last?'Close':'Skip tour')+'</button>'+(TOUR.i>0?'<button class="btn alt sm" type="button" data-tour="back">Back</button>':'')+'<button class="btn sm" type="button" data-tour="'+(last?'setup':'next')+'">'+(last?'Add my class':TOUR.i===0?'Show me around':'Next')+'</button></div></div></div>';
+  r.innerHTML='<div class="tourhole'+(el?'':' none')+'"></div><div class="tourcard"><div class="tourbird">'+birdSVG()+'</div><div class="tourtxt"><small>'+(TOUR.i+1)+' of '+n+'</small><b>'+esc(st.t)+'</b><p>'+esc(st.b)+'</p><div class="tourdots">'+TOUR.steps.map((_,k)=>'<i class="'+(k===TOUR.i?'on':'')+'"></i>').join('')+'</div><div class="row"><button class="btn alt sm" type="button" data-tour="skip">'+(last?'Close':'Skip tour')+'</button>'+(TOUR.i>0?'<button class="btn alt sm" type="button" data-tour="back">Back</button>':'')+'<button class="btn sm" type="button" data-tour="'+(last?'setup':'next')+'">'+(last?(S.studentsAreExample?'Set up my class':'Let’s go!'):TOUR.i===0?'Show me around':'Next')+'</button></div></div></div>';
   const hole=r.querySelector('.tourhole'), card=r.querySelector('.tourcard');
   if(el){ const b=el.getBoundingClientRect(), p=8; Object.assign(hole.style,{left:(b.left-p)+'px',top:(b.top-p)+'px',width:(b.width+p*2)+'px',height:(b.height+p*2)+'px'});
     const cw=card.offsetWidth, ch=card.offsetHeight, W=innerWidth, H=innerHeight; let x, y;
@@ -3391,7 +3395,7 @@ document.addEventListener('click',e=>{ const t=e.target.closest('[data-tour]'); 
   if(a==='next'){ TOUR.i++; pop(); drawTour(); }
   if(a==='back'){ TOUR.i--; drawTour(); }
   if(a==='skip') endTour();
-  if(a==='setup'){ endTour(); tab='class'; openSetup(); } });
+  if(a==='setup'){ endTour(); if(S.studentsAreExample&&typeof wizOpen==='function') wizOpen(); } });
 document.addEventListener('keydown',e=>{ if(!TOUR) return; if(e.key==='Escape') endTour(); if(e.key==='ArrowRight'&&TOUR.i<TOUR.steps.length-1){ TOUR.i++; drawTour(); } if(e.key==='ArrowLeft'&&TOUR.i>0){ TOUR.i--; drawTour(); } });
 addEventListener('resize',()=>{ if(TOUR) setTimeout(drawTour,80); });
 /* first time: start the tour after the board appears */
