@@ -606,6 +606,16 @@ textarea#finTxt{font:inherit;font-weight:400;font-size:17px;padding:10px 14px;bo
 .deskrot{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);display:flex;gap:4px}
 .deskrot button{width:26px;height:26px;border-radius:50%;border:0;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);font-size:15px;line-height:1;cursor:pointer;padding:0;color:#4A3F38}
 .deskrot button:hover,.deskx:hover{background:var(--gum-l,#FFF6C9)}
+/* helpers */
+.jobgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:4px}
+.jobcard{background:var(--jc);border-radius:20px;padding:16px 18px;display:flex;flex-direction:column;gap:6px;min-height:110px;justify-content:center;box-shadow:0 3px 0 rgba(120,90,60,.14)}
+.jobcard:nth-child(odd){transform:rotate(-.8deg)} .jobcard:nth-child(even){transform:rotate(.7deg)}
+.jobcard .jn{font-weight:800;font-size:15px;letter-spacing:.04em;text-transform:uppercase;color:#4A3F38;opacity:.75}
+.jobcard b{font-family:var(--display);font-weight:800;font-size:clamp(26px,2.4vw,38px);line-height:1.05;color:#4A3F38}
+.jobcard select{font:inherit;font-size:18px;font-weight:700;padding:6px 8px;border-radius:10px;border:2px solid rgba(74,63,56,.2);background:#fff}
+.jobedit{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+.jobedit textarea{font:inherit;font-size:16px;padding:10px 12px;border-radius:12px;border:2px solid var(--line);background:var(--panel);width:100%;box-sizing:border-box}
+.jobside{display:flex;flex-direction:column;gap:10px}
 
 /* ---------- Scrapbook look ---------- */
 body.scrap{--acc:#E2558F;--sky:#EFE6CC;--sky-calm:#E8E3D2;--dusk:#F2E0C4;--panel:#FFFDF3;--ink:#2B2B2B;--muted:#6A6458;--line:#E6DDC4;
@@ -812,7 +822,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 <script>
 (function(){
 'use strict';
-const VERSION='Roomie v1.1.1 · 12 Nov 2026';
+const VERSION='Roomie v1.2 · 12 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1147,7 +1157,7 @@ function renderOff(P,full){ if(!full) return;
   const msg=P.phase==='before'?('First up: '+P.next.b.name+' at '+fmtClock(P.next.st)):P.phase==='gap'?('Next: '+P.next.b.name+' at '+fmtClock(P.next.st)):P.phase==='after'?'School’s out. See you tomorrow!':'Add today’s plan in Setup.';
   if(P.phase==='gap'){ setStage('one','<section class="card" style="align-items:flex-start"><div class="eyebrow">Up next at '+fmtClock(P.next.st)+'</div><h1 class="big">Ready for '+esc(P.next.b.name)+'</h1>'+(P.next.b.materials?'<div class="task">'+esc(P.next.b.materials)+'</div>':'')+expHTML(P.next.b.exp)+'</section>'); return; }
   setStage('one','<section class="card"><div class="eyebrow">'+esc(isWeekend(now())?'Weekend · showing Monday’s plan':DAYNAME[dayKey(now())])+'</div><h1 class="big">'+esc(greeting())+', '+esc(S.room)+'</h1><p class="lead">'+esc(msg)+'</p>'+(S.studentsAreExample?'<div class="okbox">You’re seeing an example class. Add your class and day plan in Setup.</div>':'')+'<div class="row" style="margin-top:auto"><button class="btn gold" type="button" data-act="demo">Try a demo day from 8:40</button><button class="btn alt" type="button" data-tool="routines">Run a routine now</button><button class="btn alt" type="button" data-act="setup">Set up my day</button></div></section>'); }
-const HOME_TILES=[['routines','Routines','Morning jobs, line up, pack up'],['timer','Timer','Countdown with music'],['brain','Brain break','Move, play or calm down'],['checkin','Check-in','How is everyone feeling?'],['exit','Tickets','Entry and exit tickets'],['reflect','Reflect','Quick reflections'],['think','Thinking','Visible thinking routines'],['quiz','Quiz games','Drop Four, Mystery Stars…'],['pick','Pick a name','Fair and random'],['groups','Groups','Random groups in a tap'],['seats','Seating plan','Where everyone sits'],['packup','Pack up','First ready, first out'],['finish','Finished?','Early-finisher checklist'],['reteach','Reteach','Quick reteach cards'],['door','At the door','Catch up a late arrival']];
+const HOME_TILES=[['routines','Routines','Morning jobs, line up, pack up'],['timer','Timer','Countdown with music'],['brain','Brain break','Move, play or calm down'],['checkin','Check-in','How is everyone feeling?'],['exit','Tickets','Entry and exit tickets'],['reflect','Reflect','Quick reflections'],['think','Thinking','Visible thinking routines'],['quiz','Quiz games','Drop Four, Mystery Stars…'],['pick','Pick a name','Fair and random'],['groups','Groups','Random groups in a tap'],['seats','Seating plan','Where everyone sits'],['jobs','Helpers','Classroom jobs this week'],['packup','Pack up','First ready, first out'],['finish','Finished?','Early-finisher checklist'],['reteach','Reteach','Quick reteach cards'],['door','At the door','Catch up a late arrival']];
 function renderHome(P,full){ if(!full) return;
   setStage('','<section class="card"><div class="eyebrow">'+esc(DAYNAME[dayKey(now())]||'')+'</div><h1 class="big" style="font-size:clamp(40px,4.4vw,72px)">Hello, '+esc(S.room)+'!</h1><p class="lead" style="margin:0">What do you need?</p><div class="tiles">'+HOME_TILES.map(([t,n,d])=>'<button class="tile" type="button" data-tool="'+t+'"><b>'+esc(n)+'</b><span>'+esc(d)+'</span></button>').join('')+'</div></section><aside class="side"><section class="card sm">'+weatherHTML()+'</section>'+goalHTML()+factHTML()+'</aside>'); }
 function greeting(){ const h=now().getHours(); return h<12?'Good morning':(h<17?'Good afternoon':'Good evening'); }
@@ -1372,6 +1382,7 @@ document.addEventListener('click',e=>{
     if(tool==='reflect') return openOverlay('rpick');
     if(tool==='think') return openOverlay('thpick');
     if(tool==='packup') return openPackup();
+    if(tool==='jobs'){ A.jobEdit=false; return openOverlay('jobs'); }
     if(tool==='seats'){ A.seatEdit=false; A.seatSel=null; return openOverlay('seats'); }
     if(tool==='checkin'){ A.ciView=false; return openOverlay('checkin'); }
     if(tool==='finish'){ A.fin=null; return openOverlay('finish'); }
@@ -1708,6 +1719,7 @@ function renderFunOverlay(o,full){
   if(o==='peek'){ renderPeek(full); return true; }
   if(o==='checkin'){ renderCheckin(full); return true; }
   if(o==='seats'){ renderSeats(full); return true; }
+  if(o==='jobs'){ renderJobs(full); return true; }
   if(o==='finish'){ renderFinish(full); return true; }
   if(o==='quiz'){ renderQuiz(full); return true; }
   if(o==='thpick'){ if(full) renderThinkPicker(); return true; }
@@ -1752,7 +1764,7 @@ addEventListener('resize',()=>{ fitApp(); }); setInterval(()=>{ const st=documen
 (function(){ const mo=new MutationObserver(fitSoon); ['stage','strip'].forEach(id=>{ const el=document.getElementById(id); if(el) mo.observe(el,{childList:true}); }); const sh=document.getElementById('sheetHost'); if(sh) mo.observe(sh,{childList:true,subtree:true}); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fitSoon); fitApp(); })();
 
 /* ---- v1.0.1: class menu under the class name ---- */
-const CLASS_TOOLS=[['seats','Seating plan','Where everyone sits'],['pick','Pick a name','Fair and random'],['groups','Groups','Random groups in a tap'],['rotate','Rotations','Stations with timers'],['hero','Mystery Hero','A secret star student'],['classlist','Class list','Add or change names']];
+const CLASS_TOOLS=[['seats','Seating plan','Where everyone sits'],['jobs','Helpers','Classroom jobs this week'],['pick','Pick a name','Fair and random'],['groups','Groups','Random groups in a tap'],['rotate','Rotations','Stations with timers'],['hero','Mystery Hero','A secret star student'],['classlist','Class list','Add or change names']];
 function closeClassPop(){ const p=document.getElementById('classpop'); if(p) p.remove(); const b=document.getElementById('classBtn'); if(b) b.setAttribute('aria-expanded','false'); }
 function openClassPop(){ closeClassPop(); const b=document.getElementById('classBtn'); const m=document.createElement('div'); m.id='classpop'; m.className='classpop'; m.setAttribute('role','menu');
   m.innerHTML='<h3>'+esc(S.room)+' · '+names().length+' students</h3>'+CLASS_TOOLS.map(([t,n,d])=>'<button class="tile" type="button" role="menuitem" '+(t==='classlist'?'data-classlist="1"':'data-tool="'+t+'"')+'><b>'+esc(n)+'</b><span>'+esc(d)+'</span></button>').join('');
@@ -2164,6 +2176,27 @@ document.addEventListener('pointerdown',e=>{ if(A.overlay!=='seats'||!A.seatEdit
 document.addEventListener('pointermove',e=>{ if(!seatDrag) return; const D=seatDrag; if(!D.moved&&Math.hypot(e.clientX-D.sx,e.clientY-D.sy)<6) return; D.moved=true; e.preventDefault();
   const x=Math.max(4,Math.min(96,(e.clientX-D.r.left)/D.r.width*100)), y=Math.max(10,Math.min(96,(e.clientY-D.r.top)/D.r.height*100)); D.el.style.left=x+'%'; D.el.style.top=y+'%'; D.x=x; D.y=y; D.el.classList.add('drag'); });
 document.addEventListener('pointerup',()=>{ if(!seatDrag) return; const D=seatDrag; seatDrag=null; if(D.moved){ const t=S.seat.tables.find(x=>x.id===D.id); if(t){ t.x=Math.round(D.x*10)/10; t.y=Math.round(D.y*10)/10; save(); } A.seatDragged=true; setTimeout(()=>{ A.seatDragged=false; },50); D.el.classList.remove('drag'); } });
+
+/* ---- v1.2: classroom jobs ---- */
+const JOB_DEF=['Line leader','Door holder','Lights','Tech helper','Messenger','Board cleaner','Tidy captain','Plant carer','Librarian','Pencil monitor','Recycling','Lunch basket'];
+const JOB_COL=['#FFD9E8','#FFF1A8','#D4F2DF','#D8E8FF','#E6DDFF','#FFE1CC'];
+function weekKey(d){ d=new Date(d); d.setHours(0,0,0,0); d.setDate(d.getDate()+3-((d.getDay()+6)%7)); const w1=new Date(d.getFullYear(),0,4); return d.getFullYear()+'-'+(1+Math.round(((d-w1)/864e5-3+((w1.getDay()+6)%7))/7)); }
+function jobsState(){ if(!S.jobs) S.jobs={list:JOB_DEF.slice(0,8),off:0,fixed:{},auto:true,week:weekKey(now())}; const J=S.jobs;
+  if(J.auto&&J.week!==weekKey(now())){ J.week=weekKey(now()); J.off=(J.off+J.list.length)%Math.max(1,names().length); J.fixed={}; save(); }
+  return J; }
+function jobWho(J,i){ if(J.fixed[i]) return J.fixed[i]; const L=names(); return L.length?L[(J.off+i)%L.length]:''; }
+function renderJobs(full){ if(!full) return; const J=jobsState(), ed=!!A.jobEdit, L=names();
+  const cards=J.list.map((j,i)=>'<div class="jobcard" style="--jc:'+JOB_COL[i%JOB_COL.length]+'"><span class="jn">'+esc(j)+'</span>'+(ed?'<select data-jobwho="'+i+'" aria-label="Who does '+esc(j)+'">'+L.map(n=>opt(n,n,jobWho(J,i))).join('')+'</select>':'<b>'+esc(jobWho(J,i)||'—')+'</b>')+'</div>').join('');
+  setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">This week</div><h1 class="mid" style="color:var(--gum-d)">Classroom helpers</h1></div><div class="row">'+(ed?'':'<button class="btn gold sm" type="button" data-jb="next">Next helpers</button><button class="btn alt sm" type="button" data-jb="edit">Edit jobs</button>')+backBtn('Close')+'</div></div>'+
+   (ed?'<div class="jobedit"><label class="thin"><span>Jobs, one per line</span><textarea id="jobTxt" rows="7">'+esc(J.list.join('\n'))+'</textarea></label><div class="jobside"><label class="chk"><input type="checkbox" id="jobAuto" '+(J.auto?'checked':'')+'><span>Swap helpers automatically every Monday</span></label><p class="hint" style="margin:0">Change who has a job with the drop-downs below. “Next helpers” gives the next students in your class list a turn, so everyone gets one.</p><div class="row"><button class="btn sm" type="button" data-jb="save">Done editing</button><button class="btn alt sm" type="button" data-jb="shuffle">Shuffle</button></div></div></div>':'')+
+   '<div class="jobgrid">'+cards+'</div></section>'); }
+document.addEventListener('click',e=>{ if(A.overlay!=='jobs') return; const t=e.target.closest('[data-jb]'); if(!t) return; audio(); const J=jobsState(), a=t.dataset.jb;
+  if(a==='next'){ J.off=(J.off+J.list.length)%Math.max(1,names().length); J.fixed={}; save(); render(true); celebrate('New helpers!','small'); return; }
+  if(a==='edit'){ A.jobEdit=true; }
+  if(a==='shuffle'){ J.off=Math.floor(Math.random()*Math.max(1,names().length)); J.fixed={}; save(); pop(); }
+  if(a==='save'){ const v=(document.getElementById('jobTxt')||{}).value; if(v!=null){ const L=v.split('\n').map(x=>x.trim()).filter(Boolean); if(L.length){ Object.keys(J.fixed).forEach(k=>{ if(+k>=L.length) delete J.fixed[k]; }); J.list=L; } } J.auto=!!(document.getElementById('jobAuto')||{}).checked; save(); A.jobEdit=false; toast('Helpers saved.'); }
+  render(true); });
+document.addEventListener('change',e=>{ const s=e.target.dataset&&e.target.dataset.jobwho; if(s!=null){ const J=jobsState(); J.fixed[+s]=e.target.value; save(); } });
 
 /* ---- v1.1: welcome tour ---- */
 function tourSteps(){ const tools=S.mode==='tools';
