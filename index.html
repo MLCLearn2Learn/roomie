@@ -971,7 +971,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 (function(){
 'use strict';
 const STUDENT=/[?&]join(=|&|$)/.test(location.search);
-const VERSION='Roomie v2.0 · 12 Nov 2026';
+const VERSION='Roomie v2.1 · 12 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1432,7 +1432,7 @@ async function floatOpen(){
     const l=d.createElement('link'); l.rel='stylesheet'; l.href='https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;800&display=swap'; d.head.appendChild(l);
     const st=d.createElement('style'); st.textContent=PIP_CSS; d.head.appendChild(st);
     d.body.innerHTML='<div id="pip"></div>';
-    d.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const a=b.dataset.pact; if(a==='expand'){ A.pipBig=true; try{ A.pip.resizeTo(470,340); }catch(_){} pipRender(true); } else if(a==='shrink'){ A.pipBig=false; try{ A.pip.resizeTo(210,240); }catch(_){} pipRender(true); } else if(a==='attention') attention(); else if(a==='pick'){ pickQuiet(); } else if(a==='door'){ openOverlay('door'); } else if(a==='plus5'){ act('plus5'); } else if(a==='startNow'){ act('startNow'); } else if(a==='point'){ act('point'); } else if(a==='reset'){ resetRoom(); } else if(a==='mirmark'){ mirMarkPart('toggle'); pipRender(true); } else if(a==='mirstop'){ mirStop(); pipRender(true); } });
+    d.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const a=b.dataset.pact; if(a==='expand'){ A.pipBig=true; try{ A.pip.resizeTo(470,340); }catch(_){} pipRender(true); } else if(a==='shrink'){ A.pipBig=false; try{ A.pip.resizeTo(210,240); }catch(_){} pipRender(true); } else if(a==='attention') attention(); else if(a==='pick'){ pickQuiet(); } else if(a==='door'){ openOverlay('door'); } else if(a==='plus5'){ act('plus5'); } else if(a==='startNow'){ act('startNow'); } else if(a==='point'){ act('point'); } else if(a==='reset'){ resetRoom(); } else if(a==='mirmark'){ mirMarkPart('toggle'); pipRender(true); } else if(a==='mirslides'){ slidesLink(); } else if(a==='mirstop'){ mirStop(); pipRender(true); } });
     w.addEventListener('pagehide',()=>{ A.pip=null; A.pipDoc=null; A.pipSig=''; markFloat(); });
     markFloat(); pipRender(true);
   }catch(e){ toast('Roomie couldn’t open the floating window here. Try it on your Roomie website in Chrome or Edge.'); }
@@ -1449,7 +1449,7 @@ function pipRender(force){ if(!A.pipDoc) return; const P=A.P||phaseAt(now()); le
   if(!A.pipBig){ const b=P.block; const title=A.attnClose?'Eyes this way':P.phase==='warning'?'2 minutes to finish':P.phase==='routine'?P.routine.name:P.phase==='exit'?'Exit ticket':P.phase==='entry'?'Entry ticket':(b?b.name:'Roomie'); const left=A.attnClose?'':(P.to?fmtLeft((P.to-P.mins)*60):''); html='<button class="roo" data-pact="'+(A.attnClose?'attention':'expand')+'" title="Tap for Roomie’s controls">'+birdSVG()+'</button>'+(left?'<div class="mt">'+left+'</div>':'')+'<div class="ms">'+esc(title)+'</div>'+(left?'':'<div class="hint2">Tap Roomie for controls</div>'); cls=(cls?cls+' ':'')+'mini'; }
   else html=html+'<button class="shr" data-pact="shrink">Shrink back to Roomie</button>';
   if(typeof M!=='undefined'&&M.on){ const gg=M.goal&&(((S.coach||{}).goals||[]).find(x=>x.id===M.goal)), g=gg&&focusOf(gg); 
-    html='<div class="mir'+(M.inPart?' on':'')+'"><span><i></i>Mirror <em id="pmt"></em>'+(A.pipBig?' · <em id="pml"></em> heard':'')+'</span>'+(A.pipBig?'<span class="mb">'+(g&&g.part?'<button data-pact="mirmark">'+(M.inPart?'End '+esc(g.part):'Mark '+esc(g.part))+'</button>':'')+'<button data-pact="mirstop">Stop</button></span>':(M.inPart?'<b>marking</b>':''))+'</div>'+html; }
+    html='<div class="mir'+(M.inPart?' on':'')+'"><span><i></i>Mirror <em id="pmt"></em>'+(A.pipBig?' · <em id="pml"></em> heard'+(SL.on?' · slides linked':''):'')+'</span>'+(A.pipBig?'<span class="mb">'+(g&&g.part?'<button data-pact="mirmark">'+(M.inPart?'End '+esc(g.part):'Mark '+esc(g.part))+'</button>':'')+((S.coach||{}).slides&&!SL.on?'<button data-pact="mirslides">Link slides</button>':'')+'<button data-pact="mirstop">Stop</button></span>':(M.inPart?'<b>marking</b>':''))+'</div>'+html; }
   const sig=cls+html; if(!force&&sig===A.pipSig){ pipMirUpd(); return; } A.pipSig=sig; const root=A.pipDoc.getElementById('pip'); if(root){ root.className=cls; root.innerHTML=html; } paintMeter(); pipMirUpd(); }
 function pipMirUpd(){ if(!A.pipDoc||typeof M==='undefined'||!M.on) return; const t=A.pipDoc.getElementById('pmt'), l=A.pipDoc.getElementById('pml'); if(t) t.textContent=mirFmt((Date.now()-M.t0)/1000); if(l){ const n=(M.words||[]).length; l.textContent=n+' line'+(n===1?'':'s'); } }
 
@@ -2705,6 +2705,7 @@ const REF={
  alexander:'Alexander, R. (2020). A Dialogic Teaching Companion. Routledge.',
  eefdia:'Jay, T. et al. (2017). Dialogic Teaching: Evaluation report and executive summary. Education Endowment Foundation.',
  colvin:'Colvin, G., Sugai, G. & Patching, B. (1993). Precorrection: An instructional approach for managing predictable problem behaviors. Intervention in School and Clinic, 28(3), 143–150.',
+ mayer:'Mayer, R. E. (2021). Multimedia Learning (3rd ed.). Cambridge University Press.',
  mercer:'Mercer, N. & Littleton, K. (2007). Dialogue and the Development of Children’s Thinking. Routledge.'
 };
 const n1=v=>v.toFixed(1), n0=v=>Math.round(v)+'', mmss=m=>mirFmt(m*60);
@@ -2854,6 +2855,7 @@ function mMoments(r,F,from,to){ const W=(r.words||[]).filter(w=>w.at>=(from||0)&
   let phase=null; if(fk.includes('ei')&&W.length>=6){ const has=k=>hits[k].length>0; const names={ido:'I do',wedo:'We do',youdo:'You do'}; const heard=['ido','wedo','youdo'].filter(has), miss=['ido','wedo','youdo'].filter(k=>!has(k));
     if(heard.length&&miss.includes('wedo')) phase={bad:true,text:'Roomie heard '+heard.map(k=>names[k]+' (at '+mirFmt(hits[k][0].at)+', '+q(hits[k][0])+')').join(' and ')+' but no “We do” step. Rosenshine (2012) found guided practice, where students try with your support before working alone, is what separates the most effective teachers. Without it, errors get practised.'};
     else if(heard.length===3) phase={bad:false,text:'Roomie heard all three steps: I do at '+mirFmt(hits.ido[0].at)+', We do at '+mirFmt(hits.wedo[0].at)+' and You do at '+mirFmt(hits.youdo[0].at)+'. That gradual release is the structure Rosenshine (2012) and Archer & Hughes (2011) describe.'}; }
+  if(typeof slideMoments==='function'){ const sm=slideMoments(r,F,from,to); fix.unshift(...sm.fix); good.unshift(...sm.good); }
   return {good:good.slice(0,3),fix:fix.slice(0,3),phase,n:W.length,hits:Object.fromEntries(Object.entries(hits).map(([k,v])=>[k,v.length]))}; }
 /* patterns across this focus’s lessons */
 function mPatterns(g,upto){ const F=focusOf(g); const L=g.attempts.slice(0,upto+1).map(id=>(S.mirrors||[]).find(x=>x.id===id)).filter(Boolean); if(L.length<3) return []; const last=L.slice(-3), out=[];
@@ -2998,17 +3000,20 @@ function mirLevel(ch){ ch.an.getFloatTimeDomainData(ch.buf); let s=0; for(const 
 async function mirCalibrate(){ const C=S.coach||{}; const ch=await mirOpen(C.worn||C.room||''); let peak=[]; const t0=Date.now(); await new Promise(ok=>{ const h=setInterval(()=>{ peak.push(mirLevel(ch)); if(Date.now()-t0>4500){ clearInterval(h); ok(); } },100); }); ch.st.getTracks().forEach(t=>t.stop()); peak.sort((a,b)=>b-a); const lvl=peak.slice(0,Math.max(3,Math.floor(peak.length*0.3))).reduce((a,b)=>a+b,0)/Math.max(3,Math.floor(peak.length*0.3)); S.coach=Object.assign(S.coach||{},{tLevel:lvl}); save(); return lvl; }
 async function mirStart(){ if(M.on) return; const C=S.coach||{};
   try{ M.room=await mirOpen(C.room||''); M.worn=C.worn?await mirOpen(C.worn):null; }catch(e){ toast('Roomie needs the microphone. Allow it in the address bar.'); return; }
-  Object.assign(M,{words:[],ev:[],loudRun:0,lastLoud:0,marks:[],inPart:false,trace:'',goal:(mGoal()||{}).id||null,on:true,t0:Date.now(),tick:0,teacher:0,students:0,quiet:0,buckets:[],cur:{t:0,s:0,q:0},lastVoice:Date.now(),lastTeacher:0,run:0,longest:0,qs:[],pendQ:null,state:'q'});
+  Object.assign(M,{slides:[],words:[],ev:[],loudRun:0,lastLoud:0,marks:[],inPart:false,trace:'',goal:(mGoal()||{}).id||null,on:true,t0:Date.now(),tick:0,teacher:0,students:0,quiet:0,buckets:[],cur:{t:0,s:0,q:0},lastVoice:Date.now(),lastTeacher:0,run:0,longest:0,qs:[],pendQ:null,state:'q'});
   Object.assign(M,{lastTick:Date.now(),traceT:Date.now(),bucketT:Date.now(),lastPip:0});
   /* Sampling is driven by the audio clock as well as a timer, so it keeps going when Roomie is floating or in a background tab. */
   try{ const ac=M.ac, cs=ac.createConstantSource?ac.createConstantSource():null, sp=ac.createScriptProcessor(2048,1,1), z=ac.createGain(); z.gain.value=0; if(cs){ cs.connect(sp); cs.start(); } sp.connect(z); z.connect(ac.destination); sp.onaudioprocess=()=>mirTick(); M.sp=sp; M.cs=cs; M.z=z; if(ac.state==='suspended') ac.resume(); }catch(_){ }
   M.h=setInterval(mirTick,100);
   if(!(typeof V!=='undefined'&&V.on)) mirSR();
+  if((S.coach||{}).slides) slidesLink();
   Bird.say('I’m listening to this lesson.'); mirMark(); }
 function mirTick(){ if(!M.on) return; const now=Date.now(), dms=now-M.lastTick; if(dms<90) return; M.lastTick=now; const dt=Math.min(dms,2000)/1000; const C=S.coach||{}, tl=C.tLevel||0.05;
   const rr=mirLevel(M.room), wr=M.worn?mirLevel(M.worn):0;
-  const roomOn=rr>Math.max(M.room.floor*2.6,0.006);
-  let st; if(M.worn){ const tOn=wr>Math.max(M.worn.floor*3,tl*0.3); st=tOn?'t':roomOn?'s':'q'; } else st=roomOn?(rr>=tl*0.45?'t':'s'):'q';
+  /* the noise floor adapts to the room, but never rises to the teacher’s own voice during long explanations */
+  const rf=Math.min(M.room.floor,tl*0.15), wf=M.worn?Math.min(M.worn.floor,tl*0.15):0;
+  const roomOn=rr>Math.max(rf*2.6,0.006);
+  let st; if(M.worn){ const tOn=wr>Math.max(wf*3,tl*0.3); st=tOn?'t':roomOn?'s':'q'; } else st=roomOn?(rr>=tl*0.45?'t':'s'):'q';
   M[st==='t'?'teacher':st==='s'?'students':'quiet']+=dt; M.cur[st]+=dt;
   const lv=M.worn?wr:rr; if(st==='t'&&lv>tl*1.9){ M.loudRun+=dms; if(M.loudRun>=800&&now-M.lastLoud>8000){ M.ev.push({k:'loud',at:Math.round((now-M.t0)/100)/10}); M.lastLoud=now; } } else M.loudRun=0;
   if(st==='t'){ M.lastTeacher=now; M.run+=dt; M.longest=Math.max(M.longest,M.run); } else if(now-M.lastTeacher>2500) M.run=0;
@@ -3037,14 +3042,14 @@ function mirClassify(low,now){ if(/^(hey roomie|roomie)/.test(low)) return; cons
   if(ATT_RE.test(low)){ const last=M.ev.filter(x=>x.k==='att').pop(); if(!last||at-last.at>10) M.ev.push({k:'att',at}); return; }
   if(PRAISE_RE.test(low)&&!/^(stop|don'?t|no )/.test(low)){ M.ev.push({k:SPEC_RE.test(low)?'ps':'p',at}); return; }
   if(CORR_RE.test(low)){ M.ev.push({k:'c',at,n:(low.replace(/[^a-z' \[\]]/g,' ').replace(/\s+/g,' ').trim()).slice(0,50)}); } }
-function mirStop(){ if(!M.on) return; M.on=false; clearInterval(M.h); try{ M.sp&&(M.sp.onaudioprocess=null,M.sp.disconnect()); M.cs&&M.cs.stop(); M.z&&M.z.disconnect(); }catch(_){ } M.sp=M.cs=M.z=null; try{ M.sr&&M.sr.stop(); }catch(_){ } M.sr=null; [M.room,M.worn].forEach(c=>c&&c.st.getTracks().forEach(t=>t.stop())); if(M.cur.t+M.cur.s+M.cur.q>0) M.buckets.push(M.cur);
+function mirStop(){ if(!M.on) return; try{ slidesStop(); }catch(_){ } M.on=false; clearInterval(M.h); try{ M.sp&&(M.sp.onaudioprocess=null,M.sp.disconnect()); M.cs&&M.cs.stop(); M.z&&M.z.disconnect(); }catch(_){ } M.sp=M.cs=M.z=null; try{ M.sr&&M.sr.stop(); }catch(_){ } M.sr=null; [M.room,M.worn].forEach(c=>c&&c.st.getTracks().forEach(t=>t.stop())); if(M.cur.t+M.cur.s+M.cur.q>0) M.buckets.push(M.cur);
   const tot=Math.max(1,M.teacher+M.students+M.quiet), Q=M.qs, wq=Q.filter(q=>q.wait!=null);
-  const rep={id:uid(),date:now().toISOString(),mins:Math.round((Date.now()-M.t0)/60000),block:(A.P&&A.P.block&&A.P.block.name)||'',teacher:M.teacher/tot,students:M.students/tot,quiet:M.quiet/tot,qs:Q.map(q=>({text:q.text,open:q.open,wait:q.wait==null?null:Math.round(q.wait*10)/10,at:Math.round(q.at)})),wait:wq.length?wq.reduce((a,q)=>a+q.wait,0)/wq.length:null,longest:M.longest,trace:M.trace,ev:M.ev,words:M.words,marks:M.marks,goal:M.goal,buckets:M.buckets.map(b=>{ const s=b.t+b.s+b.q||1; return [b.t/s,b.s/s,b.q/s].map(x=>Math.round(x*100)/100); }),worn:!!M.worn,note:''};
+  const rep={id:uid(),date:now().toISOString(),mins:Math.round((Date.now()-M.t0)/60000),block:(A.P&&A.P.block&&A.P.block.name)||'',teacher:M.teacher/tot,students:M.students/tot,quiet:M.quiet/tot,qs:Q.map(q=>({text:q.text,open:q.open,wait:q.wait==null?null:Math.round(q.wait*10)/10,at:Math.round(q.at)})),wait:wq.length?wq.reduce((a,q)=>a+q.wait,0)/wq.length:null,longest:M.longest,trace:M.trace,ev:M.ev,words:M.words,slides:SL.on||M.slides.length?M.slides:undefined,marks:M.marks,goal:M.goal,buckets:M.buckets.map(b=>{ const s=b.t+b.s+b.q||1; return [b.t/s,b.s/s,b.q/s].map(x=>Math.round(x*100)/100); }),worn:!!M.worn,note:''};
   S.mirrors=[rep].concat(S.mirrors||[]).slice(0,60); const G=rep.goal&&((S.coach||{}).goals||[]).find(x=>x.id===rep.goal); if(G) G.attempts.push(rep.id); save(); mirMark(); A.mirId=rep.id; Bird.say('Your lesson mirror is ready.');
   toast('Lesson mirror saved. Open it in Setup → Coach when students have gone.'); }
 function mirMark(){ let p=document.getElementById('mirPill'); if(!M.on){ if(p) p.remove(); return; } if(!p){ p=document.createElement('div'); p.id='mirPill'; p.className='mirpill'; p.title='Lesson mirror is listening. Tap to stop.'; const t=document.querySelector('.top'); (t||document.body).appendChild(p); }
-  const gg=M.goal&&(((S.coach||{}).goals||[]).find(x=>x.id===M.goal)), g=gg&&focusOf(gg); p.innerHTML='<span class="mpm"><i class="'+M.state+'"></i>Mirror '+mirFmt((Date.now()-M.t0)/1000)+'</span>'+(g&&g.part?'<span class="mpmark'+(M.inPart?' on':'')+'" data-mark="1">'+(M.inPart?'End '+g.part:'Mark '+g.part)+'</span>':'')+'<span class="mpstop" data-mstop="1">Stop</span>'; }
-document.addEventListener('click',e=>{ if(e.target.closest('[data-mstop]')){ mirStop(); } else if(e.target.closest('[data-mark]')){ mirMarkPart('toggle'); } });
+  const gg=M.goal&&(((S.coach||{}).goals||[]).find(x=>x.id===M.goal)), g=gg&&focusOf(gg); p.innerHTML='<span class="mpm"><i class="'+M.state+'"></i>Mirror '+mirFmt((Date.now()-M.t0)/1000)+'</span>'+(g&&g.part?'<span class="mpmark'+(M.inPart?' on':'')+'" data-mark="1">'+(M.inPart?'End '+g.part:'Mark '+g.part)+'</span>':'')+((S.coach||{}).slides&&!SL.on?'<span class="mpmark" data-mslides="1">Link slides</span>':'')+'<span class="mpstop" data-mstop="1">Stop</span>'; }
+document.addEventListener('click',e=>{ if(e.target.closest('[data-mslides]')){ slidesLink(); } else if(e.target.closest('[data-mstop]')){ mirStop(); } else if(e.target.closest('[data-mark]')){ mirMarkPart('toggle'); } });
 /* one next step, chosen by rule (no AI yet) */
 function mirStep(r){ const open=r.qs.filter(q=>q.open).length, n=r.qs.length;
   if(r.wait!=null&&n>=3&&r.wait<3) return ['Wait time','After your questions, students had about '+r.wait.toFixed(1)+' seconds before someone spoke. Research on wait time suggests 3 seconds or more leads to longer, more thoughtful answers.','Next lesson, after each big question, silently count to five before taking an answer.'];
@@ -3067,11 +3072,12 @@ function coachTab(){ const C=S.coach||{};
   if(!C.unlocked) return '<div class="okbox" style="font-size:16px;line-height:1.6"><b>Lesson mirror (early access)</b><br>Roomie listens to a lesson on this computer and shows you, privately, how much you talked, how much students talked, your questions and your wait time. No audio is kept or sent anywhere.</div><div class="row"><input id="coachCode" type="text" placeholder="Early access code" style="max-width:240px"><button class="btn" type="button" data-cx="unlock">Unlock</button></div>';
   const M2=(S.mirrors||[]);
   return goalTabHTML()+'<div class="row" style="justify-content:space-between;align-items:center"><div><h2 style="margin:0">Lesson mirror</h2><p class="hint" style="margin:0">Early access. Measured on this computer. No audio is kept or sent.</p></div>'+(M.on?'<button class="btn" type="button" data-cx="stop">Stop and see my mirror</button>':'<button class="btn gold" type="button" data-cx="start">Start listening to this lesson</button>')+'</div>'+
+   '<div class="aiset"><label class="aitog"><input type="checkbox" id="slOn"'+((S.coach||{}).slides?' checked':'')+'><span><b>Link my slides</b> <em>(optional, off by default)</em></span></label><p class="hint" style="margin:0">'+((S.coach||{}).slides?'On. When the mirror starts, Chrome asks which screen to share: choose your slides window or your whole screen. ':'Off. ')+'Roomie looks at the screen every 2 seconds and keeps only numbers: when the slide changed and how busy it looked. No pictures are kept or sent, so names that flash up are never stored. Feedback can then say things like “9 minutes on slide 6 with no check”.</p></div>'+
    '<div class="cmics"><label class="thin"><span>Room microphone</span><select id="micRoom"><option value="">Laptop / default microphone</option></select></label><label class="thin"><span>Your worn microphone <em>(optional, much more accurate)</em></span><select id="micWorn"><option value="">None</option></select></label><div class="row"><button class="btn alt sm" type="button" data-cx="cal">Set my teaching voice</button><span class="hint">'+(C.tLevel?'Voice set ✓':'Do this once: Roomie listens to you say a sentence in your normal teaching voice.')+'</span></div></div>'+
    aiSettingsHTML()+'<p class="hint" style="margin:0">You can also say “Hey Roomie, mirror this lesson” and “Hey Roomie, stop the mirror”.</p>'+
    '<h3 style="margin:6px 0 0">Past lessons</h3>'+(M2.length?'<div class="mhist">'+M2.map(r=>'<div class="mhrow"><button type="button" class="mh" data-cx="open:'+r.id+'"><b>'+esc(r.block||'Lesson')+'</b><span>'+new Date(r.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'})+' · '+r.mins+' min · you '+Math.round(r.teacher*100)+'% · wait '+(r.wait==null?'–':r.wait.toFixed(1)+'s')+(r.goal?' · focus attempt':'')+'</span></button><button type="button" class="mhdel" data-cx="del:'+r.id+'" aria-label="Delete this lesson">Delete</button></div>').join('')+'</div>':'<p class="hint">No lessons yet.</p>')+(M2.length?'<button class="btn alt sm" type="button" data-cx="clear">Delete all mirrors</button>':''); }
 async function coachFillMics(){ const L=await mirDevices(); const C=S.coach||{}; [['micRoom',C.room],['micWorn',C.worn]].forEach(([id,v])=>{ const s=document.getElementById(id); if(!s) return; L.forEach((d,i)=>{ const o=document.createElement('option'); o.value=d.deviceId; o.textContent=d.label||('Microphone '+(i+1)); if(d.deviceId===v) o.selected=true; s.appendChild(o); }); }); }
-document.addEventListener('change',e=>{ const id=e.target.id; if(id==='micRoom'||id==='micWorn'){ S.coach=Object.assign(S.coach||{},{[id==='micRoom'?'room':'worn']:e.target.value}); save(); } });
+document.addEventListener('change',e=>{ const id=e.target.id; if(id==='slOn'){ S.coach=Object.assign(S.coach||{},{slides:e.target.checked}); save(); renderSetup(); return; } if(id==='micRoom'||id==='micWorn'){ S.coach=Object.assign(S.coach||{},{[id==='micRoom'?'room':'worn']:e.target.value}); save(); } });
 document.addEventListener('click',async e=>{ const b=e.target.closest('[data-cx]'); if(!b) return; audio(); const [a,v]=b.dataset.cx.split(':');
   if(a==='unlock'){ const c=(document.getElementById('coachCode').value||'').trim().toLowerCase(); if(c!==MIR_CODE){ toast('That code isn’t right.'); return; } S.coach=Object.assign(S.coach||{},{unlocked:true}); save(); try{ const s=await navigator.mediaDevices.getUserMedia({audio:true}); s.getTracks().forEach(t=>t.stop()); }catch(_){ } renderSetup(); }
   if(a==='cal'){ b.disabled=true; b.textContent='Say: “Good morning everyone, let’s get started.”'; try{ await mirCalibrate(); toast('Got it. Your teaching voice is set.'); }catch(_){ toast('Couldn’t use the microphone.'); } renderSetup(); }
@@ -3082,6 +3088,41 @@ document.addEventListener('click',async e=>{ const b=e.target.closest('[data-cx]
     S.mirrors=(S.mirrors||[]).filter(x=>x.id!==v); ((S.coach||{}).goals||[]).forEach(g=>{ g.attempts=(g.attempts||[]).filter(x=>x!==v); }); save(); toast('Lesson deleted.');
     if(A.overlay==='mirror'){ A.mirId=null; goHome(); } else renderSetup(); }
   if(a==='clear'){ if(b.dataset.sure){ S.mirrors=[]; save(); renderSetup(); } else { b.dataset.sure='1'; b.textContent='Tap again to delete them all'; } } });
+
+/* ---- v2.1: Link my slides (optional). Looks at the shared screen every 2 s on this computer and keeps only numbers:
+   when the slide changed and how busy it looked. No pictures are kept or sent. ---- */
+const SL={};
+async function slidesLink(){ if(!M.on||SL.on) return; if(!(navigator.mediaDevices&&navigator.mediaDevices.getDisplayMedia)){ toast('Linking slides needs Chrome or Edge on a laptop.'); return; }
+  try{ const st=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:2},audio:false}); const v=document.createElement('video'); v.muted=true; v.playsInline=true; v.srcObject=st; await v.play().catch(()=>{});
+    const c=document.createElement('canvas'); c.width=192; c.height=108; Object.assign(SL,{on:true,st,v,c,ctx:c.getContext('2d',{willReadFrequently:true}),prev:null,moving:0});
+    M.slides=M.slides||[]; st.getVideoTracks()[0].addEventListener('ended',()=>slidesStop(true)); SL.h=setInterval(slidesSample,2000); slidesSample(); toast('Slides linked. Roomie keeps only slide timings, no pictures.'); mirMark(); if(A.pip) pipRender(true); }
+  catch(_){ toast('Slides not linked. You can tap “Link slides” on the mirror timer any time.'); mirMark(); } }
+function slidesStop(fromEnd){ if(!SL.on) return; clearInterval(SL.h); try{ SL.st.getTracks().forEach(t=>t.stop()); }catch(_){ } SL.on=false; SL.prev=null; if(fromEnd&&M.on){ toast('Slides unlinked. The mirror is still listening.'); mirMark(); } }
+function slidesSample(){ if(!SL.on||!M.on) return; const {v,c,ctx}=SL; if(!v.videoWidth) return; ctx.drawImage(v,0,0,c.width,c.height); const d=ctx.getImageData(0,0,c.width,c.height).data, W=c.width, H=c.height, g=new Uint8Array(W*H);
+  for(let i=0,j=0;i<d.length;i+=4,j++) g[j]=(d[i]*3+d[i+1]*6+d[i+2])/10;
+  let edges=0; const row=new Uint16Array(H); for(let y=0;y<H-1;y++) for(let x=0;x<W-1;x++){ const k=y*W+x; if(Math.abs(g[k]-g[k+1])+Math.abs(g[k]-g[k+W])>60){ edges++; row[y]++; } } const busy=edges/(W*H);
+  /* text shows up as many separate bands of edges with gaps between them; photos and diagrams don't */
+  let lines=0, inBand=false; for(let y=0;y<H;y++){ const on=row[y]>W*0.06; if(on&&!inBand) lines++; inBand=on; }
+  let changed=false; if(SL.prev){ let n=0; for(let k=0;k<g.length;k++) if(Math.abs(g[k]-SL.prev[k])>30) n++; changed=n/g.length>0.04; } SL.prev=g;
+  const at=Math.round((Date.now()-M.t0)/1000), L=M.slides;
+  if(!L.length||changed){ SL.moving=changed?SL.moving+1:0; const last=L[L.length-1];
+    if(last&&SL.moving>=3){ last.motion=true; last.busy=Math.max(last.busy,busy); return; } /* video or scrolling: one long item */
+    L.push({at,busy:Math.round(busy*1000)/1000,lines}); }
+  else { SL.moving=0; const last=L[L.length-1]; last.busy=Math.max(last.busy,Math.round(busy*1000)/1000); last.lines=Math.max(last.lines||0,lines); } }
+/* analysis: slide spans inside a part of the lesson */
+function slideSpans(r,from,to){ const L=r.slides||[]; if(!L.length) return []; const end=(r.trace||'').length/2; const sp=L.map((s,i)=>({n:i+1,a:s.at,b:i+1<L.length?L[i+1].at:end,busy:s.busy,lines:s.lines||0,motion:!!s.motion}));
+  return sp.map(s=>Object.assign(s,{a:Math.max(s.a,from||0),b:Math.min(s.b,to==null?end:to)})).filter(s=>s.b-s.a>=20); }
+function slideMoments(r,F,from,to){ const sp=slideSpans(r,from,to); if(sp.length<2) return {good:[],fix:[]}; const fk=F.custom?['ei','q']:Object.keys(FOCI).filter(k=>FOCI[k]===F);
+  const ws=r.words||[], qs=r.qs||[], wt=w=>' '+String(w.t).toLowerCase()+' ';
+  const checked=s=>qs.some(q=>q.at>=s.a&&q.at<s.b)||ws.some(w=>w.at>=s.a&&w.at<s.b&&(MOM[0].re.test(wt(w))||MOM[1].re.test(wt(w))));
+  const talk=s=>{ const t=(r.trace||'').slice(Math.floor(s.a*2),Math.floor(s.b*2)); return t.length?(t.match(/t/g)||[]).length/t.length:0; };
+  const good=[], fix=[], still=sp.filter(s=>!s.motion);
+  if(fk.includes('ei')||fk.includes('q')){ const long=still.filter(s=>s.b-s.a>=300&&!checked(s)).sort((x,y)=>(y.b-y.a)-(x.b-x.a))[0];
+    if(long) fix.push({at:long.a,quote:'Slide '+long.n,sep:': ',note:Math.round((long.b-long.a)/60)+' minutes ('+mirFmt(long.a)+' to '+mirFmt(long.b)+') with no question or check for understanding. Rosenshine (2012): present new material in small steps and check after each one.'});
+    const c=still.filter(checked).length; if(still.length>=4&&c/still.length>=0.6) good.push({at:still[0].a,quote:'Your slides',sep:': ',note:'you asked a question or checked for understanding on '+c+' of '+still.length+' slides. That step-and-check rhythm is what Rosenshine (2012) describes.'}); }
+  if(fk.includes('ei')||fk.includes('talk')||F.custom){ const busy=still.filter(s=>s.lines>=7&&s.busy>=0.05&&s.b-s.a>=30&&talk(s)>=0.6);
+    if(busy.length) fix.push({at:busy[0].a,quote:(busy.length===1?'Slide ':'Slides ')+busy.slice(0,4).map(s=>s.n).join(', '),sep:' ',note:(busy.length===1?'was':'were')+' text-heavy, and you talked for most of the time '+(busy.length===1?'it was':'they were')+' up. Mayer (2021) found people learn less when they must read on-screen text while listening to the same words. Cut the text, or pause while students read.'}); }
+  return {good,fix}; }
 
 /* ---- v1.1: welcome tour ---- */
 function tourSteps(){ const tools=S.mode==='tools';
