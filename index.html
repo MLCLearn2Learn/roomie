@@ -603,6 +603,9 @@ textarea#finTxt{font:inherit;font-weight:400;font-size:17px;padding:10px 14px;bo
 .tourdots i{width:7px;height:7px;border-radius:50%;background:#E3D6BF}
 .tourdots i.on{background:var(--gum,#E2558F);width:18px;border-radius:4px}
 .tourtxt .row{gap:6px;flex-wrap:wrap}
+.deskrot{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);display:flex;gap:4px}
+.deskrot button{width:26px;height:26px;border-radius:50%;border:0;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);font-size:15px;line-height:1;cursor:pointer;padding:0;color:#4A3F38}
+.deskrot button:hover,.deskx:hover{background:var(--gum-l,#FFF6C9)}
 
 /* ---------- Scrapbook look ---------- */
 body.scrap{--acc:#E2558F;--sky:#EFE6CC;--sky-calm:#E8E3D2;--dusk:#F2E0C4;--panel:#FFFDF3;--ink:#2B2B2B;--muted:#6A6458;--line:#E6DDC4;
@@ -809,7 +812,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 <script>
 (function(){
 'use strict';
-const VERSION='Roomie v1.1 · 12 Nov 2026';
+const VERSION='Roomie v1.1.1 · 12 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -2138,8 +2141,8 @@ function fillSeats(shuffle){ const P=S.seat, L=names().slice(); if(shuffle) L.so
 function seatedNames(){ const P=seatPlan(); return Object.values(P.seats).flat().filter(Boolean); }
 function renderSeats(full){ if(!full) return; const P=seatPlan(), ed=!!A.seatEdit, sel=A.seatSel;
   const unseated=names().filter(n=>!seatedNames().includes(n));
-  const desk=t=>{ const d=DESK[t.type], ss=(P.seats[t.id]||[]); return '<div class="desk d-'+t.type+(ed?' ed':'')+'" data-desk="'+t.id+'" style="left:'+t.x+'%;top:'+t.y+'%;width:'+(t.v?9:d.w)+'%;--c:'+(t.v?1:d.c)+';">'+Array.from({length:d.n},(_,i)=>{ const nm=ss[i]||''; const on=sel&&sel.t===t.id&&sel.i===i; return '<button type="button" class="seat'+(nm?'':' empty')+(on?' sel':'')+'" data-seat="'+t.id+':'+i+'">'+(nm?esc(nm):(ed?'+':''))+'</button>'; }).join('')+(ed?'<button type="button" class="deskx" data-deskdel="'+t.id+'" aria-label="Remove table">✕</button>':'')+'</div>'; };
-  const tools=ed?'<div class="row seattools"><label class="hint">Layout <select id="seatLayout">'+SEAT_LAYOUTS.map(([k,l])=>opt(k,l,P.layout)).join('')+'</select></label><button class="btn alt sm" type="button" data-st="add:pair">+ Pair</button><button class="btn alt sm" type="button" data-st="add:group4">+ Group of 4</button><button class="btn alt sm" type="button" data-st="add:group6">+ Group of 6</button><button class="btn alt sm" type="button" data-st="add:single">+ Single</button><button class="btn gold sm" type="button" data-st="shuffle">Shuffle seats</button><button class="btn sm" type="button" data-st="done">Done editing</button></div><p class="hint" style="margin:0">Drag tables to match your room. Tap a name, then another seat, to swap. '+(unseated.length?'Not seated yet: '+unseated.map(n=>'<button type="button" class="chip uns'+(sel&&sel.n===n?' sel':'')+'" data-uns="'+esc(n)+'">'+esc(n)+'</button>').join(' '):'Everyone has a seat.')+'</p>':'';
+  const desk=t=>{ const d=DESK[t.type], ss=(P.seats[t.id]||[]); return '<div class="desk d-'+t.type+(ed?' ed':'')+'" data-desk="'+t.id+'" style="left:'+t.x+'%;top:'+t.y+'%;width:'+(t.v?9:d.w)+'%;--c:'+(t.v?1:d.c)+';'+(t.rot?'--rot:'+t.rot+'deg;':'')+'">'+Array.from({length:d.n},(_,i)=>{ const nm=ss[i]||''; const on=sel&&sel.t===t.id&&sel.i===i; return '<button type="button" class="seat'+(nm?'':' empty')+(on?' sel':'')+'" data-seat="'+t.id+':'+i+'">'+(nm?esc(nm):(ed?'+':''))+'</button>'; }).join('')+(ed?'<button type="button" class="deskx" data-deskdel="'+t.id+'" aria-label="Remove table">✕</button><span class="deskrot"><button type="button" data-deskrot="'+t.id+':-15" aria-label="Turn left" title="Turn left">↺</button><button type="button" data-deskrot="'+t.id+':15" aria-label="Turn right" title="Turn right">↻</button></span>':'')+'</div>'; };
+  const tools=ed?'<div class="row seattools"><label class="hint">Layout <select id="seatLayout">'+SEAT_LAYOUTS.map(([k,l])=>opt(k,l,P.layout)).join('')+'</select></label><button class="btn alt sm" type="button" data-st="add:pair">+ Pair</button><button class="btn alt sm" type="button" data-st="add:group4">+ Group of 4</button><button class="btn alt sm" type="button" data-st="add:group6">+ Group of 6</button><button class="btn alt sm" type="button" data-st="add:single">+ Single</button><button class="btn gold sm" type="button" data-st="shuffle">Shuffle seats</button><button class="btn sm" type="button" data-st="done">Done editing</button></div><p class="hint" style="margin:0">Drag tables to match your room, and use ↺ ↻ to angle them. Tap a name, then another seat, to swap. '+(unseated.length?'Not seated yet: '+unseated.map(n=>'<button type="button" class="chip uns'+(sel&&sel.n===n?' sel':'')+'" data-uns="'+esc(n)+'">'+esc(n)+'</button>').join(' '):'Everyone has a seat.')+'</p>':'';
   setStage('one','<section class="card seatcard"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">Seating plan</div><h1 class="mid" style="color:var(--gum-d)">Find your seat</h1></div><div class="row">'+(ed?'':'<button class="btn alt sm" type="button" data-st="edit">Edit seats</button>')+backBtn('Close')+'</div></div>'+tools+'<div class="seatroom" id="room"><div class="board">Front of the room</div>'+P.tables.map(desk).join('')+'</div></section>'); }
 function seatSwap(a,b){ const P=S.seat; const ga=a.n!=null?a.n:(P.seats[a.t]||[])[a.i]||'', gb=(P.seats[b.t]||[])[b.i]||'';
   if(a.n!=null){ (P.seats[b.t]=P.seats[b.t]||[])[b.i]=ga; } else { (P.seats[a.t]=P.seats[a.t]||[])[a.i]=gb; (P.seats[b.t]=P.seats[b.t]||[])[b.i]=ga; } save(); }
@@ -2148,6 +2151,7 @@ document.addEventListener('click',e=>{ if(A.overlay!=='seats') return; const t=e
     if(a==='edit'){ A.seatEdit=true; A.seatSel=null; } if(a==='done'){ A.seatEdit=false; A.seatSel=null; toast('Seating plan saved.'); }
     if(a==='shuffle'){ fillSeats(true); pop(); } if(a==='add'){ S.seat.tables.push({id:sid(),type:v,x:50,y:55}); save(); }
     render(true); return; }
+  const rt=t.closest('[data-deskrot]'); if(rt){ const [id,by]=rt.dataset.deskrot.split(':'); const tb=S.seat.tables.find(x=>x.id===id); if(tb){ tb.rot=(((tb.rot||0)+(+by))%360+360)%360; if(tb.rot>180) tb.rot-=360; save(); render(true); } return; }
   const dl=t.closest('[data-deskdel]'); if(dl){ const id=dl.dataset.deskdel; S.seat.tables=S.seat.tables.filter(x=>x.id!==id); delete S.seat.seats[id]; save(); render(true); return; }
   const un=t.closest('[data-uns]'); if(un){ A.seatSel={n:un.dataset.uns}; render(true); return; }
   const se=t.closest('[data-seat]'); if(se&&A.seatEdit){ if(A.seatDragged){ A.seatDragged=false; return; } const [tid,i]=se.dataset.seat.split(':'), here={t:tid,i:+i};
@@ -2156,7 +2160,7 @@ document.addEventListener('click',e=>{ if(A.overlay!=='seats') return; const t=e
 document.addEventListener('change',e=>{ if(e.target.id==='seatLayout'){ buildLayout(e.target.value,true); A.seatSel=null; render(true); } });
 /* drag tables in edit mode */
 let seatDrag=null;
-document.addEventListener('pointerdown',e=>{ if(A.overlay!=='seats'||!A.seatEdit) return; const d=e.target.closest('[data-desk]'); if(!d||e.target.closest('[data-deskdel]')) return; const room=document.getElementById('room'); seatDrag={el:d,id:d.dataset.desk,r:room.getBoundingClientRect(),sx:e.clientX,sy:e.clientY,moved:false}; });
+document.addEventListener('pointerdown',e=>{ if(A.overlay!=='seats'||!A.seatEdit) return; const d=e.target.closest('[data-desk]'); if(!d||e.target.closest('[data-deskdel],[data-deskrot]')) return; const room=document.getElementById('room'); seatDrag={el:d,id:d.dataset.desk,r:room.getBoundingClientRect(),sx:e.clientX,sy:e.clientY,moved:false}; });
 document.addEventListener('pointermove',e=>{ if(!seatDrag) return; const D=seatDrag; if(!D.moved&&Math.hypot(e.clientX-D.sx,e.clientY-D.sy)<6) return; D.moved=true; e.preventDefault();
   const x=Math.max(4,Math.min(96,(e.clientX-D.r.left)/D.r.width*100)), y=Math.max(10,Math.min(96,(e.clientY-D.r.top)/D.r.height*100)); D.el.style.left=x+'%'; D.el.style.top=y+'%'; D.x=x; D.y=y; D.el.classList.add('drag'); });
 document.addEventListener('pointerup',()=>{ if(!seatDrag) return; const D=seatDrag; seatDrag=null; if(D.moved){ const t=S.seat.tables.find(x=>x.id===D.id); if(t){ t.x=Math.round(D.x*10)/10; t.y=Math.round(D.y*10)/10; save(); } A.seatDragged=true; setTimeout(()=>{ A.seatDragged=false; },50); D.el.classList.remove('drag'); } });
