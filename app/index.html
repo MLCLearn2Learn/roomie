@@ -317,6 +317,11 @@ textarea{min-height:140px;resize:vertical;line-height:1.5}
 .growline{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:15px;font-weight:700;margin-top:2px}.growline span:last-child{color:var(--gum-d)}
 .growset{display:grid;gap:12px}.growset small{font-weight:800;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--gum-d)}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.chip{font:inherit;font-weight:700;font-size:14px;border:2px solid #EFE4D2;background:#fff;border-radius:20px;padding:4px 12px;cursor:pointer}.growstat{display:flex;gap:14px;align-items:center;background:var(--panel);border-radius:16px;padding:10px 14px}.bigbird.sm svg{width:90px;height:90px}
 .tool[hidden],.dbreak[hidden]{display:none!important}.dockset{display:grid;gap:8px;background:var(--panel);border-radius:16px;padding:14px 16px}.docklist{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:6px}.dockrow{display:flex;justify-content:space-between;align-items:center;background:#fff;border-radius:12px;padding:4px 8px}.dockrow.off{opacity:.55}.dockrow .btn{padding:2px 10px;min-width:0}
+#stage{position:relative}.stk{position:absolute;z-index:6;pointer-events:none;transform:rotate(var(--r,6deg));filter:drop-shadow(0 6px 8px rgba(60,40,20,.18))}.stk svg{display:block;width:100%;height:auto}
+.stk.pop{animation:stkpop .7s cubic-bezier(.2,1.6,.4,1) both}.stk svg{animation:stkwig 6s ease-in-out 1.2s infinite;transform-origin:50% 60%}
+@keyframes stkpop{0%{transform:scale(0) rotate(-30deg);opacity:0}60%{transform:scale(1.2) rotate(calc(var(--r,6deg) + 6deg));opacity:1}100%{transform:scale(1) rotate(var(--r,6deg))}}
+@keyframes stkwig{0%,88%,100%{transform:none}91%{transform:rotate(-5deg) scale(1.04)}94%{transform:rotate(5deg) scale(1.04)}97%{transform:rotate(-2deg)}}
+@media (prefers-reduced-motion:reduce){.stk.pop,.stk svg{animation:none}}
 .relief{background:#fff;border-radius:24px;padding:28px;display:flex;flex-direction:column;gap:14px;color:#1d2b27}
 .relief h2{font-size:30px;color:var(--gum-d)} .relief h3{font-size:22px;margin-top:6px}
 .relief table{border-collapse:collapse;width:100%} .relief td{border-bottom:1px solid var(--line);padding:6px 8px;font-weight:700;vertical-align:top}
@@ -995,7 +1000,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.2 · 12 Nov 2026';
+const VERSION='Roomie v2.3 · 13 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1626,7 +1631,7 @@ function renderSetup(){
     const RC=[['match','Match my colour',''],['pink','Pink','#FF8CC6'],['blue','Blue','#7EC3FF'],['green','Green','#7FDCA6'],['orange','Orange','#FFAA6E'],['purple','Purple','#B49BFF']];
     const LK=[['scrap','Scrapbook','#EFE6CC'],['grape','Grape soda','#7B5CFA'],['tomato','Tomato and navy','#FF6B4A'],['mint','Mint and bubblegum','#6EE7C5'],['bush','Bush (original)','#BFE8FA']];
     const sw=(attr,cur,list)=>'<div class="swatches">'+list.map(([k,l,c])=>'<button type="button" class="swatch" '+attr+'="'+k+'" aria-pressed="'+(cur===k)+'"><i style="background:'+(c||'conic-gradient(#E2558F,#3B82C4,#2E9466,#E8613F,#7457C9,#E2558F)')+'"></i><span>'+esc(l)+'</span></button>').join('')+'</div>';
-    body='<h3>Colour</h3>'+(S.theme==='scrap'?'':'<p class="hint" style="margin:0">Colours apply to the Scrapbook look.</p>')+sw('data-acc',S.accent||'pink',SW)+'<h3>Roomie’s colour</h3>'+sw('data-rc',S.roomieCol||'match',RC)+'<h3>Look</h3>'+sw('data-look',S.theme,LK)+'<h3>Today’s timetable</h3>'+sw('data-daypos',S.dayPos||'side',[['side','Down the side','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="9" height="28" rx="2" fill="#E2558F"/><rect x="16" y="6" width="20" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['top','Across the top','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="6" rx="2" fill="#E2558F"/><rect x="4" y="15" width="32" height="19" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['hide','Hidden','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover']])+'<p class="hint" style="margin:0">Changes show on the board straight away. Tap Done to see them.</p>'+(typeof dockSetupHTML==='function'?dockSetupHTML():''); }
+    body='<h3>Colour</h3>'+(S.theme==='scrap'?'':'<p class="hint" style="margin:0">Colours apply to the Scrapbook look.</p>')+sw('data-acc',S.accent||'pink',SW)+'<h3>Roomie’s colour</h3>'+sw('data-rc',S.roomieCol||'match',RC)+'<h3>Look</h3>'+sw('data-look',S.theme,LK)+'<h3>Today’s timetable</h3>'+sw('data-daypos',S.dayPos||'side',[['side','Down the side','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="9" height="28" rx="2" fill="#E2558F"/><rect x="16" y="6" width="20" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['top','Across the top','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="6" rx="2" fill="#E2558F"/><rect x="4" y="15" width="32" height="19" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['hide','Hidden','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover']])+'<p class="hint" style="margin:0">Changes show on the board straight away. Tap Done to see them.</p>'+(typeof dockSetupHTML==='function'?stkSetupHTML()+dockSetupHTML():''); }
   if(tab==='fun'){ body='<div class="row" style="align-items:flex-end"><div class="fld" style="width:220px"><label for="fFun">Fun level</label><select id="fFun">'+opt('calm','Calm: just the essentials',S.fun)+opt('lively','Lively (recommended)',S.fun)+opt('party','Party: everything on',S.fun)+'</select></div><button class="btn gold" type="button" data-sact="testFun">Test a celebration</button></div><label class="chk"><input type="checkbox" id="fMascot" '+(S.mascot!==false?'checked':'')+'><span>Show Roomie the mascot<span class="hint" style="display:block">Sings with the music, cheers for points, says hello at each change</span></span></label><label class="chk"><input type="checkbox" id="fSfx" '+(S.sfx!==false?'checked':'')+'><span>Celebration sounds<span class="hint" style="display:block">Fanfares, drumrolls and pops. The attention chime always plays.</span></span></label><p class="hint" style="margin:0">Fun comes in bursts: celebrations, races and reveals. During learning the board stays calm. If a computer is set to reduce motion, Roomie turns the animations off.</p><h3>Rotations</h3><div class="row" style="align-items:flex-start"><div class="fld" style="flex:1;min-width:240px"><label for="fStations">Stations, one per line (2 to 8)</label><textarea id="fStations" style="min-height:180px">'+esc(S.stations||'')+'</textarea></div><div class="fld" style="width:160px"><label for="fRotMin">Minutes at each</label><input id="fRotMin" type="number" min="2" max="40" value="'+(S.rotMin||12)+'"></div></div><p class="hint" style="margin:0">Roomie makes one crew per station from your class list. Crews move one station each round, with a 45-second move song.</p>'; }
   if(tab==='demo'){ const P=phaseAt(now()); body='<div class="okbox" style="font-size:16px">Try the whole day without waiting. The clock on the board jumps; nothing else changes.</div><div class="row"><button class="btn gold" type="button" data-sact="demoStart">Start the day at 8:40</button><button class="btn" type="button" data-sact="demoNext">Jump to 10 seconds before the next change</button><button class="btn alt" type="button" data-sact="demoReal">Back to the real time</button></div><p class="lead">Board time now: '+fmtClock(P.mins)+' · '+esc(P.phase)+(P.block?' · '+esc(P.block.name):'')+'</p>'; }
   if(tab==='coach'){ body=coachTab(); setTimeout(coachFillMics,0); }
@@ -3351,6 +3356,70 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-dk]'); if
   save(); applyDock(); renderSetup(); });
 document.addEventListener('change',e=>{ const t=e.target; if(!t.dataset||!t.dataset.dk) return; const [a,k]=t.dataset.dk.split(':'); if(a!=='show') return; const h=new Set(S.dockHide||[]); if(t.checked) h.delete(k); else h.add(k); S.dockHide=[...h]; save(); applyDock(); t.closest('.dockrow').classList.toggle('off',!t.checked); });
 setTimeout(applyDock,0);
+
+/* ---- v2.3: comic stickers. Bold pop-art bursts that suit each screen. All drawn here, original artwork. ---- */
+const STK_IC={
+ bolt:'<path d="M14 0 L2 18 H11 L7 32 L22 11 H13 Z"/>',
+ star:'<path d="M16 1l4.5 9.6 10.5 1.2-7.8 7.1 2.1 10.4L16 24 6.7 29.3l2.1-10.4L1 11.8l10.5-1.2z"/>',
+ clock:'<circle cx="16" cy="17" r="13"/><path d="M16 9v8l6 4" fill="none" stroke="#1B1340" stroke-width="3" stroke-linecap="round"/>',
+ q:'<circle cx="16" cy="16" r="14"/><path d="M11.5 12a4.5 4.5 0 1 1 6.5 4c-1.6.9-2 1.8-2 3.5" fill="none" stroke="#1B1340" stroke-width="3" stroke-linecap="round"/><circle cx="16" cy="24.5" r="2" fill="#1B1340"/>',
+ bulb:'<path d="M16 2a10 10 0 0 0-6 18v4h12v-4A10 10 0 0 0 16 2z"/><rect x="11" y="26" width="10" height="4" rx="2" fill="#1B1340"/>',
+ heart:'<path d="M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z"/>',
+ music:'<path d="M12 4l16-3v19a4.5 4.5 0 1 1-3-4.2V8.5l-10 2V24a4.5 4.5 0 1 1-3-4.2z"/>',
+ people:'<circle cx="10" cy="9" r="5"/><circle cx="22" cy="9" r="5"/><path d="M1 28c0-6 4-10 9-10s9 4 9 10zM13 28c0-6 4-10 9-10s9 4 9 10z"/>',
+ dice:'<rect x="2" y="2" width="28" height="28" rx="6"/><g fill="#1B1340"><circle cx="9" cy="9" r="2.6"/><circle cx="23" cy="23" r="2.6"/><circle cx="16" cy="16" r="2.6"/><circle cx="23" cy="9" r="2.6"/><circle cx="9" cy="23" r="2.6"/></g>',
+ cloud:'<path d="M8 26a7 7 0 0 1-.8-14A9 9 0 0 1 24.5 10 7.5 7.5 0 0 1 25 26z"/>',
+ ticket:'<path d="M2 8h28v5a3 3 0 0 0 0 6v5H2v-5a3 3 0 0 0 0-6z"/>',
+ check:'<circle cx="16" cy="16" r="14"/><path d="M9 16.5l5 5 9-10" fill="none" stroke="#1B1340" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>',
+ sun:'<circle cx="16" cy="16" r="8"/><g stroke="#1B1340" stroke-width="3" stroke-linecap="round"><path d="M16 1v4M16 27v4M1 16h4M27 16h4M5 5l3 3M24 24l3 3M5 27l3-3M24 8l3-3"/></g>',
+ bag:'<path d="M5 11h22l-2 18H7z"/><path d="M11 11V8a5 5 0 0 1 10 0v3" fill="none" stroke="#1B1340" stroke-width="3"/>'};
+const STK_COL={gold:['#FFD84D','#F2785C'],pink:['#FF8CC6','#7E5BEF'],blue:['#7EC3FF','#F06AA8'],green:['#7FDCA6','#F5B700'],coral:['#FF9A7A','#4A9FE0'],lilac:['#C9B6FF','#FFD84D'],sky:['#BFE3FF','#9B6BE0']};
+function stkShape(kind){ if(kind==='burst'){ let p=''; const n=13; for(let i=0;i<n*2;i++){ const r=i%2?58:96, a=Math.PI*i/n-0.2; p+=(130+r*1.25*Math.cos(a)).toFixed(1)+','+(100+r*Math.sin(a)).toFixed(1)+' '; } return '<polygon points="'+p+'"/>'; }
+  if(kind==='cloud') return '<path d="M52 150 C14 150 10 104 44 96 C34 54 92 36 112 64 C128 22 196 26 202 74 C246 72 256 132 214 146 C206 172 164 176 150 158 C130 182 80 180 74 158 C66 160 58 156 52 150 Z"/>';
+  if(kind==='bubble') return '<path d="M40 22 H222 Q244 22 244 44 V132 Q244 154 222 154 H112 L66 188 L78 154 H40 Q18 154 18 132 V44 Q18 22 40 22 Z"/>';
+  return '<path d="M28 34 L232 18 L218 92 L246 100 L224 176 L22 168 L36 104 L14 96 Z"/>'; }
+let STK_N=0;
+function stickerSVG(o){ const id='hd'+(++STK_N), c=STK_COL[o.col]||STK_COL.gold, lines=String(o.word).split('|'), K='#1B1340', sh=stkShape(o.shape);
+  const fs=lines.length>1?(Math.max(...lines.map(l=>l.length))>9?30:36):(o.word.length>8?36:46), y0=lines.length>1?92:112;
+  return '<svg viewBox="0 0 260 200" class="stksvg" aria-hidden="true"><defs><pattern id="'+id+'" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="4.5" cy="4.5" r="1.7" fill="#fff" opacity=".45"/></pattern></defs>'+
+   '<g transform="translate(9 9)" fill="'+c[1]+'">'+sh+'</g><g fill="'+c[0]+'" stroke="'+K+'" stroke-width="5" stroke-linejoin="round">'+sh+'</g><g fill="url(#'+id+')">'+sh+'</g>'+
+   lines.map((l,i)=>'<text x="130" y="'+(y0+i*(fs+2))+'" text-anchor="middle" font-family="Lilita One,Baloo 2,Impact,sans-serif" font-weight="800" font-size="'+fs+'" fill="#fff" stroke="'+K+'" stroke-width="7" stroke-linejoin="round" paint-order="stroke" letter-spacing="1">'+esc(l)+'</text>').join('')+
+   (o.icon&&STK_IC[o.icon]?'<g transform="translate(196 136) rotate(10)" fill="'+c[1]+'" stroke="'+K+'" stroke-width="2.5" stroke-linejoin="round">'+STK_IC[o.icon]+'</g>':'')+'</svg>'; }
+const STK_BREAK={statue:['FREEZE!','burst','coral','star'],animals:['ROAR!','burst','gold','bolt'],weatherbody:['WHOOSH!','cloud','sky','cloud'],shake:['5-4-3-2-1!','burst','pink','bolt'],mirror:['COPY|ME!','bubble','lilac','people'],says:['ROOMIE|SAYS!','bubble','pink','star'],rather:['WOULD YOU|RATHER?','bubble','blue','q'],oddone:['SPOT|IT!','burst','green','q'],champ:['ROCK!|PAPER!','bolt','coral','bolt'],count:['COUNT|IT UP!','burst','gold','star'],coin:['HEADS|OR HIPS?','bolt','blue','dice'],squiggle:['SQUIGGLE!','cloud','lilac','star'],rhyme:['RHYME|TIME!','bubble','green','music'],moved:['WHAT’S|MOVED?','bubble','gold','q'],voice:['WHO|SAID IT?','bubble','pink','q'],thisthat:['THIS|OR THAT?','bolt','green','bolt'],listrace:['BEAT|THE LIST!','burst','coral','clock'],thanks:['THANK|YOU!','cloud','pink','heart'],portrait:['SAY|CHEESE!','burst','blue','star'],factswap:['FACT|SWAP!','bubble','lilac','bulb'],balloon:['BREATHE|IN…','cloud','sky','cloud'],square:['BREATHE|IN…','cloud','green','cloud'],finger:['BREATHE|SLOW…','cloud','lilac','heart']};
+const STK_TYPE={movement:['MOVE IT!','burst','coral','bolt'],game:['GAME ON!','bolt','blue','dice'],calm:['CHILL|OUT','cloud','sky','cloud'],breathing:['BREATHE…','cloud','sky','cloud']};
+const STK_OV={thpick:['THINK|BIG!','cloud','lilac','bulb'],tpick:['TICKET|TIME!','bubble','gold','ticket'],rpick:['LOOK|BACK','cloud','sky','bulb'],routines:['ROUTINE|TIME!','burst','gold','star'],late:['WELCOME|IN!','burst','pink','sun'],brainpick:['BRAIN|BREAK!','burst','gold','bolt'],timer:['TICK|TOCK!','burst','blue','clock'],pick:['WHO’S|NEXT?','bubble','pink','q'],hero:['MYSTERY|HERO!','burst','lilac','star'],groups:['TEAM|UP!','bolt','green','people'],checkin:['HOW ARE|YOU?','cloud','pink','heart'],exit:['SHOW WHAT|YOU KNOW!','bubble','gold','ticket'],ticket:['SHOW WHAT|YOU KNOW!','bubble','gold','ticket'],think:['THINK|BIG!','cloud','lilac','bulb'],quiz:['QUIZ|TIME!','bolt','coral','star'],poll:['VOTE!','burst','green','check'],reflect:['LOOK|BACK','cloud','sky','bulb'],packup:['PACK|IT UP!','bolt','gold','bag'],finish:['ALL|DONE?','bubble','green','check'],reteach:['LET’S TRY|AGAIN!','bubble','blue','bulb'],door:['WELCOME|IN!','burst','pink','sun'],seats:['FIND YOUR|SEAT!','bubble','blue','people'],jobs:['HELPERS|ASSEMBLE!','bolt','gold','people'],rotate:['ROTATE!','bolt','coral','clock'],manualRoutine:['LET’S|GO!','burst','gold','star'],practise:['READY…|GO!','burst','coral','clock'],calm:['AHHH…','cloud','sky','cloud'],join:['JOIN|IN!','burst','green','people'],groupsShow:['TEAM|UP!','bolt','green','people']};
+const STK_ROUT={arrival:['GOOD|MORNING!','burst','gold','sun'],lineup:['LINE|UP!','bolt','blue','people'],packup:['PACK|IT UP!','bolt','gold','bag'],cleanup:['TIDY|TIME!','burst','green','star'],changeover:['ALL|CHANGE!','bolt','coral','bolt'],settle:['WELCOME|BACK!','cloud','sky','heart'],endofday:['WHAT A|DAY!','burst','pink','star']};
+function stkPick(){ const o=A.overlay, P=A.P||{};
+  if(o==='brain'&&A.brain){ const b=A.brain; return ['b:'+b.id].concat(STK_BREAK[b.id]||STK_TYPE[b.breath?'breathing':b.type]||STK_TYPE.game); }
+  if(o&&STK_OV[o]) return ['o:'+o].concat(STK_OV[o]);
+  if(o) return null;
+  if(P.phase==='routine'&&P.routine){ const r=STK_ROUT[P.routine.id]; return r?['r:'+P.routine.id].concat(r):null; }
+  if(P.phase==='break'&&P.block){ const n=/lunch/i.test(P.block.name); return ['k:'+P.block.name,n?'LUNCH|TIME!':'PLAY|TIME!','burst',n?'green':'gold','sun']; }
+  return null; }
+function stickerize(){ const st=document.getElementById('stage'); if(!st||STUDENT||S.stickers===false) return; const pick=stkPick(); const old=st.querySelector(':scope > .stk');
+  if(!pick){ if(old) old.remove(); A.stkKey=''; return; }
+  const card=st.querySelector(':scope > .card, :scope > section.card'); if(!card) return;
+  const [key,word,shape,col,icon]=pick; const fresh=key!==A.stkKey;
+  if(old&&old.dataset.k===key){ stkPlace(old,card); return; } if(old) old.remove();
+  const d=document.createElement('div'); d.className='stk'+(fresh?' pop':''); d.dataset.k=key; const r=((key.length*37)%11)-5; d.style.setProperty('--r',(r>=0?r+3:r-3)+'deg'); d.innerHTML=stickerSVG({word,shape,col,icon}); st.appendChild(d); stkPlace(d,card);
+  if(fresh&&key.startsWith('b:')&&S.fun!=='calm'&&typeof burst==='function') burst(word.replace('|',' '));
+  A.stkKey=key; }
+function stkPlace(d,card){ const st=document.getElementById('stage'), sr=st.getBoundingClientRect(), cr=card.getBoundingClientRect();
+  const w=cr.width, h=cr.height, base=Math.round(Math.max(130,Math.min(270,w*0.3,h*0.42)));
+  const rr=e=>{ if(/^(H1|H2|H3|P|LABEL|LI)$/.test(e.tagName)&&!e.querySelector('button,input')){ const g=document.createRange(); g.selectNodeContents(e); return g.getBoundingClientRect(); } return e.getBoundingClientRect(); };
+  const els=[...card.querySelectorAll('*')].filter(e=>/^(BUTTON|INPUT|TEXTAREA|SELECT)$/.test(e.tagName)||(e.tagName.toLowerCase()==='svg'&&!e.classList.contains('stksvg'))||[...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim()));
+  const boxes=els.map(rr).filter(r=>r.width&&r.height&&r.bottom>cr.top&&r.top<cr.bottom);
+  const hit=(x,y,sz)=>{ const L=x+sz*0.1,T=y+sz*0.1,R=x+sz*0.9,B=y+sz*0.68; return boxes.some(r=>r.left<R&&r.right>L&&r.top<B&&r.bottom>T); };
+  const m=Math.max(12,w*0.022), tries=[];
+  for(const sz of [base,Math.round(base*0.78),Math.max(110,Math.round(base*0.6)),96]){ const hh=sz*0.77;
+    tries.push([cr.right-sz-m,cr.bottom-hh-m,sz],[cr.left+m,cr.bottom-hh-m,sz],[cr.right-sz-m,cr.top+h*0.42,sz],[cr.left+w*0.5-sz/2,cr.bottom-hh-m,sz],[cr.right-sz-m,cr.top+h*0.2,sz],[cr.left+w*0.55,cr.top+m,sz],[cr.left+w*0.42,cr.top+m,sz]); }
+  let pick=tries.find(([x,y,sz])=>!hit(x,y,sz));
+  if(!pick){ const sz=96; pick=[cr.right-sz-4,cr.bottom-sz*0.72,sz]; }
+  const [x,y,sz]=pick; d.style.width=sz+'px'; d.style.left=(x-sr.left)+'px'; d.style.top=(y-sr.top)+'px'; }
+{ const f=render; render=function(){ const r=f.apply(this,arguments); try{ stickerize(); }catch(_){ } return r; }; }
+addEventListener('resize',()=>{ const d=document.querySelector('#stage > .stk'), c=document.querySelector('#stage > .card'); if(d&&c) stkPlace(d,c); });
+function stkSetupHTML(){ return '<h3>Comic pictures</h3><label class="chk"><input type="checkbox" data-stkon '+(S.stickers===false?'':'checked')+'><span>Show a comic picture on each screen (like “BRAIN BREAK!” or “TICK TOCK!”)</span></label>'; }
+document.addEventListener('change',e=>{ const t=e.target; if(!t.matches||!t.matches('[data-stkon]')) return; S.stickers=t.checked; save(); if(!t.checked){ const d=document.querySelector('#stage > .stk'); if(d) d.remove(); A.stkKey=''; } });
 
 /* ---- v1.1: welcome tour ---- */
 function tourSteps(){ const tools=S.mode==='tools', ex=S.studentsAreExample;
