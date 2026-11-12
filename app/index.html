@@ -906,6 +906,43 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 @media (max-width:599px){.dock{flex-wrap:wrap}.dbreak{display:none}}
 @media (min-width:600px){ .top{flex-wrap:nowrap} .top>*{flex-shrink:0} .top .date,.top #dateLabel{flex-shrink:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} }
 
+/* v2.4 screen designs */
+#stage .card.scene{position:relative;overflow:hidden;border:4px solid #1B1340;box-shadow:7px 7px 0 #1B1340}
+#stage.scened > .card:not(.scene),#stage.scened > .side > .card{border:3px solid #1B1340;box-shadow:5px 5px 0 #1B1340}
+.card.scene > :not(.scn-band):not(.scn-art){position:relative;z-index:1}
+.scn-band{position:absolute;left:0;right:0;top:0;z-index:0;border-bottom:4px solid #1B1340;background-color:var(--b1)}
+.pat-dots{background:radial-gradient(var(--b2) 23%,transparent 24%) 0 0/36px 36px,radial-gradient(var(--b2) 23%,transparent 24%) 18px 18px/36px 36px,var(--b1)}
+.pat-gingham{background:linear-gradient(90deg,color-mix(in srgb,var(--b2) 45%,transparent) 50%,transparent 0) 0 0/40px 40px,linear-gradient(color-mix(in srgb,var(--b2) 45%,transparent) 50%,transparent 0) 0 0/40px 40px,var(--b1)}
+.pat-stripes{background:repeating-linear-gradient(-45deg,var(--b1) 0 20px,var(--b2) 20px 40px)}
+.pat-grid{background:linear-gradient(var(--b2) 3px,transparent 3px) 0 0/30px 30px,linear-gradient(90deg,var(--b2) 3px,transparent 3px) 0 0/30px 30px,var(--b1)}
+.pat-burst{background:repeating-conic-gradient(from 0deg at 80% 130%,var(--b1) 0 8deg,var(--b2) 8deg 16deg)}
+.pat-waves{background:radial-gradient(circle at 50% 100%,transparent 13px,var(--b2) 14px 19px,transparent 20px) 0 0/40px 22px,var(--b1)}
+.pat-zig{background:linear-gradient(135deg,var(--b2) 25%,transparent 25%) -20px 0/40px 40px,linear-gradient(225deg,var(--b2) 25%,transparent 25%) -20px 0/40px 40px,linear-gradient(315deg,var(--b2) 25%,transparent 25%) 0 0/40px 40px,linear-gradient(45deg,var(--b2) 25%,transparent 25%) 0 0/40px 40px,var(--b1)}
+.pat-stars{background:radial-gradient(#fff 1.6px,transparent 2.4px) 0 0/34px 34px,radial-gradient(#ffffffaa 1.2px,transparent 2px) 17px 11px/34px 34px,var(--b1)}
+.card.scene .eyebrow{display:inline-block;background:#fff;border:3px solid #1B1340;border-radius:99px;padding:3px 14px;color:#1B1340;box-shadow:3px 3px 0 #1B1340;width:fit-content}
+.card.scene h1{max-width:calc(100% - var(--aw,0px) - 34px);line-height:1.22;font-family:'Lilita One','Baloo 2',sans-serif!important;font-weight:400;letter-spacing:.5px;font-size:clamp(32px,4.2vw,66px)!important;margin-top:4px}
+.card.scene h1.long{font-size:clamp(26px,3vw,46px)!important}
+.card.scene h1 .pl,.scn-attn .pl{display:inline-block;background:var(--pc);color:#1B1340;border:4px solid #1B1340;border-radius:14px;padding:.02em .28em .08em;box-shadow:4px 4px 0 #1B1340;transform:rotate(var(--pr));margin:0 .02em .16em}
+.scn-art{position:absolute;right:20px;z-index:2;pointer-events:none}
+.scn-art svg{display:block;width:100%;height:auto;animation:scnbob 4s ease-in-out infinite;filter:drop-shadow(3px 4px 0 rgba(27,19,64,.18))}
+.scn-art.pop{animation:scnpop .6s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes scnpop{from{transform:scale(.3) rotate(-12deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes scnbob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-5px) rotate(1.5deg)}}
+.attn.scn-attn{background:repeating-conic-gradient(from 0deg at 50% 40%,#FF8F6E 0 9deg,#FFB49C 9deg 18deg)}
+.scn-attn > svg,.scn-attn > b,.scn-attn > p{display:none}
+.atn-art{width:min(280px,36vw)} .atn-art svg{width:100%;display:block;animation:scnbob 3s ease-in-out infinite}
+.atn-t{font-family:'Lilita One','Baloo 2',sans-serif;font-weight:400;font-size:clamp(54px,8.5vw,124px);line-height:1.15;margin:0}
+.atn-steps{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.atn-steps span{background:var(--pc);color:#1B1340;border:4px solid #1B1340;border-radius:18px;box-shadow:5px 5px 0 #1B1340;padding:6px 22px;font-family:'Lilita One','Baloo 2',sans-serif;font-size:clamp(24px,3vw,40px);display:flex;align-items:center;gap:10px}
+.atn-steps b{background:#fff;border:3px solid #1B1340;border-radius:50%;width:1.3em;height:1.3em;display:grid;place-items:center;font-size:.75em}
+.scn-attn #attnOk{border:4px solid #1B1340;box-shadow:5px 5px 0 #1B1340;color:#1B1340!important;font-family:'Lilita One','Baloo 2',sans-serif;font-size:28px;padding:10px 34px}
+@media (prefers-reduced-motion:reduce){.scn-art svg,.scn-art.pop,.atn-art svg{animation:none}}
+@media (max-width:600px){.card.scene h1{max-width:100%}}
+.card.scene .eyebrow{color:#1B1340!important}
+body.scrap .card.door{color:var(--ink,#2B2B2B)} body.scrap .card.door [style*="CDEBD9"]{color:#5A5550!important} body.scrap #doorLeft{color:var(--gum-d)!important}
+body.scrap .door .task{background:#FFE88F;color:#1B1340}
+.scn-band,.scn-art{zoom:1!important}
+
 </style>
 
 <svg class="land" viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60 C 260 10 520 40 760 70 S 1200 100 1440 50 L1440 150 L0 150 Z" fill="#7CC79A" id="hill1"></path><path d="M0 110 C 300 80 600 105 900 120 S 1260 130 1440 100 L1440 150 L0 150 Z" fill="#2F8F6B"></path></svg>
@@ -1000,7 +1037,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.3 · 13 Nov 2026';
+const VERSION='Roomie v2.4 · 13 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1631,7 +1668,7 @@ function renderSetup(){
     const RC=[['match','Match my colour',''],['pink','Pink','#FF8CC6'],['blue','Blue','#7EC3FF'],['green','Green','#7FDCA6'],['orange','Orange','#FFAA6E'],['purple','Purple','#B49BFF']];
     const LK=[['scrap','Scrapbook','#EFE6CC'],['grape','Grape soda','#7B5CFA'],['tomato','Tomato and navy','#FF6B4A'],['mint','Mint and bubblegum','#6EE7C5'],['bush','Bush (original)','#BFE8FA']];
     const sw=(attr,cur,list)=>'<div class="swatches">'+list.map(([k,l,c])=>'<button type="button" class="swatch" '+attr+'="'+k+'" aria-pressed="'+(cur===k)+'"><i style="background:'+(c||'conic-gradient(#E2558F,#3B82C4,#2E9466,#E8613F,#7457C9,#E2558F)')+'"></i><span>'+esc(l)+'</span></button>').join('')+'</div>';
-    body='<h3>Colour</h3>'+(S.theme==='scrap'?'':'<p class="hint" style="margin:0">Colours apply to the Scrapbook look.</p>')+sw('data-acc',S.accent||'pink',SW)+'<h3>Roomie’s colour</h3>'+sw('data-rc',S.roomieCol||'match',RC)+'<h3>Look</h3>'+sw('data-look',S.theme,LK)+'<h3>Today’s timetable</h3>'+sw('data-daypos',S.dayPos||'side',[['side','Down the side','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="9" height="28" rx="2" fill="#E2558F"/><rect x="16" y="6" width="20" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['top','Across the top','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="6" rx="2" fill="#E2558F"/><rect x="4" y="15" width="32" height="19" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['hide','Hidden','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover']])+'<p class="hint" style="margin:0">Changes show on the board straight away. Tap Done to see them.</p>'+(typeof dockSetupHTML==='function'?stkSetupHTML()+dockSetupHTML():''); }
+    body='<h3>Colour</h3>'+(S.theme==='scrap'?'':'<p class="hint" style="margin:0">Colours apply to the Scrapbook look.</p>')+sw('data-acc',S.accent||'pink',SW)+'<h3>Roomie’s colour</h3>'+sw('data-rc',S.roomieCol||'match',RC)+'<h3>Look</h3>'+sw('data-look',S.theme,LK)+'<h3>Today’s timetable</h3>'+sw('data-daypos',S.dayPos||'side',[['side','Down the side','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="9" height="28" rx="2" fill="#E2558F"/><rect x="16" y="6" width="20" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['top','Across the top','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="6" rx="2" fill="#E2558F"/><rect x="4" y="15" width="32" height="19" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['hide','Hidden','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover']])+'<p class="hint" style="margin:0">Changes show on the board straight away. Tap Done to see them.</p>'+(typeof dockSetupHTML==='function'?scSetupHTML()+dockSetupHTML():''); }
   if(tab==='fun'){ body='<div class="row" style="align-items:flex-end"><div class="fld" style="width:220px"><label for="fFun">Fun level</label><select id="fFun">'+opt('calm','Calm: just the essentials',S.fun)+opt('lively','Lively (recommended)',S.fun)+opt('party','Party: everything on',S.fun)+'</select></div><button class="btn gold" type="button" data-sact="testFun">Test a celebration</button></div><label class="chk"><input type="checkbox" id="fMascot" '+(S.mascot!==false?'checked':'')+'><span>Show Roomie the mascot<span class="hint" style="display:block">Sings with the music, cheers for points, says hello at each change</span></span></label><label class="chk"><input type="checkbox" id="fSfx" '+(S.sfx!==false?'checked':'')+'><span>Celebration sounds<span class="hint" style="display:block">Fanfares, drumrolls and pops. The attention chime always plays.</span></span></label><p class="hint" style="margin:0">Fun comes in bursts: celebrations, races and reveals. During learning the board stays calm. If a computer is set to reduce motion, Roomie turns the animations off.</p><h3>Rotations</h3><div class="row" style="align-items:flex-start"><div class="fld" style="flex:1;min-width:240px"><label for="fStations">Stations, one per line (2 to 8)</label><textarea id="fStations" style="min-height:180px">'+esc(S.stations||'')+'</textarea></div><div class="fld" style="width:160px"><label for="fRotMin">Minutes at each</label><input id="fRotMin" type="number" min="2" max="40" value="'+(S.rotMin||12)+'"></div></div><p class="hint" style="margin:0">Roomie makes one crew per station from your class list. Crews move one station each round, with a 45-second move song.</p>'; }
   if(tab==='demo'){ const P=phaseAt(now()); body='<div class="okbox" style="font-size:16px">Try the whole day without waiting. The clock on the board jumps; nothing else changes.</div><div class="row"><button class="btn gold" type="button" data-sact="demoStart">Start the day at 8:40</button><button class="btn" type="button" data-sact="demoNext">Jump to 10 seconds before the next change</button><button class="btn alt" type="button" data-sact="demoReal">Back to the real time</button></div><p class="lead">Board time now: '+fmtClock(P.mins)+' · '+esc(P.phase)+(P.block?' · '+esc(P.block.name):'')+'</p>'; }
   if(tab==='coach'){ body=coachTab(); setTimeout(coachFillMics,0); }
@@ -3357,69 +3394,145 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-dk]'); if
 document.addEventListener('change',e=>{ const t=e.target; if(!t.dataset||!t.dataset.dk) return; const [a,k]=t.dataset.dk.split(':'); if(a!=='show') return; const h=new Set(S.dockHide||[]); if(t.checked) h.delete(k); else h.add(k); S.dockHide=[...h]; save(); applyDock(); t.closest('.dockrow').classList.toggle('off',!t.checked); });
 setTimeout(applyDock,0);
 
-/* ---- v2.3: comic stickers. Bold pop-art bursts that suit each screen. All drawn here, original artwork. ---- */
-const STK_IC={
- bolt:'<path d="M14 0 L2 18 H11 L7 32 L22 11 H13 Z"/>',
- star:'<path d="M16 1l4.5 9.6 10.5 1.2-7.8 7.1 2.1 10.4L16 24 6.7 29.3l2.1-10.4L1 11.8l10.5-1.2z"/>',
- clock:'<circle cx="16" cy="17" r="13"/><path d="M16 9v8l6 4" fill="none" stroke="#1B1340" stroke-width="3" stroke-linecap="round"/>',
- q:'<circle cx="16" cy="16" r="14"/><path d="M11.5 12a4.5 4.5 0 1 1 6.5 4c-1.6.9-2 1.8-2 3.5" fill="none" stroke="#1B1340" stroke-width="3" stroke-linecap="round"/><circle cx="16" cy="24.5" r="2" fill="#1B1340"/>',
- bulb:'<path d="M16 2a10 10 0 0 0-6 18v4h12v-4A10 10 0 0 0 16 2z"/><rect x="11" y="26" width="10" height="4" rx="2" fill="#1B1340"/>',
- heart:'<path d="M16 29S3 21 3 11.5A6.5 6.5 0 0 1 16 8a6.5 6.5 0 0 1 13 3.5C29 21 16 29 16 29z"/>',
- music:'<path d="M12 4l16-3v19a4.5 4.5 0 1 1-3-4.2V8.5l-10 2V24a4.5 4.5 0 1 1-3-4.2z"/>',
- people:'<circle cx="10" cy="9" r="5"/><circle cx="22" cy="9" r="5"/><path d="M1 28c0-6 4-10 9-10s9 4 9 10zM13 28c0-6 4-10 9-10s9 4 9 10z"/>',
- dice:'<rect x="2" y="2" width="28" height="28" rx="6"/><g fill="#1B1340"><circle cx="9" cy="9" r="2.6"/><circle cx="23" cy="23" r="2.6"/><circle cx="16" cy="16" r="2.6"/><circle cx="23" cy="9" r="2.6"/><circle cx="9" cy="23" r="2.6"/></g>',
- cloud:'<path d="M8 26a7 7 0 0 1-.8-14A9 9 0 0 1 24.5 10 7.5 7.5 0 0 1 25 26z"/>',
- ticket:'<path d="M2 8h28v5a3 3 0 0 0 0 6v5H2v-5a3 3 0 0 0 0-6z"/>',
- check:'<circle cx="16" cy="16" r="14"/><path d="M9 16.5l5 5 9-10" fill="none" stroke="#1B1340" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>',
- sun:'<circle cx="16" cy="16" r="8"/><g stroke="#1B1340" stroke-width="3" stroke-linecap="round"><path d="M16 1v4M16 27v4M1 16h4M27 16h4M5 5l3 3M24 24l3 3M5 27l3-3M24 8l3-3"/></g>',
- bag:'<path d="M5 11h22l-2 18H7z"/><path d="M11 11V8a5 5 0 0 1 10 0v3" fill="none" stroke="#1B1340" stroke-width="3"/>'};
-const STK_COL={gold:['#FFD84D','#F2785C'],pink:['#FF8CC6','#7E5BEF'],blue:['#7EC3FF','#F06AA8'],green:['#7FDCA6','#F5B700'],coral:['#FF9A7A','#4A9FE0'],lilac:['#C9B6FF','#FFD84D'],sky:['#BFE3FF','#9B6BE0']};
-function stkShape(kind){ if(kind==='burst'){ let p=''; const n=13; for(let i=0;i<n*2;i++){ const r=i%2?58:96, a=Math.PI*i/n-0.2; p+=(130+r*1.25*Math.cos(a)).toFixed(1)+','+(100+r*Math.sin(a)).toFixed(1)+' '; } return '<polygon points="'+p+'"/>'; }
-  if(kind==='cloud') return '<path d="M52 150 C14 150 10 104 44 96 C34 54 92 36 112 64 C128 22 196 26 202 74 C246 72 256 132 214 146 C206 172 164 176 150 158 C130 182 80 180 74 158 C66 160 58 156 52 150 Z"/>';
-  if(kind==='bubble') return '<path d="M40 22 H222 Q244 22 244 44 V132 Q244 154 222 154 H112 L66 188 L78 154 H40 Q18 154 18 132 V44 Q18 22 40 22 Z"/>';
-  return '<path d="M28 34 L232 18 L218 92 L246 100 L224 176 L22 168 L36 104 L14 96 Z"/>'; }
-let STK_N=0;
-function stickerSVG(o){ const id='hd'+(++STK_N), c=STK_COL[o.col]||STK_COL.gold, lines=String(o.word).split('|'), K='#1B1340', sh=stkShape(o.shape);
-  const fs=lines.length>1?(Math.max(...lines.map(l=>l.length))>9?30:36):(o.word.length>8?36:46), y0=lines.length>1?92:112;
-  return '<svg viewBox="0 0 260 200" class="stksvg" aria-hidden="true"><defs><pattern id="'+id+'" width="9" height="9" patternUnits="userSpaceOnUse"><circle cx="4.5" cy="4.5" r="1.7" fill="#fff" opacity=".45"/></pattern></defs>'+
-   '<g transform="translate(9 9)" fill="'+c[1]+'">'+sh+'</g><g fill="'+c[0]+'" stroke="'+K+'" stroke-width="5" stroke-linejoin="round">'+sh+'</g><g fill="url(#'+id+')">'+sh+'</g>'+
-   lines.map((l,i)=>'<text x="130" y="'+(y0+i*(fs+2))+'" text-anchor="middle" font-family="Lilita One,Baloo 2,Impact,sans-serif" font-weight="800" font-size="'+fs+'" fill="#fff" stroke="'+K+'" stroke-width="7" stroke-linejoin="round" paint-order="stroke" letter-spacing="1">'+esc(l)+'</text>').join('')+
-   (o.icon&&STK_IC[o.icon]?'<g transform="translate(196 136) rotate(10)" fill="'+c[1]+'" stroke="'+K+'" stroke-width="2.5" stroke-linejoin="round">'+STK_IC[o.icon]+'</g>':'')+'</svg>'; }
-const STK_BREAK={statue:['FREEZE!','burst','coral','star'],animals:['ROAR!','burst','gold','bolt'],weatherbody:['WHOOSH!','cloud','sky','cloud'],shake:['5-4-3-2-1!','burst','pink','bolt'],mirror:['COPY|ME!','bubble','lilac','people'],says:['ROOMIE|SAYS!','bubble','pink','star'],rather:['WOULD YOU|RATHER?','bubble','blue','q'],oddone:['SPOT|IT!','burst','green','q'],champ:['ROCK!|PAPER!','bolt','coral','bolt'],count:['COUNT|IT UP!','burst','gold','star'],coin:['HEADS|OR HIPS?','bolt','blue','dice'],squiggle:['SQUIGGLE!','cloud','lilac','star'],rhyme:['RHYME|TIME!','bubble','green','music'],moved:['WHAT’S|MOVED?','bubble','gold','q'],voice:['WHO|SAID IT?','bubble','pink','q'],thisthat:['THIS|OR THAT?','bolt','green','bolt'],listrace:['BEAT|THE LIST!','burst','coral','clock'],thanks:['THANK|YOU!','cloud','pink','heart'],portrait:['SAY|CHEESE!','burst','blue','star'],factswap:['FACT|SWAP!','bubble','lilac','bulb'],balloon:['BREATHE|IN…','cloud','sky','cloud'],square:['BREATHE|IN…','cloud','green','cloud'],finger:['BREATHE|SLOW…','cloud','lilac','heart']};
-const STK_TYPE={movement:['MOVE IT!','burst','coral','bolt'],game:['GAME ON!','bolt','blue','dice'],calm:['CHILL|OUT','cloud','sky','cloud'],breathing:['BREATHE…','cloud','sky','cloud']};
-const STK_OV={thpick:['THINK|BIG!','cloud','lilac','bulb'],tpick:['TICKET|TIME!','bubble','gold','ticket'],rpick:['LOOK|BACK','cloud','sky','bulb'],routines:['ROUTINE|TIME!','burst','gold','star'],late:['WELCOME|IN!','burst','pink','sun'],brainpick:['BRAIN|BREAK!','burst','gold','bolt'],timer:['TICK|TOCK!','burst','blue','clock'],pick:['WHO’S|NEXT?','bubble','pink','q'],hero:['MYSTERY|HERO!','burst','lilac','star'],groups:['TEAM|UP!','bolt','green','people'],checkin:['HOW ARE|YOU?','cloud','pink','heart'],exit:['SHOW WHAT|YOU KNOW!','bubble','gold','ticket'],ticket:['SHOW WHAT|YOU KNOW!','bubble','gold','ticket'],think:['THINK|BIG!','cloud','lilac','bulb'],quiz:['QUIZ|TIME!','bolt','coral','star'],poll:['VOTE!','burst','green','check'],reflect:['LOOK|BACK','cloud','sky','bulb'],packup:['PACK|IT UP!','bolt','gold','bag'],finish:['ALL|DONE?','bubble','green','check'],reteach:['LET’S TRY|AGAIN!','bubble','blue','bulb'],door:['WELCOME|IN!','burst','pink','sun'],seats:['FIND YOUR|SEAT!','bubble','blue','people'],jobs:['HELPERS|ASSEMBLE!','bolt','gold','people'],rotate:['ROTATE!','bolt','coral','clock'],manualRoutine:['LET’S|GO!','burst','gold','star'],practise:['READY…|GO!','burst','coral','clock'],calm:['AHHH…','cloud','sky','cloud'],join:['JOIN|IN!','burst','green','people'],groupsShow:['TEAM|UP!','bolt','green','people']};
-const STK_ROUT={arrival:['GOOD|MORNING!','burst','gold','sun'],lineup:['LINE|UP!','bolt','blue','people'],packup:['PACK|IT UP!','bolt','gold','bag'],cleanup:['TIDY|TIME!','burst','green','star'],changeover:['ALL|CHANGE!','bolt','coral','bolt'],settle:['WELCOME|BACK!','cloud','sky','heart'],endofday:['WHAT A|DAY!','burst','pink','star']};
-function stkPick(){ const o=A.overlay, P=A.P||{};
-  if(o==='brain'&&A.brain){ const b=A.brain; return ['b:'+b.id].concat(STK_BREAK[b.id]||STK_TYPE[b.breath?'breathing':b.type]||STK_TYPE.game); }
-  if(o&&STK_OV[o]) return ['o:'+o].concat(STK_OV[o]);
-  if(o) return null;
-  if(P.phase==='routine'&&P.routine){ const r=STK_ROUT[P.routine.id]; return r?['r:'+P.routine.id].concat(r):null; }
-  if(P.phase==='break'&&P.block){ const n=/lunch/i.test(P.block.name); return ['k:'+P.block.name,n?'LUNCH|TIME!':'PLAY|TIME!','burst',n?'green':'gold','sun']; }
+/* ---- v2.4: Screen designs. Each screen gets a patterned header band, chunky colour-block title and its own picture.
+   All artwork is original, drawn here as SVG. ---- */
+const SCK='#1B1340', SKIN=['#F6C9A0','#D9A06F','#8D5A3B','#FFE0BD','#B97A4E'], HAIR=['#3B2A20','#1B1340','#8A4B21','#E0A43A','#5A3A8A'];
+const sc={
+ c:(x,y,r,f,e)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${f}" ${e||''}/>`,
+ e:(x,y,rx,ry,f,e)=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${f}" ${e||''}/>`,
+ r:(x,y,w,h,rx,f,e)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${f}" ${e||''}/>`,
+ p:(d,f,e)=>`<path d="${d}" fill="${f||'none'}" ${e||''}/>`,
+ t:(x,y,s,txt,f,e)=>`<text x="${x}" y="${y}" font-family="Lilita One,Baloo 2,sans-serif" font-size="${s}" text-anchor="middle" fill="${f||SCK}" stroke="none" ${e||''}>${txt}</text>`,
+ sp:(x,y,s,f)=>`<path d="M${x} ${y-s}Q${x} ${y} ${x+s} ${y}Q${x} ${y} ${x} ${y+s}Q${x} ${y} ${x-s} ${y}Q${x} ${y} ${x} ${y-s}Z" fill="${f||'#fff'}" stroke-width="2.5"/>`,
+ note:(x,y,f)=>`<path d="M${x+6} ${y}V${y-26}l12 5v7l-12-5" fill="${f}"/><ellipse cx="${x}" cy="${y}" rx="7.5" ry="6" fill="${f}" transform="rotate(-20 ${x} ${y})"/>`,
+ g:(tf,inner)=>`<g transform="${tf}">${inner}</g>`
+};
+function scKid(shirt,skin,pose,hair){ const A={up:[[-22,-4],[22,-4]],out:[[-28,14],[28,14]],down:[[-15,36],[15,36]],waveL:[[-22,-6],[15,36]],waveR:[[-15,36],[22,-6]],hip:[[-20,28],[20,28]]}[pose||'down'];
+ return `<g stroke-width="6">`+A.map((a,i)=>`<path d="M${i?9:-9} 17L${a[0]} ${a[1]}" stroke="${SCK}"/>`).join('')+`<path d="M-5 38L-8 58M5 38L8 58" stroke="${SCK}"/></g>`+
+  sc.r(-11,12,22,28,9,shirt)+sc.c(0,0,12,skin)+sc.p('M-12 -1A12 12 0 0 1 12 -1Q4 -9 -12 -1Z',hair)+`<g stroke="none" fill="${SCK}"><circle cx="-4.5" cy="1" r="1.8"/><circle cx="4.5" cy="1" r="1.8"/></g>`+sc.p('M-4 5Q0 8.5 4 5','none','stroke-width="2.2"'); }
+const scHand=(x,y,s,skin)=>sc.g(`translate(${x} ${y}) scale(${s})`,sc.r(-25,0,50,50,18,skin)+[-23,-11,1,13].map((fx,i)=>sc.r(fx,-30+(i===0||i===3?6:0),11,38,6,skin)).join('')+sc.r(-40,14,30,12,6,skin,'transform="rotate(-30 -25 20)"')+sc.r(-25,0,50,50,18,skin,'stroke="none"'));
+const scBubble=(x,y,w,h,f,tail)=>sc.p(`M${x+14} ${y}H${x+w-14}Q${x+w} ${y} ${x+w} ${y+14}V${y+h-14}Q${x+w} ${y+h} ${x+w-14} ${y+h}H${tail==='r'?x+w-26:x+40}L${tail==='r'?x+w-14:x+22} ${y+h+16}L${tail==='r'?x+w-44:x+28} ${y+h}H${x+14}Q${x} ${y+h} ${x} ${y+h-14}V${y+14}Q${x} ${y} ${x+14} ${y}Z`,f);
+const scCloud=(x,y,s,f)=>sc.g(`translate(${x} ${y}) scale(${s})`,sc.p('M-30 14C-46 14-46-8-28-8C-28-28 0-34 8-18C18-30 42-24 40-4C54-2 52 14 38 14Z',f));
+const scBolt=(x,y,s,f)=>sc.g(`translate(${x} ${y}) scale(${s})`,sc.p('M6-30L-14 4H0L-6 30L16-6H2Z',f));
+const scSun=(x,y,r,f)=>`<g stroke-width="4">`+Array.from({length:8},(_,i)=>{const a=i*Math.PI/4;return `<path d="M${(x+Math.cos(a)*(r+6)).toFixed(1)} ${(y+Math.sin(a)*(r+6)).toFixed(1)}L${(x+Math.cos(a)*(r+15)).toFixed(1)} ${(y+Math.sin(a)*(r+15)).toFixed(1)}"/>`;}).join('')+`</g>`+sc.c(x,y,r,f);
+const scFace=(x,y,r,f,m)=>sc.c(x,y,r,f)+`<g stroke="none" fill="${SCK}"><circle cx="${x-r*.33}" cy="${y-r*.15}" r="${r*.1}"/><circle cx="${x+r*.33}" cy="${y-r*.15}" r="${r*.1}"/></g>`+sc.p(m==='flat'?`M${x-r*.35} ${y+r*.38}H${x+r*.35}`:m==='sad'?`M${x-r*.38} ${y+r*.5}Q${x} ${y+r*.18} ${x+r*.38} ${y+r*.5}`:`M${x-r*.42} ${y+r*.25}Q${x} ${y+r*.72} ${x+r*.42} ${y+r*.25}`,'none','stroke-width="3"');
+const scArrowCycle=(c1,c2)=>sc.p('M40 62A40 40 0 0 1 112 46','none','stroke-width="10" stroke="'+SCK+'"')+sc.p('M40 62A40 40 0 0 1 112 46','none','stroke-width="5" stroke="'+c1+'"')+sc.p('M100 32L122 48L98 58Z',c1)+sc.p('M120 80A40 40 0 0 1 48 96','none','stroke-width="10" stroke="'+SCK+'"')+sc.p('M120 80A40 40 0 0 1 48 96','none','stroke-width="5" stroke="'+c2+'"')+sc.p('M60 110L38 94L62 84Z',c2);
+const SC_ART={
+ statue:()=>sc.e(80,120,40,7,'#00000022','stroke="none"')+sc.g('translate(80 54)',scKid('#FF8CC6',SKIN[1],'out',HAIR[0]))+sc.note(22,62,'#B79CFF')+sc.note(38,34,'#FFD84D')+sc.c(132,32,16,'#7EC3FF')+sc.r(125,24,4.5,16,2,'#fff','stroke="none"')+sc.r(134,24,4.5,16,2,'#fff','stroke="none"')+sc.sp(140,96,9,'#BFE3FF')+sc.sp(18,104,7,'#FFD84D'),
+ animals:()=>sc.e(80,92,48,32,'#6FD6A0')+sc.e(80,100,28,18,'#C6F2D8','stroke="none"')+sc.e(46,118,16,8,'#6FD6A0')+sc.e(114,118,16,8,'#6FD6A0')+sc.c(58,58,15,'#6FD6A0')+sc.c(102,58,15,'#6FD6A0')+sc.c(58,58,9,'#fff')+sc.c(102,58,9,'#fff')+sc.c(60,59,4.5,SCK,'stroke="none"')+sc.c(100,59,4.5,SCK,'stroke="none"')+sc.p('M58 84Q80 102 102 84','none')+sc.e(54,80,5,3,'#FF8CC6','stroke="none"')+sc.e(106,80,5,3,'#FF8CC6','stroke="none"')+sc.sp(140,30,9,'#FFD84D')+sc.sp(20,36,7,'#fff'),
+ weatherbody:()=>scSun(52,44,20,'#FFD84D')+scCloud(90,64,1.08,'#fff')+scBolt(92,108,0.9,'#FFD84D')+`<g stroke="#4A9FE0" stroke-width="5"><path d="M124 96l-5 12M138 92l-5 12M64 96l-5 12"/></g>`,
+ shake:()=>scHand(80,64,1.15,SKIN[3])+`<g stroke-width="5" fill="none"><path d="M28 44q-12 18 0 36M16 36q-16 26 0 52M132 44q12 18 0 36M144 36q16 26 0 52"/></g>`,
+ mirror:()=>sc.g('translate(44 46)',scKid('#7EC3FF',SKIN[0],'waveL',HAIR[2]))+sc.g('translate(116 46)',scKid('#FF8CC6',SKIN[2],'waveR',HAIR[1]))+sc.p('M80 14V128','none','stroke-dasharray="6 9" stroke-width="3"')+sc.sp(80,8,7,'#FFD84D'),
+ says:()=>scBubble(10,10,140,64,'#fff')+sc.t(80,38,22,'ROOMIE')+sc.t(80,64,22,'SAYS…','#F06AA8')+sc.g('translate(120 96) scale(.62)',scKid('#FFD84D',SKIN[1],'up',HAIR[0]))+sc.sp(40,112,10,'#FFD84D'),
+ rather:()=>sc.r(14,28,58,80,12,'#FFD84D','transform="rotate(-9 43 68)"')+sc.t(42,82,40,'A','#1B1340','transform="rotate(-9 43 68)"')+sc.r(88,28,58,80,12,'#7EC3FF','transform="rotate(9 117 68)"')+sc.t(118,82,40,'B','#1B1340','transform="rotate(9 117 68)"')+sc.c(80,72,18,'#FF8CC6')+sc.t(80,80,20,'OR','#fff'),
+ oddone:()=>[[24,14],[84,14],[24,74],[84,74]].map(([x,y],i)=>sc.r(x,y,52,52,12,'#fff')+(i===3?sc.p(`M${x+26} ${y+10}L${x+44} ${y+42}H${x+8}Z`,'#7EC3FF'):sc.c(x+26,y+26,15,'#FFA94D'))).join('')+sc.r(78,68,64,64,16,'none','stroke="#F06AA8" stroke-dasharray="7 6" stroke-width="4"'),
+ champ:()=>sc.c(36,82,26,'#FFD84D')+sc.p('M22 90q-4-14 8-20q6-10 16-4q12 2 10 14q4 12-10 14H28q-8 0-6-4Z','#B9B2C9')+sc.c(80,46,26,'#7EC3FF')+sc.p('M68 30H86L94 38V64H68Z','#fff')+sc.p('M86 30V38H94','none','stroke-width="2.5"')+sc.c(124,82,26,'#FF8CC6')+sc.c(114,94,6,'#fff')+sc.c(126,96,6,'#fff')+sc.p('M117 89L134 66M123 90L120 64','none','stroke-width="4"'),
+ count:()=>[[22,108,14,'1','#FFD84D'],[48,86,15,'2','#FF8CC6'],[78,70,16,'3','#7EC3FF'],[106,56,12,'…','#6FD6A0'],[134,36,20,'20','#FFA94D']].map(([x,y,r,n,f])=>sc.c(x,y,r,f)+sc.t(x,y+r*.42,r*1.15,n)).join('')+sc.sp(140,100,9,'#fff'),
+ coin:()=>sc.p('M30 112Q14 70 40 36','none','stroke-width="4" stroke-dasharray="2 9"')+sc.c(78,74,42,'#FFD84D')+sc.c(78,74,32,'#FFE88F')+sc.t(78,90,42,'H')+sc.e(134,40,6,16,'#FFD84D')+sc.sp(130,100,9,'#fff')+sc.sp(34,26,7,'#FFD84D'),
+ squiggle:()=>sc.r(18,16,112,96,10,'#fff','transform="rotate(-5 74 64)"')+sc.p('M34 82C48 26 66 112 82 58S118 40 110 92','none','stroke="#F06AA8" stroke-width="6"')+sc.g('rotate(38 120 104)',sc.r(96,96,52,16,4,'#FFD84D')+sc.p('M148 96L164 104L148 112Z','#F6C9A0')+sc.r(88,96,10,16,3,'#FF8CC6')),
+ rhyme:()=>scBubble(8,12,76,46,'#FF8CC6')+sc.t(46,44,26,'CAT')+scBubble(76,62,76,46,'#7EC3FF','r')+sc.t(114,94,26,'HAT')+sc.note(30,120,'#FFD84D')+sc.sp(140,26,8,'#FFD84D'),
+ moved:()=>sc.r(30,56,48,10,4,'#FFA94D')+sc.r(30,22,10,44,4,'#FFA94D')+`<g stroke-width="6"><path d="M36 66V104M72 66V104"/></g>`+sc.c(108,60,28,'#BFE3FF')+sc.p('M126 80L148 106','none','stroke-width="11"')+sc.p('M126 80L148 106','none','stroke-width="5" stroke="#FF8CC6"')+sc.t(108,72,32,'?')+sc.sp(20,118,8,'#FFD84D'),
+ voice:()=>scFace(62,72,38,SKIN[1])+sc.r(22,54,80,16,8,'#FF8CC6')+sc.p('M48 54L42 46M76 54L82 46','none','stroke-width="3"')+`<g fill="none" stroke-width="5"><path d="M110 56q10 16 0 32M124 46q18 26 0 52M138 36q24 36 0 72"/></g>`,
+ thisthat:()=>sc.r(72,16,14,116,4,'#C98A4B')+sc.p('M18 38H76V70H18L4 54Z','#FFD84D')+sc.t(42,62,19,'THIS')+sc.p('M82 76H142L156 92L142 108H82Z','#7EC3FF')+sc.t(116,100,19,'THAT')+sc.e(79,132,30,6,'#6FD6A0'),
+ listrace:()=>sc.r(16,18,74,106,8,'#C98A4B')+sc.r(24,30,58,88,4,'#fff')+sc.r(38,12,30,14,5,'#B9B2C9')+[48,68,88].map(y=>sc.p(`M32 ${y}l5 5 9-10`,'none','stroke="#2F8F6B" stroke-width="4"')+sc.p(`M52 ${y}H74`,'none','stroke-width="3"')).join('')+sc.c(118,86,28,'#fff')+sc.r(112,50,12,9,3,'#FF8CC6')+sc.p('M118 86V68M118 86L130 94','none','stroke-width="4"'),
+ thanks:()=>sc.p('M80 128S26 94 26 60A26 26 0 0 1 80 46A26 26 0 0 1 134 60C134 94 80 128 80 128Z','#FF8CC6')+sc.p('M48 58q4-12 16-12','none','stroke="#fff" stroke-width="5"')+[[22,22,'1'],[80,14,'2'],[138,22,'3']].map(([x,y,n])=>sc.c(x,y,12,'#FFD84D')+sc.t(x,y+6,16,n)).join(''),
+ portrait:()=>`<g stroke-width="6"><path d="M50 96L34 136M110 96L126 136M80 96V136"/></g>`+sc.r(28,14,104,84,6,'#fff')+scFace(80,54,24,SKIN[0])+sc.p('M58 40Q80 18 102 40','none','stroke="#8A4B21" stroke-width="7"')+sc.g('rotate(-35 136 100)',sc.r(118,96,44,8,4,'#C98A4B')+sc.p('M118 92L104 100L118 108Z','#F06AA8')),
+ factswap:()=>scBubble(6,40,64,50,'#7EC3FF')+sc.t(38,76,34,'?')+scBubble(90,40,64,50,'#FF8CC6','r')+sc.t(122,76,34,'!')+sc.c(80,24,14,'#FFD84D')+sc.r(74,36,12,8,2,'#B9B2C9')+sc.sp(80,124,8,'#FFD84D'),
+ balloon:()=>sc.p('M80 98Q70 116 86 126T80 140','none','stroke-width="3"')+sc.e(80,56,36,42,'#FF8CC6')+sc.p('M74 98H86L80 90Z','#FF8CC6')+sc.p('M62 36q6-12 18-14','none','stroke="#fff" stroke-width="6"')+`<g fill="none" stroke-width="4" stroke="#7EC3FF"><path d="M14 50q10-6 20 0t20 0M10 72q10-6 20 0t20 0"/></g>`,
+ square:()=>sc.r(36,22,88,88,10,'none','stroke-width="9"')+sc.r(36,22,88,88,10,'none','stroke="#6FD6A0" stroke-width="4" stroke-dasharray="10 8"')+sc.c(36,22,10,'#FFD84D')+sc.t(80,16,13,'IN')+sc.t(140,70,13,'HOLD','#1B1340','transform="rotate(90 140 66)"')+sc.t(80,130,13,'OUT')+sc.t(20,70,13,'HOLD','#1B1340','transform="rotate(-90 20 66)"'),
+ finger:()=>scHand(80,72,1.1,SKIN[0])+sc.p('M52 80L56 40L64 80L70 34L77 80L83 34L90 80L96 44L101 80','none','stroke="#F06AA8" stroke-width="4.5"')+sc.c(52,80,5,'#F06AA8','stroke-width="2.5"'),
+ /* routines */
+ arrival:()=>scSun(122,40,20,'#FFD84D')+sc.p('M28 66L80 30L132 66Z','#F2785C')+sc.r(36,64,88,62,4,'#FFE0BD')+sc.r(70,92,22,34,4,'#7EC3FF')+sc.r(44,76,18,16,3,'#BFE3FF')+sc.r(100,76,18,16,3,'#BFE3FF')+sc.p('M80 30V10','none','stroke-width="3"')+sc.p('M80 10H98L92 16L98 22H80','#FF8CC6'),
+ lineup:()=>[[24,'#FF8CC6',0],[60,'#7EC3FF',2],[96,'#FFD84D',1],[132,'#6FD6A0',4]].map(([x,s,k],i)=>sc.g(`translate(${x} ${44+(i%2)*4}) scale(.95)`,scKid(s,SKIN[k],'down',HAIR[(k+1)%5]))).join('')+sc.p('M8 116H152','none','stroke-dasharray="8 7" stroke-width="3"'),
+ packup:()=>sc.r(46,30,68,96,24,'#7EC3FF')+sc.p('M64 30V20Q80 8 96 20V30','none','stroke-width="5"')+sc.r(58,78,44,34,10,'#FFD84D')+sc.p('M58 90H102','none','stroke-width="3"')+sc.r(62,22,12,26,3,'#FF8CC6','transform="rotate(-12 68 35)"')+sc.sp(132,34,9,'#FFD84D')+sc.sp(26,96,7,'#fff'),
+ cleanup:()=>sc.p('M32 16L80 92','none','stroke-width="9"')+sc.p('M32 16L80 92','none','stroke="#C98A4B" stroke-width="4"')+sc.p('M66 92L96 74L118 120L80 132Z','#FFD84D')+`<g stroke-width="2.5"><path d="M86 96l12 28M96 90l14 26"/></g>`+sc.p('M120 64H152L146 120H126Z','#6FD6A0')+sc.r(116,56,40,9,4,'#6FD6A0')+sc.sp(20,92,9,'#fff')+sc.sp(140,26,8,'#FFD84D'),
+ changeover:()=>scArrowCycle('#FFA94D','#7EC3FF')+sc.sp(80,72,12,'#FFD84D'),
+ settle:()=>scCloud(76,64,1.45,'#fff')+sc.p('M58 64q6 6 12 0M90 64q6 6 12 0','none','stroke-width="3"')+sc.p('M70 80q10 8 20 0','none','stroke-width="3"')+sc.e(54,74,5,3,'#FF8CC6','stroke="none"')+sc.e(106,74,5,3,'#FF8CC6','stroke="none"')+sc.t(136,30,18,'z')+sc.t(148,16,13,'z'),
+ endofday:()=>sc.p('M108 16A34 34 0 1 0 140 66A26 26 0 1 1 108 16Z','#FFD84D')+sc.p('M20 92L52 66L84 92Z','#F2785C')+sc.r(26,90,52,40,3,'#FFE0BD')+sc.r(44,102,16,16,3,'#FFD84D')+sc.sp(30,30,8,'#fff')+sc.sp(64,20,6,'#FFD84D')+sc.sp(134,108,8,'#fff'),
+ /* tools */
+ timer:()=>`<g stroke-width="6"><path d="M52 112L42 126M108 112L118 126"/></g>`+sc.p('M34 40A18 18 0 0 1 58 22Z','#FFD84D')+sc.p('M126 40A18 18 0 0 0 102 22Z','#FFD84D')+sc.c(80,74,44,'#F2785C')+sc.c(80,74,34,'#fff')+sc.p('M80 74V52M80 74L96 84','none','stroke-width="5"')+sc.c(80,74,4,SCK)+`<g fill="none" stroke-width="4"><path d="M18 64q-6 10 0 20M142 64q6 10 0 20"/></g>`,
+ pick:()=>sc.r(54,22,14,46,3,'#fff','transform="rotate(-14 61 45)"')+sc.r(78,14,14,46,3,'#FFD84D','transform="rotate(4 85 37)"')+sc.r(100,24,14,44,3,'#FF8CC6','transform="rotate(18 107 46)"')+sc.p('M44 60H116L108 118H52Z','#3B3486')+sc.r(44,58,72,14,4,'#F06AA8')+sc.e(80,118,52,10,'#3B3486')+sc.sp(26,40,9,'#FFD84D')+sc.sp(138,72,8,'#fff'),
+ checkin:()=>scFace(34,62,22,'#FFD84D')+scFace(80,62,22,'#6FD6A0')+scFace(126,62,22,'#7EC3FF','flat')+sc.r(18,104,124,22,11,'#fff')+sc.t(80,121,15,'HOW ARE YOU?'),
+ ticket:()=>sc.g('rotate(-10 80 70)',sc.p('M18 38H142V58A12 12 0 0 0 142 82V102H18V82A12 12 0 0 0 18 58Z','#FFD84D')+sc.p('M54 42V98','none','stroke-dasharray="5 6" stroke-width="3"')+sc.t(98,78,26,'EXIT')+sc.sp(36,70,9,'#FF8CC6'))+sc.sp(140,20,8,'#fff'),
+ think:()=>scCloud(86,46,1.15,'#fff')+sc.c(44,90,9,'#fff')+sc.c(30,110,6,'#fff')+sc.c(92,44,16,'#FFD84D')+sc.r(85,58,14,9,3,'#B9B2C9')+sc.p('M92 18V10M70 30l-6-6M114 30l6-6','none','stroke-width="4"'),
+ quiz:()=>sc.p('M48 22H112V50A32 32 0 0 1 48 50Z','#FFD84D')+sc.p('M48 30H30Q28 56 52 60M112 30H130Q132 56 108 60','none','stroke-width="6"')+sc.r(70,80,20,22,3,'#FFD84D')+sc.r(52,102,56,18,5,'#F2785C')+sc.sp(80,44,11,'#fff')+sc.sp(22,104,8,'#FF8CC6')+sc.sp(140,100,8,'#7EC3FF'),
+ poll:()=>sc.r(24,70,30,50,5,'#FF8CC6')+sc.r(64,34,30,86,5,'#6FD6A0')+sc.r(104,56,30,64,5,'#7EC3FF')+sc.p('M14 122H146','none','stroke-width="5"')+sc.c(79,20,13,'#FFD84D')+sc.p('M73 20l4 4 8-8','none','stroke-width="3"'),
+ reflect:()=>sc.p('M80 34Q50 22 18 30V118Q50 110 80 122Z','#fff')+sc.p('M80 34Q110 22 142 30V118Q110 110 80 122Z','#BFE3FF')+`<g stroke-width="3"><path d="M30 52H66M30 68H66M30 84H58M94 52H130M94 68H122"/></g>`+sc.g('rotate(30 120 92)',sc.r(96,86,44,11,3,'#FFD84D')+sc.p('M140 86L152 91.5L140 97Z','#F6C9A0')),
+ finish:()=>sc.r(30,12,86,114,8,'#fff')+[34,58,82].map(y=>sc.r(42,y,16,16,4,'#6FD6A0')+sc.p(`M45 ${y+8}l4 4 7-8`,'none','stroke-width="3"')+sc.p(`M66 ${y+8}H102`,'none','stroke-width="3"')).join('')+sc.c(118,104,22,'#FFD84D')+sc.sp(118,104,11,'#fff'),
+ reteach:()=>sc.r(16,20,128,82,8,'#2F8F6B')+sc.r(16,20,128,82,8,'none','stroke-width="7" stroke="#C98A4B"')+sc.t(64,72,30,'2+2','#fff')+sc.p('M104 46A18 18 0 1 1 100 76','none','stroke="#FFD84D" stroke-width="5"')+sc.p('M96 68L100 80L110 72Z','#FFD84D','stroke="#FFD84D"')+sc.r(40,108,80,8,4,'#C98A4B'),
+ door:()=>sc.r(40,14,80,116,6,'#FFE0BD')+sc.p('M48 22L100 30V124L48 128Z','#FFA94D')+sc.c(90,78,4,SCK)+sc.r(30,126,100,10,4,'#FF8CC6')+sc.sp(134,30,9,'#FFD84D')+sc.sp(22,60,7,'#FFD84D'),
+ late:()=>sc.r(26,14,70,116,6,'#FFE0BD')+sc.p('M34 22L80 30V124L34 128Z','#FFA94D')+sc.c(116,82,28,'#fff')+sc.p('M116 82V64M116 82L128 90','none','stroke-width="4"'),
+ groups:()=>[[44,26,'#FF8CC6',0],[116,26,'#7EC3FF',2],[44,86,'#FFD84D',1],[116,86,'#6FD6A0',4]].map(([x,y,s,k])=>sc.g(`translate(${x} ${y}) scale(.72)`,scKid(s,SKIN[k],'up',HAIR[k]))).join('')+sc.c(80,72,13,'#fff')+sc.sp(80,72,8,'#FFD84D'),
+ seats:()=>sc.r(30,56,100,14,5,'#C98A4B')+`<g stroke-width="6"><path d="M40 70V118M120 70V118"/></g>`+sc.r(20,80,30,8,3,'#7EC3FF')+sc.r(20,50,8,38,3,'#7EC3FF')+sc.r(110,80,30,8,3,'#FF8CC6')+sc.r(132,50,8,38,3,'#FF8CC6')+sc.r(60,36,28,20,3,'#fff')+sc.r(92,40,18,16,3,'#FFD84D'),
+ jobs:()=>sc.p('M62 76L48 132L64 122L72 136L80 82Z','#7EC3FF')+sc.p('M98 76L112 132L96 122L88 136L80 82Z','#FF8CC6')+sc.c(80,58,36,'#FFD84D')+sc.c(80,58,26,'#fff')+sc.t(80,66,20,'JOB'),
+ hero:()=>sc.p('M40 40Q80 20 120 40L132 126Q80 112 28 126Z','#F06AA8')+sc.p('M44 60Q80 44 116 60Q114 82 96 80Q88 70 80 72Q72 70 64 80Q46 82 44 60Z','#3B3486')+sc.e(64,66,8,6,'#fff')+sc.e(96,66,8,6,'#fff')+sc.sp(80,104,12,'#FFD84D'),
+ calm:()=>[46,34,22].map((r,i)=>sc.c(80,70,r,['#D6C7FF','#B79CFF','#fff'][i])).join('')+sc.p('M72 70q4 4 8 0M84 70q4 4 8 0','none','stroke-width="2.5"')+sc.p('M28 120q12-8 24 0t24 0t24 0t24 0','none','stroke="#7EC3FF" stroke-width="5"'),
+ routines:()=>sc.r(30,12,100,116,10,'#fff')+[34,62,90].map((y,i)=>sc.sp(48,y+6,9,['#FFD84D','#FF8CC6','#7EC3FF'][i])+sc.r(64,y,52,12,6,['#FFE88F','#FFBADD','#BFE3FF'][i],'stroke-width="2.5"')).join(''),
+ practise:()=>sc.c(70,78,40,'#fff')+sc.r(62,28,16,12,3,'#FF8CC6')+sc.p('M70 78V50M70 78L88 90','none','stroke-width="5"')+sc.p('M120 20V120','none','stroke-width="5"')+sc.p('M120 22H152L144 36L152 50H120Z','#6FD6A0'),
+ rotate:()=>scArrowCycle('#6FD6A0','#FF8CC6'),
+ lesson:()=>sc.p('M80 40Q50 28 14 36V122Q50 114 80 126Z','#fff')+sc.p('M80 40Q110 28 146 36V122Q110 114 80 126Z','#fff')+`<g stroke-width="3"><path d="M26 58H66M26 74H66M26 90H60M94 58H134M94 74H134M94 90H126"/></g>`+sc.sp(80,16,10,'#FFD84D')+sc.sp(140,14,7,'#FF8CC6'),
+ warning:()=>sc.r(44,12,72,12,5,'#C98A4B')+sc.r(44,116,72,12,5,'#C98A4B')+sc.p('M52 24H108Q108 54 84 70Q108 86 108 116H52Q52 86 76 70Q52 54 52 24Z','#BFE3FF')+sc.p('M60 108H100Q90 92 80 90Q70 92 60 108Z','#FFD84D','stroke="none"')+sc.p('M66 40H94Q88 54 80 58Q72 54 66 40Z','#FFD84D','stroke="none"'),
+ brk:()=>scSun(124,36,18,'#FFD84D')+sc.c(62,84,36,'#FF8CC6')+sc.p('M26 84H98M62 48Q42 84 62 120M62 48Q82 84 62 120','none','stroke-width="3.5"')+sc.p('M10 128H150','none','stroke="#2F8F6B" stroke-width="6"'),
+ today:()=>sc.r(26,24,108,100,10,'#fff')+sc.r(26,24,108,26,10,'#F06AA8')+`<g stroke-width="6"><path d="M50 14V34M110 14V34"/></g>`+[0,1,2].map(i=>[0,1].map(j=>sc.r(40+i*30,62+j*28,20,18,4,i+j===2?'#FFD84D':'#BFE3FF','stroke-width="2.5"')).join('')).join(''),
+ mirrorcoach:()=>sc.r(60,14,40,66,20,'#B79CFF')+`<g stroke-width="3"><path d="M64 34H96M64 46H96M64 58H96"/></g>`+sc.p('M44 60Q44 96 80 96Q116 96 116 60','none','stroke-width="6"')+sc.p('M80 96V120M58 122H102','none','stroke-width="6"')+`<g fill="none" stroke-width="4"><path d="M26 40q-8 14 0 28M134 40q8 14 0 28"/></g>`,
+ brainpick:()=>scBolt(80,70,2.2,'#FFD84D')+sc.sp(28,30,10,'#fff')+sc.sp(132,104,10,'#FF8CC6')+sc.sp(136,30,7,'#fff')+sc.sp(30,106,7,'#7EC3FF'),
+ attention:()=>sc.e(50,70,30,36,'#fff')+sc.e(110,70,30,36,'#fff')+sc.c(56,76,14,'#4A9FE0')+sc.c(104,76,14,'#4A9FE0')+sc.c(58,78,7,SCK,'stroke="none"')+sc.c(102,78,7,SCK,'stroke="none"')+sc.c(53,72,3.5,'#fff','stroke="none"')+sc.c(99,72,3.5,'#fff','stroke="none"')+`<g stroke-width="5"><path d="M24 24l10 10M50 14v12M136 24l-10 10M110 14v12"/></g>`
+};
+/* [pattern, band colour, pattern colour, art] */
+const SC_THEME={
+ statue:['dots','#FF8F6E','#FFB49C'],animals:['dots','#6FD6A0','#A8EBC6'],weatherbody:['waves','#7EC3FF','#B4DCFF'],shake:['zig','#FFA94D','#FFC98A'],mirror:['gingham','#B79CFF','#fff'],says:['burst','#FF8CC6','#FFBADD'],rather:['gingham','#7EC3FF','#fff'],oddone:['grid','#FFD84D','#FFE88F'],champ:['zig','#FF8F6E','#FFB49C'],count:['dots','#3FC1C9','#8FDDE1'],coin:['burst','#FFA94D','#FFC98A'],squiggle:['stripes','#B79CFF','#D6C7FF'],rhyme:['dots','#FF8CC6','#FFBADD'],moved:['gingham','#6FD6A0','#fff'],voice:['waves','#B79CFF','#D6C7FF'],thisthat:['stripes','#7EC3FF','#B4DCFF'],listrace:['grid','#FF8F6E','#FFB49C'],thanks:['dots','#FFBADD','#fff'],portrait:['stripes','#FFD84D','#FFE88F'],factswap:['gingham','#FFA94D','#fff'],balloon:['waves','#BFE3FF','#fff'],square:['grid','#A8EBC6','#fff'],finger:['waves','#D6C7FF','#fff'],
+ arrival:['burst','#FFD84D','#FFE88F'],lineup:['stripes','#7EC3FF','#B4DCFF'],packup:['zig','#FFA94D','#FFC98A'],cleanup:['gingham','#6FD6A0','#fff'],changeover:['dots','#FF8F6E','#FFB49C'],settle:['waves','#BFE3FF','#fff'],endofday:['stars','#3B3486','#fff'],
+ timer:['burst','#FF8F6E','#FFB49C'],pick:['dots','#B79CFF','#D6C7FF'],checkin:['gingham','#FF8CC6','#fff'],ticket:['grid','#FFD84D','#FFE88F'],tpick:['grid','#FFD84D','#FFE88F'],think:['dots','#7EC3FF','#B4DCFF'],thpick:['dots','#7EC3FF','#B4DCFF'],quiz:['burst','#3FC1C9','#8FDDE1'],poll:['stripes','#6FD6A0','#A8EBC6'],reflect:['waves','#B79CFF','#D6C7FF'],rpick:['waves','#B79CFF','#D6C7FF'],finish:['gingham','#6FD6A0','#fff'],reteach:['grid','#7EC3FF','#B4DCFF'],door:['burst','#FF8CC6','#FFBADD'],late:['dots','#FFA94D','#FFC98A'],groups:['zig','#6FD6A0','#A8EBC6'],seats:['gingham','#7EC3FF','#fff'],jobs:['stripes','#FFD84D','#FFE88F'],hero:['stars','#3B3486','#fff'],calm:['waves','#D6C7FF','#fff'],routines:['dots','#FFD84D','#FFE88F'],practise:['zig','#6FD6A0','#A8EBC6'],rotate:['stripes','#FF8CC6','#FFBADD'],brainpick:['zig','#FF8CC6','#FFBADD'],
+ lesson:['grid','#BFE3FF','#fff'],warning:['stripes','#FFD84D','#FFE88F'],brk:['burst','#6FD6A0','#A8EBC6'],today:['dots','#FF8CC6','#FFBADD'],mirrorcoach:['waves','#D6C7FF','#fff'],mprogress:['grid','#D6C7FF','#fff']
+};
+const SC_TYPE={movement:'statue',game:'rather',calm:'squiggle',breathing:'balloon'};
+const SC_WORD={statue:'FREEZE!',animals:'ROAR!',weatherbody:'WHOOSH!',shake:'SHAKE IT!',mirror:'COPY ME!',says:'ROOMIE SAYS!',rather:'WOULD YOU RATHER?',oddone:'SPOT IT!',champ:'ROCK! PAPER!',count:'COUNT IT UP!',coin:'HEADS OR HIPS?',squiggle:'SQUIGGLE!',rhyme:'RHYME TIME!',moved:'WHAT’S MOVED?',voice:'WHO SAID IT?',thisthat:'THIS OR THAT?',listrace:'BEAT THE LIST!',thanks:'THANK YOU!',portrait:'SAY CHEESE!',factswap:'FACT SWAP!'};
+function scKey(){ const o=A.overlay, P=A.P||{};
+  if(o==='brain'&&A.brain){ const b=A.brain; return SC_ART[b.id]?b.id:(SC_TYPE[b.breath?'breathing':b.type]||'statue'); }
+  if(o==='ticket'||o==='tpick') return o; if(o==='mirror') return 'mirrorcoach';
+  if(o==='groupsShow') return 'groups'; if(o==='manualRoutine') return 'routines';
+  if(o) return SC_THEME[o]?o:null;
+  if(P.phase==='routine'&&P.routine) return SC_ART[P.routine.id]?P.routine.id:'routines';
+  if(P.phase==='exit'||P.phase==='entry') return 'ticket';
+  if(P.phase==='lesson') return 'lesson'; if(P.phase==='warning') return 'warning'; if(P.phase==='break') return 'brk';
   return null; }
-function stickerize(){ const st=document.getElementById('stage'); if(!st||STUDENT||S.stickers===false) return; const pick=stkPick(); const old=st.querySelector(':scope > .stk');
-  if(!pick){ if(old) old.remove(); A.stkKey=''; return; }
-  const card=st.querySelector(':scope > .card, :scope > section.card'); if(!card) return;
-  const [key,word,shape,col,icon]=pick; const fresh=key!==A.stkKey;
-  if(old&&old.dataset.k===key){ stkPlace(old,card); return; } if(old) old.remove();
-  const d=document.createElement('div'); d.className='stk'+(fresh?' pop':''); d.dataset.k=key; const r=((key.length*37)%11)-5; d.style.setProperty('--r',(r>=0?r+3:r-3)+'deg'); d.innerHTML=stickerSVG({word,shape,col,icon}); st.appendChild(d); stkPlace(d,card);
-  if(fresh&&key.startsWith('b:')&&S.fun!=='calm'&&typeof burst==='function') burst(word.replace('|',' '));
-  A.stkKey=key; }
-function stkPlace(d,card){ const st=document.getElementById('stage'), sr=st.getBoundingClientRect(), cr=card.getBoundingClientRect();
-  const w=cr.width, h=cr.height, base=Math.round(Math.max(130,Math.min(270,w*0.3,h*0.42)));
-  const rr=e=>{ if(/^(H1|H2|H3|P|LABEL|LI)$/.test(e.tagName)&&!e.querySelector('button,input')){ const g=document.createRange(); g.selectNodeContents(e); return g.getBoundingClientRect(); } return e.getBoundingClientRect(); };
-  const els=[...card.querySelectorAll('*')].filter(e=>/^(BUTTON|INPUT|TEXTAREA|SELECT)$/.test(e.tagName)||(e.tagName.toLowerCase()==='svg'&&!e.classList.contains('stksvg'))||[...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim()));
-  const boxes=els.map(rr).filter(r=>r.width&&r.height&&r.bottom>cr.top&&r.top<cr.bottom);
-  const hit=(x,y,sz)=>{ const L=x+sz*0.1,T=y+sz*0.1,R=x+sz*0.9,B=y+sz*0.68; return boxes.some(r=>r.left<R&&r.right>L&&r.top<B&&r.bottom>T); };
-  const m=Math.max(12,w*0.022), tries=[];
-  for(const sz of [base,Math.round(base*0.78),Math.max(110,Math.round(base*0.6)),96]){ const hh=sz*0.77;
-    tries.push([cr.right-sz-m,cr.bottom-hh-m,sz],[cr.left+m,cr.bottom-hh-m,sz],[cr.right-sz-m,cr.top+h*0.42,sz],[cr.left+w*0.5-sz/2,cr.bottom-hh-m,sz],[cr.right-sz-m,cr.top+h*0.2,sz],[cr.left+w*0.55,cr.top+m,sz],[cr.left+w*0.42,cr.top+m,sz]); }
-  let pick=tries.find(([x,y,sz])=>!hit(x,y,sz));
-  if(!pick){ const sz=96; pick=[cr.right-sz-4,cr.bottom-sz*0.72,sz]; }
-  const [x,y,sz]=pick; d.style.width=sz+'px'; d.style.left=(x-sr.left)+'px'; d.style.top=(y-sr.top)+'px'; }
-{ const f=render; render=function(){ const r=f.apply(this,arguments); try{ stickerize(); }catch(_){ } return r; }; }
-addEventListener('resize',()=>{ const d=document.querySelector('#stage > .stk'), c=document.querySelector('#stage > .card'); if(d&&c) stkPlace(d,c); });
-function stkSetupHTML(){ return '<h3>Comic pictures</h3><label class="chk"><input type="checkbox" data-stkon '+(S.stickers===false?'':'checked')+'><span>Show a comic picture on each screen (like “BRAIN BREAK!” or “TICK TOCK!”)</span></label>'; }
-document.addEventListener('change',e=>{ const t=e.target; if(!t.matches||!t.matches('[data-stkon]')) return; S.stickers=t.checked; save(); if(!t.checked){ const d=document.querySelector('#stage > .stk'); if(d) d.remove(); A.stkKey=''; } });
+function scPlate(h,key){ const txt=h.textContent.trim(); if(!txt||h.dataset.scn===txt) return; const cols=['#FFD84D','#FF8CC6','#7EC3FF','#6FD6A0','#B79CFF','#FFA94D','#fff'];
+  const band=(SC_THEME[key]||[])[1], pool=cols.filter(c=>c.toLowerCase()!==String(band).toLowerCase()); let k=key.length%pool.length;
+  h.innerHTML=txt.split(/\s+/).map((w,i)=>'<span class="pl" style="--pc:'+pool[(k+i)%pool.length]+';--pr:'+(i%2?1.6:-1.8)+'deg">'+esc(w)+'</span>').join(' '); h.dataset.scn=h.textContent.trim(); h.classList.toggle('long',txt.length>22); }
+function scenify(){ const st=document.getElementById('stage'); if(!st) return; const off=STUDENT||S.scenes===false; const key=off?null:scKey();
+  st.querySelectorAll(':scope > .card.scene').forEach(c=>{ if(!key||c.dataset.sk!==key){ c.classList.remove('scene'); c.querySelectorAll(':scope > .scn-band, :scope > .scn-art').forEach(x=>x.remove()); } });
+  st.classList.toggle('scened',!!key); if(!key) { A.scKey=''; return; }
+  const card=[...st.querySelectorAll(':scope > .card, :scope > section.card')].find(c=>c.querySelector('h1'))||st.querySelector(':scope > .card'); if(!card) return;
+  const th=SC_THEME[key]||['dots','#FFD84D','#FFE88F'], fresh=A.scKey!==key; A.scKey=key;
+  card.classList.add('scene'); card.dataset.sk=key; card.style.setProperty('--b1',th[1]); card.style.setProperty('--b2',th[2]);
+  let band=card.querySelector(':scope > .scn-band'); if(!band){ band=document.createElement('div'); band.className='scn-band'; band.setAttribute('aria-hidden','true'); card.prepend(band); }
+  band.className='scn-band pat-'+th[0];
+  let art=card.querySelector(':scope > .scn-art'); const artFn=SC_ART[key]||SC_ART[{tpick:'ticket',thpick:'think',rpick:'reflect',exit:'ticket'}[key]];
+  if(artFn&&!art){ art=document.createElement('div'); art.className='scn-art'+(fresh?' pop':''); art.setAttribute('aria-hidden','true'); art.innerHTML='<svg viewBox="0 0 160 140"><g stroke="'+SCK+'" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">'+artFn()+'</g></svg>'; card.appendChild(art); }
+  const h=card.querySelector('h1'); if(h&&!h.id) scPlate(h,key);
+  scLayout(card,band,art,h);
+  if(fresh) setTimeout(scRelayout,350);
+  if(fresh&&A.overlay==='brain'&&S.fun!=='calm'&&typeof burst==='function'){ const w=SC_WORD[A.brain&&A.brain.id]; if(w) burst(w); } }
+function scLayout(card,band,art,h){ const cr=card.getBoundingClientRect(); if(!cr.width) return;
+  const hdr=(h?[...card.children].find(c=>c===h||c.contains(h)):null)||[...card.children].find(c=>!c.classList.contains('scn-band')&&!c.classList.contains('scn-art'));
+  if(!hdr){ band.style.height='0'; if(art) art.style.display='none'; return; }
+  const tg=card.querySelector('.tgrid'), dense=(tg&&tg.children.length>8)||(parseFloat(getComputedStyle(hdr).zoom)||1)<0.98;
+  const aw=art?(dense?100:Math.round(Math.max(100,Math.min(180,cr.width*0.2)))):0; card.style.setProperty('--aw',dense?'0px':aw+'px');
+  hdr.style.marginBottom=''; if(art){ art.style.display=''; art.style.left=''; }
+  const hb=hdr.getBoundingClientRect().bottom-cr.top; let rb=4, bl=cr.width;
+  card.querySelectorAll('button,input,select,.eyebrow').forEach(x=>{ const r=x.getBoundingClientRect(); if(!r.width||r.top-cr.top>=hb) return; if(r.right>cr.right-aw-70) rb=Math.max(rb,r.bottom-cr.top); if(r.left>cr.left+cr.width*0.4) bl=Math.min(bl,r.left-cr.left); });
+  const top=dense?8:rb+10, need=art?top+aw*0.875*0.92:0, extra=Math.max(dense?18:26,need-hb+12);
+  const hz=parseFloat(getComputedStyle(hdr).zoom)||1; hdr.style.marginBottom=Math.round(extra/hz)+'px'; band.style.height=Math.round(hb+extra-12)+'px';
+  if(art){ art.style.width=aw+'px'; art.style.top=Math.round(top)+'px'; if(dense) art.style.left=Math.round(bl-aw-34)+'px'; } }
+{ const f=render; render=function(){ const r=f.apply(this,arguments); try{ scenify(); }catch(e){ console.warn(e); } return r; }; }
+function scRelayout(){ const c=document.querySelector('#stage > .card.scene'); if(c) scLayout(c,c.querySelector(':scope > .scn-band'),c.querySelector(':scope > .scn-art'),c.querySelector('h1')); }
+addEventListener('resize',scRelayout); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(scRelayout);
+/* attention: full-screen design */
+{ const f=attention; attention=function(){ const r=f.apply(this,arguments); const a=document.querySelector('#overlayHost .attn'); if(a&&!a.querySelector('.atn-art')&&!STUDENT&&S.scenes!==false){ a.classList.add('scn-attn');
+    a.insertAdjacentHTML('afterbegin','<div class="atn-art" aria-hidden="true"><svg viewBox="0 0 160 140"><g stroke="'+SCK+'" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">'+SC_ART.attention()+'</g></svg></div><h2 class="atn-t"><span class="pl" style="--pc:#FFD84D;--pr:-2deg">Eyes</span> <span class="pl" style="--pc:#fff;--pr:1.5deg">this</span> <span class="pl" style="--pc:#7EC3FF;--pr:-1deg">way!</span></h2><div class="atn-steps"><span style="--pc:#FF8CC6"><b>1</b>Stop</span><span style="--pc:#FFD84D"><b>2</b>Look</span><span style="--pc:#6FD6A0"><b>3</b>Listen</span></div>'); }
+  return r; }; }
+function scSetupHTML(){ return '<h3>Screen designs</h3><label class="chk"><input type="checkbox" data-scon '+(S.scenes===false?'':'checked')+'><span>Bright designs and pictures on each screen</span></label>'; }
+document.addEventListener('change',e=>{ const t=e.target; if(!t.matches||!t.matches('[data-scon]')) return; S.scenes=t.checked; save(); render(true); });
 
 /* ---- v1.1: welcome tour ---- */
 function tourSteps(){ const tools=S.mode==='tools', ex=S.studentsAreExample;
