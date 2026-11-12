@@ -57,6 +57,8 @@ h1,h2,h3{margin:0;text-wrap:balance;font-family:var(--display);font-weight:800}
 .vpriv.warn{background:#FFE1CC}
 .vpriv b{font-family:var(--display);font-size:20px}
 .vpriv span{font-size:15px;line-height:1.4}
+.vsug{position:fixed;left:50%;top:140px;transform:translateX(-50%);z-index:76;background:#FFFDF3;border:3px solid #F5B700;border-radius:20px;padding:12px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 12px 28px rgba(60,40,20,.2);font-family:var(--body);max-width:90vw}
+.vsug small{font-weight:700;font-size:15px}
 .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
 .vrow{background:var(--panel);border-radius:14px;padding:10px 14px;display:flex;flex-direction:column;gap:2px}
 .vrow b{font-family:var(--display);font-size:20px;color:var(--gum-d)}
@@ -827,6 +829,7 @@ body.scrap .tab[aria-selected="true"]{background:var(--acc);color:#fff} body.scr
 body.scrap .dock .tool{font-size:19px;padding:3px 12px;min-height:42px}
 body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 @media (max-width:599px){.dock{flex-wrap:wrap}.dbreak{display:none}}
+@media (min-width:600px){ .top{flex-wrap:nowrap} .top>*{flex-shrink:0} .top .date,.top #dateLabel{flex-shrink:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} }
 
 </style>
 
@@ -919,7 +922,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 (function(){
 'use strict';
 const STUDENT=/[?&]join(=|&|$)/.test(location.search);
-const VERSION='Roomie v1.4.1 · 12 Nov 2026';
+const VERSION='Roomie v1.5 · 12 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1879,7 +1882,7 @@ document.addEventListener('input',e=>{ if(e.target.id==='cpName'){ S.room=e.targ
 document.addEventListener('change',e=>{ if(e.target.id==='cpName'){ A.phaseKey=''; render(true); } });
 
 /* ---- v1.2.1: one Home button that always works ---- */
-function goHome(){ try{ if(typeof TOUR!=='undefined'&&TOUR) endTour(); }catch(_){}
+function goHome(){ try{ if(typeof TOUR!=='undefined'&&TOUR) endTour(); }catch(_){} try{ if(A.attnClose) A.attnClose(); }catch(_){}
   ['classpop','segpop','dmenu'].forEach(id=>{ const el=document.getElementById(id); if(el) el.remove(); });
   const sh=document.getElementById('sheetHost'); if(sh&&sh.innerHTML) closeSetup();
   A.seatEdit=false; A.jobEdit=false; A.seatSel=null; A.qz=null; A.th=null;
@@ -2430,10 +2433,124 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-pl]'); if
 
 if(!STUDENT) setTimeout(()=>{ markLive(); },300);
 
+/* ---- v1.5: Roomie understands everyday requests (runs on this computer, no internet) ---- */
+const NW={zero:0,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,sixty:60,ninety:90};
+function nNorm(s){ s=' '+String(s).toLowerCase().replace(/[’‘]/g,"'").replace(/-/g,' ').replace(/[^a-z0-9' ]+/g,' ')+' ';
+  s=s.replace(/ a minute and a half /g,' 90 seconds ').replace(/ (a )?half (a|an) minute /g,' 30 seconds ').replace(/ (a )?couple (of )?/g,' 2 ').replace(/ a few /g,' 3 ')
+     .replace(/ (twenty|thirty|forty|fifty) (one|two|three|four|five|six|seven|eight|nine) /g,(m,a,b)=>' '+(NW[a]+NW[b])+' ')
+     .replace(/ one (?!(minutes?|mins?|seconds?|secs?|hours?|points?|more|extra|groups?|teams?) )/g,' one_ ')
+     .replace(/ (zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|ninety) /g,(m,w)=>' '+NW[w]+' ')
+     .replace(/ (a|an|one) (minute|min) /g,' 1 minute ').replace(/ for (\d+) /g,' $1 ').replace(/ mins? /g,' minutes ').replace(/ secs? /g,' seconds ');
+  return s.replace(/ one_ /g,' one ').replace(/\s+/g,' '); }
+const nNum=s=>{ const m=s.match(/ (\d+) /); return m?+m[1]:0; };
+function nDur(s){ const m=s.match(/ (\d+) (minutes?|seconds?|hours?) /); if(m) return /^s/.test(m[2])?+m[1]:/^h/.test(m[2])?+m[1]*3600:+m[1]*60; const n=s.match(/ timer (\d+) /); return n?+n[1]*60:0; }
+const nWords=s=>s.trim().split(' ').filter(w=>w.length>2&&!/^(the|and|for|our|you|can|please|now|let's|lets|let|its|it's|time|some|with|have|that|this|what|want|need|could|would|start|give|show|put|get|go|do|roomie|hey)$/.test(w));
+function nFind(s,list,key){ let best=null, bs=0; const W=nWords(s); list.forEach(x=>{ const n=nNorm(x[key]).trim(); if(!n) return; if(s.includes(' '+n+' ')){ const sc=10+n.length; if(sc>bs){ bs=sc; best=x; } return; } const nw=nWords(' '+n+' '); if(!nw.length) return; const hit=nw.filter(w=>W.includes(w)).length; const sc=hit/nw.length; if(hit>=Math.min(2,nw.length)&&sc>=0.6&&sc>bs){ bs=sc; best=x; } }); return best; }
+const dayBlocks=()=>{ try{ return computeDay(now()); }catch(_){ return []; } };
+const nowMins=()=>{ const d=now(); return d.getHours()*60+d.getMinutes()+d.getSeconds()/60; };
+const mm=m=>{ m=Math.max(0,Math.round(m)); return m>=60?Math.floor(m/60)+' hour'+(m>=120?'s':'')+(m%60?' and '+(m%60)+' minutes':''):m+' minute'+(m===1?'':'s'); };
+function nAnswer(t){ Bird.say(t.length>60?t.slice(0,58)+'…':t); vShow(t); try{ say(t); }catch(_){ } }
+function hereBreak(type){ goHome(); startBrain(type||null); }
+const BTYPE=s=>/ (quiet|calm|calming|breath|breathing|breathe|mindful|mindfulness|relax|relaxing|settle|settling|peaceful|still) /.test(s)?'calm':/ (move|moving|movement|active|dance|dancing|wiggle|wiggles|stretch|stretching|shake|jump|energ|exercise|physical|run around) /.test(s)?'movement':/ (game|games|play|fun one) /.test(s)?'game':null;
+const INTENTS=[
+ /* ---- questions (answered out loud) ---- */
+ {id:'whatnext',k:[[/ what('s| is| are)? (we doing |do we have |happening )?(next|coming up|on next|after this|after that) /,4],[/ what('s| is) (on )?now /,2],[/ what are we doing /,2.5]],
+  run(){ const t=nowMins(), D=dayBlocks(), nx=D.find(x=>x.st>t+0.5); const cur=D.find(x=>x.st<=t&&x.en>t); if(S.mode==='tools'||!D.length) return nAnswer('There’s no timetable today. Just ask me for what you need!'); nAnswer((cur?'Right now it’s '+cur.b.name+'. ':'')+(nx?'Next is '+nx.b.name+' at '+fmtClock(nx.st)+', in '+mm(nx.st-t)+'.':'That’s everything for today!')); }},
+ {id:'when',k:[[/ (when|what time)('s| is| does| do we have| do we go to| do we go| do we| are we) /,3],[/ how long (until|till|til|before|to) /,3.5]],
+  run(s){ const t=nowMins(), D=dayBlocks(); const target=nFind(s,D.map(x=>({name:x.b.name,x})),'name')||(/ (home|end of (the )?day|bell|finish) /.test(s)?{x:D[D.length-1],name:'the end of the day',end:true}:null)||(/ (break|play) /.test(s)?{x:D.find(x=>x.b.kind==='break'&&x.st>t)}:null);
+   if(!target||!target.x){ return nAnswer('I couldn’t find that in today’s plan.'); } const x=target.x, at=target.end?x.en:x.st; nAnswer(at<t?x.b.name+' was at '+fmtClock(at)+'.':(target.end?'Home time':x.b.name)+' is at '+fmtClock(at)+'. That’s '+mm(at-t)+' away.'); }},
+ {id:'timeleft',k:[[/ how (long|much time|many minutes)( do we have| is| have we got)?( left| to go| remaining)? /,3],[/ time left /,3]],
+  run(){ if(MT.running||MT.remaining&&MT.remaining()>0) return nAnswer(mm(MT.remaining()/60)+' left on the timer.'); const t=nowMins(), D=dayBlocks(), cur=D.find(x=>x.st<=t&&x.en>t); nAnswer(cur?mm(cur.en-t)+' left of '+cur.b.name+'.':'There’s no timer going.'); }},
+ {id:'clock',k:[[/ what (time is it|is the time|'s the time) /,4],[/ what day is it /,4]],
+  run(s){ const d=now(); nAnswer(/ day /.test(s)?'It’s '+d.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long'})+'.':'It’s '+fmtClock(d.getHours()*60+d.getMinutes())+'.'); }},
+ {id:'points?',k:[[/ how many points /,4],[/ how close (are we )?(to|for) /,3]],
+  run(){ const g=S.goal; nAnswer('We have '+g.points+' of '+g.target+' points for '+g.name+'. '+(g.target-g.points>0?(g.target-g.points)+' to go!':'We made it!')); }},
+ {id:'whojob',names:()=>{ try{ return jobsState().list; }catch(_){ return []; } },nameW:2,k:[[/ who('s| is| are)( the| on| doing| our| today's| this week's)? /,1]],
+  run(s){ try{ const J=jobsState(); const j=nFind(s,J.list.map((n,i)=>({n,i})),'n'); if(!j) return 'skip'; nAnswer(jobWho(J,j.i)+' is '+j.n.toLowerCase()+' this week.'); }catch(_){ return 'skip'; } }},
+ /* ---- context words ---- */
+ {id:'another',k:[[/ (another|different|new|next) (one|break|game|brain break|ticket|routine|name|person|student|question|activity) /,3],[/ something else /,3],[/ (do|try) (it|that) again /,2.5],[/ (one|go) more (time)? /,1.2],[/ (pick|choose) again /,3],[/ again /,1]],
+  run(){ const o=A.overlay;
+   if(o==='brain'||o==='brainpick'){ startBrain(A.brain&&A.brain.type||null); return 'Here’s another one!'; }
+   if(o==='pick'){ vclick({'data-act':'pick'}); return null; }
+   if(o==='ticket'||o==='tpick'){ A.tp={kind:(A.xo&&A.xo.kind)||'exit',live:true,form:false}; useTicket(null); return 'A different ticket!'; }
+   if(o==='think'){ startThink(null); return null; } if(o==='reflect'||o==='rpick'){ startReflect(null); return null; }
+   if(o==='groups'){ makeGroups(A.gLast||{size:4}); return 'New groups!'; } if(o==='quiz'&&A.qz){ startQuiz(A.qz.id); return 'New game!'; }
+   if(o==='jobs'){ vclick({'data-jb':'next'}); return null; }
+   const L=V.lastIntent&&INTENTS.find(x=>x.id===V.lastIntent); if(L&&L.id!=='another'){ const r=L.run(V.lastText||' '); return r==='skip'?'Another what?':r; }
+   return 'Another what? Try “another brain break”.'; }},
+ {id:'next',k:[[/ next( step| part| one| page| slide)? /,1.6],[/ (move on|keep going|carry on to the next) /,2]],
+  run(){ const b=visibleBtn(/^(next|finish|next step|another round)/i); if(b){ b.click(); return null; } return 'There’s nothing to move on from.'; }},
+ {id:'prev',k:[[/ (previous|go back a step|back a step|last step|step back) /,3]], run(){ const b=visibleBtn(/^back$/i); if(b){ b.click(); return null; } return 'skip'; }},
+ {id:'pause',k:[[/ pause /,3],[/ (hold on|hang on|wait a (sec|second|minute)|freeze the timer) /,2]],
+  run(){ const b=visibleBtn(/^pause$/i); if(b){ b.click(); return 'Paused.'; } if(MT.running){ MT.pause(); render(true); return 'Paused.'; } Music.pause&&Music.pause(); return 'Paused.'; }},
+ {id:'resume',k:[[/ (resume|unpause|carry on|continue|keep going|start again|go again|play again) /,2.5]],
+  run(){ const b=visibleBtn(/^resume$/i); if(b){ b.click(); return null; } if(MT.resume){ MT.resume(); render(true); } return 'Off we go!'; }},
+ /* ---- class management ---- */
+ {id:'home',k:[[/ (go )?home( screen)? /,2],[/ (close|exit|end|finish|done|cancel|go back|back to the plan|that's (all|enough|it)|we're done|all done|stop that|stop it|stop) /,1.3]], run(){ goHome(); return 'Back home.'; }},
+ {id:'attention',k:[[/ attention /,3],[/ eyes (on me|this way|up|to the front|on the board) /,3],[/ (everyone|everybody|class) (look|listen|stop) /,2.5],[/ (look|listen) (here|up|to me) /,2],[/ hands (on heads|up|down) /,1.5],[/ freeze /,1.4],[/ (quiet|silence) please /,2]], run(){ tool('attention'); return null; }},
+ {id:'reset',k:[[/ reset( the room| the class)? /,3],[/ (calm|settle) (everyone|everybody|the class|them|us|it|things|the room) down /,3],[/ (too )?(noisy|loud|crazy|wild|chaotic|hyper|silly) /,1.8],[/ (settle|calm down) /,1.5]], run(){ tool('reset'); return 'Let’s reset.'; }},
+ {id:'point',k:[[/ (give|add|award) .*points? /,3],[/ (plus|add) (1|one|a) /,2],[/ points? /,1.4],[/ (well done|good job|great job|good work|great work|awesome|amazing|nice work|fantastic|brilliant) /,1.5]],
+  run(s){ const n=Math.min(10,Math.max(1,nNum(s)||1)); for(let i=0;i<n;i++) setTimeout(()=>tool('point'),i*350); return n>1?n+' points!':'Point!'; }},
+ {id:'brain',names:()=>BREAKS.filter(x=>!x.breath).map(x=>x.name),k:[[/ (get up|up and move|get moving|move our bodies|on our feet|stand up and) /,2.2],[/ (a |some )?(breath|breaths|deep breath) /,1.6],[/ something (calm|quiet|calming|active|fun|different|relaxing|to move) /,2.2],[/ (calm|quiet) (down|time|moment|one) /,1.3],[/ brain ?breaks? /,3],[/ (break|breaks) /,1.4],[/ (wiggle|wiggles|stretch|stretching|energi[sz]er|shake (it )?out|get (them|us|everyone|the kids) moving|movement break|move around|dance|dancing) /,1.8],[/ (restless|fidgety|tired|sleepy|flat|zoned out|need (a )?(reset|break|breather)) /,1.4],[/ breathing|breathe|mindful(ness)? /,1.4],[/ (play|do) (a |some )?game /,1.2]],
+  run(s){ const b=nFind(s,BREAKS.filter(x=>!x.breath),'name'); goHome(); if(b){ startBrain(null,b.id); return b.name+'!'; } const t=BTYPE(s); startBrain(t); return t==='calm'?'A calm one.':t==='movement'?'Let’s move!':'Brain break time!'; }},
+ {id:'timer',k:[[/ timer /,3],[/ \d+ (minutes?|seconds?|hours?) /,2],[/ count ?down /,2.5],[/ (set|start) (a |the )?(clock|time) /,2]],
+  run(s){ if(/ (stop|cancel|clear|turn off|end) (the )?timer /.test(s)){ MT.stop(); render(true); return 'Timer stopped.'; }
+   if(/ (add|more|extra|another|give (them|us) (an )?(extra|more)) /.test(s)&&MT.add){ const d=nDur(s)||60; MT.add(d); render(true); return 'Added '+(d%60?d+' seconds':mm(d/60))+'.'; }
+   if(/ (take off|take away|less|minus|remove|knock off) /.test(s)&&MT.add){ const d=nDur(s)||60; MT.add(-d); render(true); return 'Took off '+(d%60?d+' seconds':mm(d/60))+'.'; }
+   const d=nDur(s)||300; goHome(); tool('timer'); setTimeout(()=>vclick({'data-timer':d}),60); return (d%60?d+' seconds':mm(d/60))+'. Go!'; }},
+ {id:'moretime',k:[[/ \d+ more (minutes?|seconds?) /,3.6],[/ (more time|another minute|one more minute|extra minute|2 more minutes|few more minutes|bit longer|little longer) /,3.5]],
+  run(s){ const d=nDur(s)||60; if(MT.add){ MT.add(d); render(true); } return 'Okay, '+(d%60?d+' more seconds':mm(d/60)+' more')+'.'; }},
+ {id:'pick',k:[[/ (pick|choose|select|call)( out| on)? (a |an |one |some )?(name|student|person|someone|somebody|kid|child|helper|volunteer|girl|boy) /,3.5],[/ who('s| is)( going| gonna)?( to)? (next|answer|answering|go first|first|turn) /,3],[/ random (name|student|person) /,3.5],[/ (name picker|pick a name|spin the names) /,3.5],[/ volunteer /,1.4],[/ (pick|choose) (one|someone) /,2]],
+  run(){ goHome(); tool('pick'); setTimeout(()=>vclick({'data-act':'pick'}),150); return 'Let’s see…'; }},
+ {id:'groups',k:[[/ groups? /,2.5],[/ teams? /,2],[/ (partners?|pairs?|buddies|buddy up|partner up) /,2.5],[/ split (the class|them|us|everyone) /,2],[/ (threes|fours|fives) /,1.5]],
+  run(s){ goHome(); let o; const n=nNum(s); if(/ (partners?|pairs?|buddies|buddy|twos) /.test(s)) o={size:2}; else if(/ (of|in) \d+ /.test(s)||/ (threes|fours|fives) /.test(s)) o={size:n||({threes:3,fours:4,fives:5}[(s.match(/ (threes|fours|fives) /)||[])[1]])||4}; else if(n) o={count:n}; else o={size:4}; A.gLast=o; makeGroups(o); return 'Here are your '+(o.size===2?'pairs':'groups')+'!'; }},
+ {id:'exit',nameNeed:/ (ticket|slip|exit) /,names:()=>ticketsOf('exit',true).map(x=>x.t),k:[[/ exit (ticket|slip|card|question|pass)s? /,4],[/ exit /,1.5],[/ (end of (the )?lesson|before (we|they) (go|leave)) /,1.5],[/ check (for )?understanding /,1.5]],
+  run(s){ const L=ticketsOf('exit',true), t=nFind(s,L,'t'); goHome(); A.tp={kind:'exit',live:true,form:false}; useTicket(t?t.id:null); return t?t.t+'!':'Here’s an exit ticket!'; }},
+ {id:'entry',nameNeed:/ (ticket|slip|starter|entry) /,names:()=>ticketsOf('entry',true).map(x=>x.t),k:[[/ (entry|entrance) (ticket|slip|task|question)s? /,4],[/ (starter|warm ?up|do now|bell ringer|settler) /,2.5]],
+  run(s){ const L=ticketsOf('entry',true), t=nFind(s,L,'t'); goHome(); A.tp={kind:'entry',live:true,form:false}; useTicket(t?t.id:null); return t?t.t+'!':'Here’s an entry ticket!'; }},
+ {id:'ticket',k:[[/ tickets? /,2]], run(){ goHome(); tool('exit'); return 'Which ticket would you like?'; }},
+ {id:'think',names:()=>THINK.map(x=>x.name),k:[[/ thinking routines? /,3.5],[/ (visible )?thinking /,1.6],[/ (see think wonder|claim support question|compass points|headlines|i used to think|what makes you say that|connect extend challenge|think puzzle explore|generate sort connect) /,4]],
+  run(s){ const r=nFind(s,THINK,'name'); goHome(); startThink(r?r.id:null); return r?r.name+'!':'Thinking caps on!'; }},
+ {id:'reflect',names:()=>REFLECT.map(x=>x.name),k:[[/ reflect(ion|ions|ing)? /,3],[/ (fist to five|thumbs up|stand up if|two stars and a wish|3 2 1) /,1.6]],
+  run(s){ const r=nFind(s,REFLECT,'name'); goHome(); startReflect(r?r.id:null); return 'Time to reflect.'; }},
+ {id:'checkin',k:[[/ check ?in /,3.5],[/ feel(ing|ings)? /,1.8],[/ how('s| is| are) (everyone|everybody|the class|we|you all|you guys|the kids)( going| doing| feeling| travelling)? /,3],[/ (mood|well ?being|emotions) /,1.6]],
+  run(){ goHome(); tool('checkin'); return 'How is everyone feeling?'; }},
+ {id:'quiz',k:[[/ quiz(zes)? /,3],[/ (revision|review|trivia) (game|quiz) /,3],[/ (drop (four|4)|connect (four|4)|mystery stars?|stay afloat) /,4]],
+  run(s){ goHome(); tool('quiz'); const id=/ (drop|connect) (four|4) /.test(s)?'drop':/ mystery stars? /.test(s)?'stars':/ afloat /.test(s)?'float':''; if(id) setTimeout(()=>startQuiz(id),80); return id?'Game on!':'Pick a quiz game.'; }},
+ {id:'poll',k:[[/ poll /,3.5],[/ (vote|voting) /,2.5],[/ (yes or no|true or false|multiple choice|a b c d|abcd|thumbs poll|confidence) /,1.5]],
+  run(s){ goHome(); A.poll={type:/ yes or no /.test(s)?'yesno':/ true or false /.test(s)?'tf':/ (thumbs|got it) /.test(s)?'thumbs':/ confidence /.test(s)?'conf':'abcd',q:''}; tool('poll'); return 'Poll time!'; }},
+ {id:'packup',k:[[/ pack( it| everything)? (up|away) /,5.5],[/ (tidy ?up|clean ?up|clear (your|the) desks?|put (everything|things|it all) away) /,3],[/ (home time|end of (the )?day|time to go home) /,1.5]], run(){ goHome(); tool('packup'); return null; }},
+ {id:'routine',names:()=>S.routines.map(x=>x.name),k:[[/ routines? /,1.6],[/ (line ?up|lining up) /,3],[/ (arrival|morning (routine|jobs)|good morning routine) /,3]],
+  run(s){ const r=nFind(s,S.routines,'name')||(/ line ?up| lining up /.test(s)?routineById('lineup'):/ arrival| morning /.test(s)?routineById('arrival'):null); goHome(); if(r){ runRoutine(r.id); return r.name+'!'; } tool('routines'); return 'Which routine?'; }},
+ {id:'seats',k:[[/ (seating( plan)?|seats|where (do|does|should|are) .*(sit|sitting)|sitting plan) /,3]], run(){ goHome(); tool('seats'); return null; }},
+ {id:'jobs',k:[[/ (helpers?|classroom jobs|class jobs|jobs|monitors) /,2.8]], run(s){ goHome(); tool('jobs'); if(/ (new|next|change|swap) /.test(s)) setTimeout(()=>vclick({'data-jb':'next'}),150); return null; }},
+ {id:'hero',k:[[/ mystery (hero|student|person|walker) /,4]], run(){ goHome(); tool('hero'); return null; }},
+ {id:'rotate',k:[[/ (rotations?|stations?|centers|centres|rotate) /,3]], run(){ goHome(); tool('rotate'); return null; }},
+ {id:'reteach',k:[[/ (reteach|re teach|go over (it|that|this) again|explain (it|that) again) /,3]], run(){ goHome(); tool('reteach'); return null; }},
+ {id:'finish',k:[[/ (early finishers?|finished early|(they're|i'm|we're|someone's|somebody's) (done|finished)|what (do|can) (they|i|we) do (now|when)) /,3],[/ finished /,1.5]], run(){ goHome(); tool('finish'); return null; }},
+ {id:'door',k:[[/ (late|latecomer|late arrival|at the door|just arrived|someone's here|catch (them|her|him) up) /,2.4]], run(){ goHome(); tool('door'); return null; }},
+ {id:'musicoff',k:[[/ (music|song|sound|sounds|rain|piano|birds|noise) off /,4],[/ (no|stop) (more )?(music|sounds?) /,3],[/ (stop|turn off|no more|mute|kill|end) (the )?(music|song|sound|sounds|rain|piano|birds|noise) /,4],[/ (quiet|silence) (the )?music /,3]], run(){ try{ Focus.stop(); }catch(_){ } try{ Music.fadeStop(); }catch(_){ } return 'Music off.'; }},
+ {id:'music',k:[[/ (music|song|songs|focus (music|sound)|background (music|sound)|rain( sounds)?|piano|bird ?song|birds|calm sounds) /,2.5],[/ (play|put on) /,0.8]],
+  run(s){ const k=/ rain /.test(s)?'rain':/ bird/.test(s)?'birds':'piano'; try{ Focus.start(k); }catch(_){ } return {rain:'Rain sounds.',birds:'Birdsong.',piano:'Soft piano.'}[k]; }},
+ {id:'fullscreen',k:[[/ full ?screen /,4],[/ (make it|go) big(ger)? /,2]], run(){ document.getElementById('fsBtn').click(); return null; }},
+ {id:'float',k:[[/ (float|over (my|the) slides|mini (mode|roomie)|small window|picture in picture) /,3.5]], run(){ vclick({'data-tool':'float'}); return null; }},
+ {id:'devices',k:[[/ (student devices|join code|class code|ipads?|chromebooks?|devices|laptops) /,3]], run(s){ goHome(); if(/ (turn on|start|switch on|let them) /.test(s)&&!S.liveOn){ liveOn(); } openOverlay('join'); return null; }},
+ {id:'help',k:[[/ (help|what can (you|i) (do|say)|commands|what do i say) /,3]], run(){ openOverlay('voicehelp'); return 'Here’s what I can do.'; }},
+ {id:'setup',k:[[/ (setup|set up|settings|day plan|class list) /,2.5]], run(){ goHome(); openSetup(); return null; }}
+];
+function nluRun(raw){ const s=nNorm(raw); if(!s.trim()) return {ok:false,empty:true};
+  const nameHit=it=>{ if(!it.names||(it.nameNeed&&!it.nameNeed.test(s))) return 0; let L=[]; try{ L=it.names()||[]; }catch(_){ } return L.some(n=>{ const t=nNorm(n).trim(); return t.length>2&&s.includes(' '+t+' '); })?(it.nameW||4):0; };
+  const scored=INTENTS.map(it=>({it,sc:it.k.reduce((a,[re,w])=>a+(re.test(s)?w:0),0)+nameHit(it)})).filter(x=>x.sc>0).sort((a,b)=>b.sc-a.sc);
+  for(const {it,sc} of scored){ if(sc<1.2) break; let r; try{ r=it.run(s); }catch(e){ r='Oops, I couldn’t do that.'; } if(r==='skip') continue; if(r) Bird.say(r); if(!/^(another|next|prev|pause|resume|home|whatnext|when|timeleft|clock|points\?|whojob|help)$/.test(it.id)){ V.lastIntent=it.id; V.lastText=s; } return {ok:true,id:it.id}; }
+  return {ok:false,guesses:scored.slice(0,3).map(x=>x.it.id)}; }
+
 /* ---- v1.4: "Hey Roomie" voice commands ---- */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 const V={on:false,rec:null,awake:0,last:''};
-const WAKE=/\b(hey|hi|hay|a|ok|okay)[ ,]*(roomie|roomy|rumi|rooney|ruby|rumie|roomies|room ?e|roomee)\b/i;
+const WNAME='roomie|roomy|roomies|roomie\'s|rumi|rumie|ruumi|roomee|room e|roomi|rumy|rhumie|roomly|rooming|rooney|ruby|rummy|romy|roomba|rome|ruminy|bruny|groomie|loomie';
+const WAKE=new RegExp('(^|\\b)(hey|hi|hay|hello|ok|okay|oi|yo|a|hey there)?[ ,]*('+WNAME+')(\\b|$)','i');
+const WAKE_STRICT=/\b(roomie|roomy|roomies|rumi|rumie|roomee|roomi)\b/i;
+function wakeIn(t){ const m=t.match(WAKE); if(!m) return null; const name=m[3].toLowerCase(); if(!m[2]&&!WAKE_STRICT.test(name)) return null; if(/^(ruby|rome|rooney|roomba|rummy)$/.test(name)&&!/^(hey|hi|hay|hello|ok|okay|oi|yo)$/i.test(m[2]||'')) return null; return t.slice(m.index+m[0].length).replace(/^[\s,.!]+/,''); }
 const NUMW={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,fifteen:15,twenty:20,thirty:30,a:1,an:1};
 const num=s=>{ const m=s.match(/(\d+|one|two|three|four|five|six|seven|eight|nine|ten|fifteen|twenty|thirty)\b/); return m?(+m[1]||NUMW[m[1]]):0; };
 function vclick(attrs){ const b=document.createElement('button'); b.type='button'; b.style.display='none'; Object.entries(attrs).forEach(([k,v])=>b.setAttribute(k,v)); document.body.appendChild(b); b.click(); b.remove(); }
@@ -2471,11 +2588,16 @@ const VCMDS=[
  [/\b(more time|another minute|one more minute|extra minute)\b/, ()=>{ if(MT.add){ MT.add(60); render(true); return 'One more minute.'; } return null; }],
  [/\b(routine|morning routine|arrival|line ?up)\b/, s=>{ goHome(); const id=/line ?up/.test(s)?'lineup':/arrival|morning/.test(s)?'arrival':''; if(id&&routineById(id)) runRoutine(id); else tool('routines'); return null; }]
 ];
-function vHandle(cmd){ cmd=cmd.toLowerCase().replace(/[.!?]/g,' ').replace(/\s+/g,' ').trim(); V.last=cmd; vShow('“'+cmd+'”');
-  if(!cmd){ Bird.say('Yes?'); return; }
-  for(const [re,fn] of VCMDS){ if(re.test(cmd)){ try{ const r=fn(cmd); if(r) Bird.say(r); }catch(e){ Bird.say('Oops, I couldn’t do that.'); } V.awake=0; vMark(); return; } }
-  Bird.say('Sorry, I didn’t get that.'); vShow('Try: “Hey Roomie, brain break” or “Hey Roomie, timer 5 minutes”'); V.awake=0; vMark(); }
-function vShow(t){ let el=document.getElementById('vheard'); if(!el){ el=document.createElement('div'); el.id='vheard'; el.className='vheard'; document.body.appendChild(el); } el.textContent=t; el.classList.add('on'); clearTimeout(V.ht); V.ht=setTimeout(()=>el.classList.remove('on'),3500); }
+function vHandle(cmd){ cmd=(cmd||'').replace(/\s+/g,' ').trim(); V.last=cmd.toLowerCase(); V.awake=0; vMark();
+  if(!cmd){ V.awake=Date.now()+8000; vMark(); Bird.say('Yes?'); chime(1); setTimeout(vMark,8100); return; }
+  vShow('“'+cmd+'”'); const r=nluRun(cmd); window.__nluLast=r.ok?r.id:'none:'+(r.guesses||[]).join(','); if(r.ok) return;
+  const G={brain:'Brain break',timer:'Timer',pick:'Pick a name',groups:'Groups',exit:'Exit ticket',entry:'Entry ticket',think:'Thinking routine',reflect:'Reflection',checkin:'Check-in',quiz:'Quiz game',poll:'Poll',packup:'Pack up',routine:'Routines',seats:'Seating plan',jobs:'Helpers',attention:'Attention',reset:'Reset the room',music:'Music',home:'Home',point:'+1 point'};
+  const opts=(r.guesses||[]).filter(g=>G[g]); const base=['brain','timer','pick','exit']; const list=(opts.length?opts:base).slice(0,3);
+  Bird.say('Did you mean…?'); vSuggest(cmd,list.map(g=>[g,G[g]])); }
+function vSuggest(cmd,list){ let el=document.getElementById('vsug'); if(!el){ el=document.createElement('div'); el.id='vsug'; el.className='vsug'; document.body.appendChild(el); }
+  el.innerHTML='<small>I heard “'+esc(cmd)+'”. Did you mean…</small><div class="row">'+list.map(([g,n])=>'<button class="btn sm" type="button" data-vsug="'+g+'">'+esc(n)+'</button>').join('')+'<button class="btn alt sm" type="button" data-vsug="">No thanks</button></div>'; el.hidden=false; clearTimeout(V.sh); V.sh=setTimeout(()=>{ el.hidden=true; },9000); }
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-vsug]'); if(!b) return; const g=b.dataset.vsug, el=document.getElementById('vsug'); if(el) el.hidden=true; if(!g) return; const it=INTENTS.find(x=>x.id===g); if(it){ const r=it.run(nNorm(V.last)); if(r&&r!=='skip') Bird.say(r); } });
+function vShow(t){ let el=document.getElementById('vheard'); if(!el){ el=document.createElement('div'); el.id='vheard'; el.className='vheard'; document.body.appendChild(el); } el.textContent=t; el.classList.add('on'); clearTimeout(V.ht); V.ht=setTimeout(()=>el.classList.remove('on'),t.startsWith('🎙')?2500:4500); }
 function vMark(){ const b=document.getElementById('micBtn'); if(!b) return; b.classList.toggle('on',V.on); b.classList.toggle('awake',V.on&&Date.now()<V.awake); b.title=V.on?'Roomie is listening for “Hey Roomie”. Tap to stop.':'Turn on “Hey Roomie” voice commands'; }
 async function vLocalReady(){ if(!SR||!SR.available) return 'unsupported';
   try{ let a=await SR.available({langs:['en-US'],processLocally:true});
@@ -2485,19 +2607,19 @@ async function vStart(){ if(!SR){ toast('Voice commands need Chrome or Edge.'); 
   const local=S.voiceCloud!==true; let lang='en-AU';
   if(local){ const a=await vLocalReady(); if(a!=='available'){ V.blocked=true; openOverlay('voicehelp'); return; } lang='en-US'; }
   V.blocked=false; V.local=local;
-  const r=new SR(); r.lang=lang; if(local) r.processLocally=true; r.continuous=true; r.interimResults=false; r.maxAlternatives=3; V.rec=r; V.on=true; S.voice=true; save(); vMark();
-  r.onresult=e=>{ for(let i=e.resultIndex;i<e.results.length;i++){ if(!e.results[i].isFinal) continue; const alts=[...e.results[i]].map(a=>a.transcript);
-      const hit=alts.find(t=>WAKE.test(t));
-      if(hit){ const after=hit.split(WAKE).pop().replace(/^[\s,]+/,''); const rest=hit.replace(/.*?(roomie|roomy|rumi|rooney|ruby|rumie|roomies|room ?e|roomee)\b[\s,]*/i,''); if(rest.trim()) vHandle(rest); else { V.awake=Date.now()+7000; vMark(); Bird.say('Yes?'); chime(1); setTimeout(vMark,7100); } }
-      else if(Date.now()<V.awake) vHandle(alts[0]); } };
+  const r=new SR(); r.lang=lang; if(local) r.processLocally=true; r.continuous=true; r.interimResults=true; r.maxAlternatives=3; V.rec=r; V.on=true; S.voice=true; save(); vMark();
+  r.onresult=e=>{ for(let i=e.resultIndex;i<e.results.length;i++){ const res=e.results[i], alts=[...res].map(a=>a.transcript);
+      if(!res.isFinal){ const t=alts[0]||''; if(wakeIn(t)!==null||Date.now()<V.awake) vShow('🎙 '+t+'…'); continue; }
+      let cmd=null; for(const t of alts){ const c=wakeIn(t); if(c!==null){ cmd=c; break; } }
+      if(cmd!==null) vHandle(cmd); else if(Date.now()<V.awake) vHandle(alts[0]); } };
   r.onerror=e=>{ if(e.error==='not-allowed'||e.error==='service-not-allowed'){ V.on=false; S.voice=false; save(); vMark(); toast('Roomie needs permission to use the microphone. Allow it in the address bar and try again.'); } };
   r.onend=()=>{ if(V.on) setTimeout(()=>{ try{ r.start(); }catch(_){ } },300); };
   try{ r.start(); }catch(_){ }
   if(!S.voiceHelped){ S.voiceHelped=true; save(); openOverlay('voicehelp'); } }
 function vStop(){ V.on=false; S.voice=false; save(); try{ V.rec&&V.rec.stop(); }catch(_){ } V.rec=null; vMark(); }
 document.addEventListener('click',e=>{ if(e.target.closest('#micBtn')){ audio(); V.on?vStop():vStart(); } if(e.target.closest('[data-vhelp]')){ openOverlay('voicehelp'); } });
-function renderVoiceHelp(full){ if(!full) return; const L=[['Brain break','“Hey Roomie, it’s time for a brain break” · “…a quiet break” · “…a movement break”'],['Timer','“Hey Roomie, timer 5 minutes” · “…30 seconds” · “…one more minute” · “…pause”'],['Students','“Hey Roomie, pick a name” · “…groups of 3” · “…seating plan” · “…helpers”'],['Tickets','“Hey Roomie, exit ticket” · “…entry ticket”'],['Thinking','“Hey Roomie, thinking routine” · “…see think wonder” · “…next step” · “…reflection”'],['Class','“Hey Roomie, check-in” · “…poll” · “…quiz” · “…pack up”'],['Calm','“Hey Roomie, attention” · “…reset the room” · “…give us a point”'],['Anywhere','“Hey Roomie, home”']];
-  setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">Voice commands</div><h1 class="mid" style="color:var(--gum-d)">Just say “Hey Roomie…”</h1></div>'+backBtn('Got it')+'</div><div class="vgrid">'+L.map(([a,b])=>'<div class="vrow"><b>'+esc(a)+'</b><span>'+esc(b)+'</span></div>').join('')+'</div><p class="hint" style="margin:0">You can also say “Hey Roomie”, wait for the beep, then say what you need. The microphone button at the top turns pink while Roomie listens.</p>'+vPrivacyHTML()+'</section>'); }
+function renderVoiceHelp(full){ if(!full) return; const L=[['Brain break','“Hey Roomie, they’re getting restless, let’s have a brain break” · “…something calm” · “…play Heads or Hips”'],['Questions','“Hey Roomie, what’s next?” · “…when is lunch?” · “…how long until recess?” · “…who’s line leader?” · “…how many points do we have?”'],['Changing your mind','“Hey Roomie, another one” · “…something else” · “…go back a step” · “…give them 2 more minutes”'],['Timer','“Hey Roomie, timer 5 minutes” · “…30 seconds” · “…one more minute” · “…pause”'],['Students','“Hey Roomie, pick a name” · “…groups of 3” · “…seating plan” · “…helpers”'],['Tickets','“Hey Roomie, exit ticket” · “…entry ticket”'],['Thinking','“Hey Roomie, thinking routine” · “…see think wonder” · “…next step” · “…reflection”'],['Class','“Hey Roomie, check-in” · “…poll” · “…quiz” · “…pack up”'],['Calm','“Hey Roomie, attention” · “…reset the room” · “…give us a point”'],['Anywhere','“Hey Roomie, home”']];
+  setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">Voice commands</div><h1 class="mid" style="color:var(--gum-d)">Just say “Hey Roomie…”</h1><p class="lead" style="margin:4px 0 0">Talk to Roomie the way you’d talk to a teacher aide. These are just examples.</p></div>'+backBtn('Got it')+'</div><div class="vgrid">'+L.map(([a,b])=>'<div class="vrow"><b>'+esc(a)+'</b><span>'+esc(b)+'</span></div>').join('')+'</div><p class="hint" style="margin:0">You can also say “Hey Roomie”, wait for the beep, then say what you need. The microphone button at the top turns pink while Roomie listens.</p>'+vPrivacyHTML()+'</section>'); }
 function vPrivacyHTML(){ const cloud=S.voiceCloud===true;
   return '<div class="vpriv'+(V.blocked?' warn':'')+'"><b>'+(V.blocked?'This browser can’t listen on this computer yet':cloud?'Listening is using Google or Microsoft':'Listening stays on this computer')+'</b><span>'+(V.blocked?'Roomie only listens on the computer itself, so nothing you say leaves the room. This browser doesn’t support that yet. Update Chrome (Settings → About Chrome), then try the microphone again.':cloud?'Your browser sends what it hears to Google (Chrome) or Microsoft (Edge) to turn it into words. Roomie itself never records or saves anything.':'Your browser turns speech into words on this computer. Nothing you say is sent anywhere, recorded or saved.')+'</span><label class="chk"><input type="checkbox" id="vCloud" '+(cloud?'checked':'')+'><span>Allow Google or Microsoft to do the listening if this computer can’t</span></label></div>'; }
 document.addEventListener('change',e=>{ if(e.target.id==='vCloud'){ S.voiceCloud=e.target.checked; save(); V.blocked=false; render(true); } });
