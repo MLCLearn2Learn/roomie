@@ -63,6 +63,9 @@ body.at-home .homebtn{opacity:.55}
 .classbtn:hover .cbsub{transform:translateY(-1px)}
 .cbcaret{font-size:14px;color:var(--gum-d)}
 .classpop{position:fixed;z-index:72;background:var(--panel,#FFFDF3);border:3px solid var(--gum,#E2558F);border-radius:22px;padding:14px;box-shadow:0 16px 36px rgba(60,40,20,.25);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:min(560px,92vw);animation:pop .25s cubic-bezier(.2,1.6,.4,1)}
+.cprename{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cprename label{font-weight:800;font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:var(--gum-d)}
+.cprename input{flex:1;min-width:0;font-family:var(--display);font-weight:800;font-size:22px;padding:8px 12px;border-radius:12px;border:2.5px solid var(--line);background:#fff;color:var(--ink)}
 .classpop h3{grid-column:1/-1;margin:0 0 2px;font-size:18px}
 .classpop .tile{min-height:84px}
 /* compact day plan */
@@ -901,7 +904,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 (function(){
 'use strict';
 const STUDENT=/[?&]join(=|&|$)/.test(location.search);
-const VERSION='Roomie v1.3 · 12 Nov 2026';
+const VERSION='Roomie v1.3.1 · 12 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1850,12 +1853,14 @@ addEventListener('resize',()=>{ fitApp(); }); setInterval(()=>{ const st=documen
 const CLASS_TOOLS=[['seats','Seating plan','Where everyone sits'],['jobs','Helpers','Classroom jobs this week'],['pick','Pick a name','Fair and random'],['groups','Groups','Random groups in a tap'],['rotate','Rotations','Stations with timers'],['hero','Mystery Hero','A secret star student'],['classlist','Class list','Add or change names']];
 function closeClassPop(){ const p=document.getElementById('classpop'); if(p) p.remove(); const b=document.getElementById('classBtn'); if(b) b.setAttribute('aria-expanded','false'); }
 function openClassPop(){ closeClassPop(); const b=document.getElementById('classBtn'); const m=document.createElement('div'); m.id='classpop'; m.className='classpop'; m.setAttribute('role','menu');
-  m.innerHTML='<h3>'+esc(S.room)+' · '+names().length+' students</h3>'+CLASS_TOOLS.map(([t,n,d])=>'<button class="tile" type="button" role="menuitem" '+(t==='classlist'?'data-classlist="1"':'data-tool="'+t+'"')+'><b>'+esc(n)+'</b><span>'+esc(d)+'</span></button>').join('');
+  m.innerHTML='<div class="cprename"><label for="cpName">Class name</label><input id="cpName" type="text" maxlength="30" value="'+esc(S.room)+'" placeholder="e.g. 7 Blue, Year 4 Koalas"><span class="hint">'+names().length+' students</span></div>'+CLASS_TOOLS.map(([t,n,d])=>'<button class="tile" type="button" role="menuitem" '+(t==='classlist'?'data-classlist="1"':'data-tool="'+t+'"')+'><b>'+esc(n)+'</b><span>'+esc(d)+'</span></button>').join('');
   document.body.appendChild(m); const r=b.getBoundingClientRect(); m.style.left=Math.max(8,r.left)+'px'; m.style.top=(r.bottom+8)+'px'; b.setAttribute('aria-expanded','true'); }
 document.addEventListener('click',e=>{ if(e.target.closest('#classBtn')){ audio(); document.getElementById('classpop')?closeClassPop():openClassPop(); return; }
   if(e.target.closest('[data-classlist]')){ closeClassPop(); tab='class'; openSetup(); return; }
-  if(document.getElementById('classpop')) setTimeout(closeClassPop,0); });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeClassPop(); });
+  if(document.getElementById('classpop')&&!e.target.closest('#classpop')) setTimeout(closeClassPop,0); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeClassPop(); if(e.key==='Enter'&&e.target.id==='cpName'){ e.target.blur(); closeClassPop(); } });
+document.addEventListener('input',e=>{ if(e.target.id==='cpName'){ S.room=e.target.value.trim()||'My class'; save(); const l=document.getElementById('roomLabel'); if(l) l.textContent=S.room; } });
+document.addEventListener('change',e=>{ if(e.target.id==='cpName'){ A.phaseKey=''; render(true); } });
 
 /* ---- v1.2.1: one Home button that always works ---- */
 function goHome(){ try{ if(typeof TOUR!=='undefined'&&TOUR) endTour(); }catch(_){}
