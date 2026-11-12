@@ -47,6 +47,16 @@ h1,h2,h3{margin:0;text-wrap:balance;font-family:var(--display);font-weight:800}
 .seg.next{background:var(--wattle);color:#2A1E00}
 /* check-in */
 .fslot{display:block;font-family:var(--body);font-size:13px;font-weight:800;color:var(--gum-d);letter-spacing:.04em;text-transform:uppercase}
+/* voice */
+.micbtn.on{background:#E2558F!important;color:#fff;box-shadow:0 0 0 0 rgba(226,85,143,.5);animation:micp 2s infinite}
+.micbtn.awake{background:#F5B700!important;color:#3B2A00;animation:micp .7s infinite}
+@keyframes micp{0%{box-shadow:0 0 0 0 rgba(226,85,143,.45)}100%{box-shadow:0 0 0 14px rgba(226,85,143,0)}}
+.vheard{position:fixed;left:50%;top:96px;transform:translate(-50%,-10px);z-index:75;background:#4A3F38;color:#FFF6E0;border-radius:999px;padding:9px 20px;font-family:var(--body);font-weight:700;font-size:18px;opacity:0;transition:all .25s;pointer-events:none;max-width:80vw;text-align:center}
+.vheard.on{opacity:1;transform:translate(-50%,0)}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
+.vrow{background:var(--panel);border-radius:14px;padding:10px 14px;display:flex;flex-direction:column;gap:2px}
+.vrow b{font-family:var(--display);font-size:20px;color:var(--gum-d)}
+.vrow span{font-size:15px;line-height:1.35}
 /* student devices */
 .livebtn{display:inline-flex;align-items:center;gap:7px;border:0;cursor:pointer;font-family:var(--display);font-weight:800;font-size:17px;color:#4A3F38;background:#fff;border-radius:999px;padding:7px 14px;box-shadow:0 2px 0 rgba(120,90,60,.15)}
 .livebtn.on{background:#2F8F6B;color:#fff}
@@ -828,6 +838,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
       <span class="clock" id="clock">--:--</span>
       <button class="ibtn" id="fsBtn" type="button" aria-label="Full screen"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
       <button class="ibtn" data-tool="float" type="button" aria-label="Float over my slides" title="Float over my slides"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="15" rx="2"/><rect x="12" y="11" width="7" height="5.5" rx="1" fill="currentColor"/></svg></button>
+      <button class="ibtn micbtn" id="micBtn" type="button" aria-label="Hey Roomie voice commands"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/></svg></button>
       <button class="livebtn" id="liveBtn" type="button" title="Student devices"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M11 18h2"/></svg><span>Student devices</span></button>
       <button class="ibtn" data-tour="start" type="button" aria-label="Take the tour" title="Take the tour"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.4-2.7 4"/><circle cx="12" cy="17.6" r=".6" fill="currentColor"/></svg></button>
       <button class="ibtn" id="lookBtn" type="button" aria-label="Look and colours" title="Look & colours"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.7-.9 1.4-1.8-.4-1.2.5-2.2 1.6-2.2H17a4 4 0 0 0 4-4c0-5.5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.3"/><circle cx="10" cy="7" r="1.3"/><circle cx="15" cy="7" r="1.3"/></svg></button>
@@ -904,7 +915,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 (function(){
 'use strict';
 const STUDENT=/[?&]join(=|&|$)/.test(location.search);
-const VERSION='Roomie v1.3.1 · 12 Nov 2026';
+const VERSION='Roomie v1.4 · 12 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1805,6 +1816,7 @@ function renderFunOverlay(o,full){
   if(o==='seats'){ renderSeats(full); return true; }
   if(o==='jobs'){ renderJobs(full); return true; }
   if(o==='join'){ renderJoin(full); return true; }
+  if(o==='voicehelp'){ renderVoiceHelp(full); return true; }
   if(o==='poll'){ renderPoll(full); return true; }
   if(o==='finish'){ renderFinish(full); return true; }
   if(o==='quiz'){ renderQuiz(full); return true; }
@@ -2413,6 +2425,69 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-pl]'); if
   render(true); });
 
 if(!STUDENT) setTimeout(()=>{ markLive(); },300);
+
+/* ---- v1.4: "Hey Roomie" voice commands ---- */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const V={on:false,rec:null,awake:0,last:''};
+const WAKE=/\b(hey|hi|hay|a|ok|okay)[ ,]*(roomie|roomy|rumi|rooney|ruby|rumie|roomies|room ?e|roomee)\b/i;
+const NUMW={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,fifteen:15,twenty:20,thirty:30,a:1,an:1};
+const num=s=>{ const m=s.match(/(\d+|one|two|three|four|five|six|seven|eight|nine|ten|fifteen|twenty|thirty)\b/); return m?(+m[1]||NUMW[m[1]]):0; };
+function vclick(attrs){ const b=document.createElement('button'); b.type='button'; b.style.display='none'; Object.entries(attrs).forEach(([k,v])=>b.setAttribute(k,v)); document.body.appendChild(b); b.click(); b.remove(); }
+const tool=t=>vclick({'data-tool':t});
+function visibleBtn(re){ return [...document.querySelectorAll('#stage button, #overlayHost button, .livewall button')].find(b=>b.offsetParent!==null&&re.test(b.textContent.trim())); }
+const VCMDS=[
+ [/\b(home|stop|that'?s (all|enough)|close( it| that)?|go back)\b/, ()=>{ goHome(); return 'Back home.'; }],
+ [/\b(attention|eyes (on|this way|up)|everyone look)\b/, ()=>{ tool('attention'); return null; }],
+ [/\breset( the room)?\b|\bcalm (everyone|the class|us) down\b/, ()=>{ tool('reset'); return 'Let’s reset.'; }],
+ [/\b(point|plus one|well done|good job|great job)\b/, ()=>{ tool('point'); return 'Point!'; }],
+ [/\b(quiet|calm|breathing) (brain )?break\b/, ()=>{ goHome(); startBrain('calm'); return 'A quiet break.'; }],
+ [/\b(move|moving|movement|active) (brain )?break\b/, ()=>{ goHome(); startBrain('movement'); return 'Let’s move!'; }],
+ [/\bbrain ?break|\bbreak time\b|\bgame break\b/, ()=>{ goHome(); startBrain(/game/.test(V.last)?'game':null); return 'Brain break time!'; }],
+ [/\btimer\b|\bminutes?\b|\bseconds?\b|\bcount ?down\b/, s=>{ let n=num(s)||5, sec=/second/.test(s)?n:n*60; goHome(); tool('timer'); setTimeout(()=>vclick({'data-timer':sec}),60); return (/second/.test(s)?n+' seconds':n+(n===1?' minute':' minutes'))+'. Go!'; }],
+ [/\b(pick|choose|select) (a |someone|somebody|a name|a student|a person)|\bwho('?s| is) next\b|\bpick a name\b/, ()=>{ goHome(); tool('pick'); setTimeout(()=>vclick({'data-act':'pick'}),120); return 'Let’s see…'; }],
+ [/\bgroups?\b/, s=>{ const n=num(s); goHome(); if(/\bgroups? of\b/.test(s)&&n) makeGroups({size:n}); else if(n) makeGroups({count:n}); else makeGroups({size:4}); return 'Here are your groups.'; }],
+ [/\bexit ticket\b|\bexit slip\b/, ()=>{ goHome(); A.tp={kind:'exit',live:true,form:false}; useTicket(null); return 'Here’s your exit ticket!'; }],
+ [/\bentry ticket\b|\bstarter\b/, ()=>{ goHome(); A.tp={kind:'entry',live:true,form:false}; useTicket(null); return 'Here’s your entry ticket!'; }],
+ [/\bsee,? think,? wonder\b/, ()=>{ goHome(); startThink('stw'); return null; }],
+ [/\bthinking routine|\bthink(ing)? time\b|\bvisible thinking\b/, ()=>{ goHome(); startThink(null); return null; }],
+ [/\breflect(ion)?\b/, ()=>{ goHome(); startReflect(null); return 'Time to reflect.'; }],
+ [/\bcheck[- ]?in\b|\bhow (is everyone|are we|are you all) feeling\b|\bfeelings\b/, ()=>{ goHome(); tool('checkin'); return 'How is everyone feeling?'; }],
+ [/\bquiz\b/, ()=>{ goHome(); tool('quiz'); return 'Pick a quiz game.'; }],
+ [/\bpoll\b|\bvote\b/, ()=>{ goHome(); tool('poll'); return 'Poll time.'; }],
+ [/\bpack ?up\b|\btidy up\b|\bclean ?up\b/, ()=>{ goHome(); tool('packup'); return null; }],
+ [/\bseating( plan)?\b|\bwhere (do we|everyone) sit/, ()=>{ goHome(); tool('seats'); return null; }],
+ [/\bhelpers?\b|\bclassroom jobs\b|\bjobs\b/, ()=>{ goHome(); tool('jobs'); return null; }],
+ [/\bmystery hero\b/, ()=>{ goHome(); tool('hero'); return null; }],
+ [/\brotations?\b|\bstations?\b/, ()=>{ goHome(); tool('rotate'); return null; }],
+ [/\breteach\b/, ()=>{ goHome(); tool('reteach'); return null; }],
+ [/\bfinished\b|\bearly finishers?\b/, ()=>{ goHome(); tool('finish'); return null; }],
+ [/\bnext( step| one)?\b|\bkeep going\b/, ()=>{ const b=visibleBtn(/^(next|finish|another|next step)/i); if(b){ b.click(); return null; } return 'There’s nothing to move on from.'; }],
+ [/\bpause\b/, ()=>{ const b=visibleBtn(/^pause$/i); if(b){ b.click(); return 'Paused.'; } if(MT.running){ MT.pause(); render(true); return 'Paused.'; } return null; }],
+ [/\b(resume|carry on|continue)\b/, ()=>{ const b=visibleBtn(/^resume$/i); if(b){ b.click(); return null; } MT.resume&&MT.resume(); render(true); return 'Off we go.'; }],
+ [/\b(more time|another minute|one more minute|extra minute)\b/, ()=>{ if(MT.add){ MT.add(60); render(true); return 'One more minute.'; } return null; }],
+ [/\b(routine|morning routine|arrival|line ?up)\b/, s=>{ goHome(); const id=/line ?up/.test(s)?'lineup':/arrival|morning/.test(s)?'arrival':''; if(id&&routineById(id)) runRoutine(id); else tool('routines'); return null; }]
+];
+function vHandle(cmd){ cmd=cmd.toLowerCase().replace(/[.!?]/g,' ').replace(/\s+/g,' ').trim(); V.last=cmd; vShow('“'+cmd+'”');
+  if(!cmd){ Bird.say('Yes?'); return; }
+  for(const [re,fn] of VCMDS){ if(re.test(cmd)){ try{ const r=fn(cmd); if(r) Bird.say(r); }catch(e){ Bird.say('Oops, I couldn’t do that.'); } V.awake=0; vMark(); return; } }
+  Bird.say('Sorry, I didn’t get that.'); vShow('Try: “Hey Roomie, brain break” or “Hey Roomie, timer 5 minutes”'); V.awake=0; vMark(); }
+function vShow(t){ let el=document.getElementById('vheard'); if(!el){ el=document.createElement('div'); el.id='vheard'; el.className='vheard'; document.body.appendChild(el); } el.textContent=t; el.classList.add('on'); clearTimeout(V.ht); V.ht=setTimeout(()=>el.classList.remove('on'),3500); }
+function vMark(){ const b=document.getElementById('micBtn'); if(!b) return; b.classList.toggle('on',V.on); b.classList.toggle('awake',V.on&&Date.now()<V.awake); b.title=V.on?'Roomie is listening for “Hey Roomie”. Tap to stop.':'Turn on “Hey Roomie” voice commands'; }
+function vStart(){ if(!SR){ toast('Voice commands need Chrome or Edge.'); return; }
+  const r=new SR(); r.lang='en-AU'; r.continuous=true; r.interimResults=false; r.maxAlternatives=3; V.rec=r; V.on=true; S.voice=true; save(); vMark();
+  r.onresult=e=>{ for(let i=e.resultIndex;i<e.results.length;i++){ if(!e.results[i].isFinal) continue; const alts=[...e.results[i]].map(a=>a.transcript);
+      const hit=alts.find(t=>WAKE.test(t));
+      if(hit){ const after=hit.split(WAKE).pop().replace(/^[\s,]+/,''); const rest=hit.replace(/.*?(roomie|roomy|rumi|rooney|ruby|rumie|roomies|room ?e|roomee)\b[\s,]*/i,''); if(rest.trim()) vHandle(rest); else { V.awake=Date.now()+7000; vMark(); Bird.say('Yes?'); chime(1); setTimeout(vMark,7100); } }
+      else if(Date.now()<V.awake) vHandle(alts[0]); } };
+  r.onerror=e=>{ if(e.error==='not-allowed'||e.error==='service-not-allowed'){ V.on=false; S.voice=false; save(); vMark(); toast('Roomie needs permission to use the microphone. Allow it in the address bar and try again.'); } };
+  r.onend=()=>{ if(V.on) setTimeout(()=>{ try{ r.start(); }catch(_){ } },300); };
+  try{ r.start(); }catch(_){ }
+  if(!S.voiceHelped){ S.voiceHelped=true; save(); openOverlay('voicehelp'); } }
+function vStop(){ V.on=false; S.voice=false; save(); try{ V.rec&&V.rec.stop(); }catch(_){ } V.rec=null; vMark(); }
+document.addEventListener('click',e=>{ if(e.target.closest('#micBtn')){ audio(); V.on?vStop():vStart(); } if(e.target.closest('[data-vhelp]')){ openOverlay('voicehelp'); } });
+function renderVoiceHelp(full){ if(!full) return; const L=[['Brain break','“Hey Roomie, it’s time for a brain break” · “…a quiet break” · “…a movement break”'],['Timer','“Hey Roomie, timer 5 minutes” · “…30 seconds” · “…one more minute” · “…pause”'],['Students','“Hey Roomie, pick a name” · “…groups of 3” · “…seating plan” · “…helpers”'],['Tickets','“Hey Roomie, exit ticket” · “…entry ticket”'],['Thinking','“Hey Roomie, thinking routine” · “…see think wonder” · “…next step” · “…reflection”'],['Class','“Hey Roomie, check-in” · “…poll” · “…quiz” · “…pack up”'],['Calm','“Hey Roomie, attention” · “…reset the room” · “…give us a point”'],['Anywhere','“Hey Roomie, home”']];
+  setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">Voice commands</div><h1 class="mid" style="color:var(--gum-d)">Just say “Hey Roomie…”</h1></div>'+backBtn('Got it')+'</div><div class="vgrid">'+L.map(([a,b])=>'<div class="vrow"><b>'+esc(a)+'</b><span>'+esc(b)+'</span></div>').join('')+'</div><p class="hint" style="margin:0">You can also say “Hey Roomie”, wait for the beep, then say what you need. The microphone button at the top turns pink while Roomie listens. Nothing is recorded or saved by Roomie. Chrome and Edge send what you say to Google or Microsoft to turn it into words.</p></section>'); }
+setTimeout(()=>{ vMark(); if(S.voice&&SR&&!STUDENT){ /* browsers need a tap before the mic can start again */ const once=()=>{ document.removeEventListener('click',once,true); if(S.voice&&!V.on) vStart(); }; document.addEventListener('click',once,true); } },400);
 
 /* ---- v1.1: welcome tour ---- */
 function tourSteps(){ const tools=S.mode==='tools';
