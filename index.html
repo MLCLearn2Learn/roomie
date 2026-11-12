@@ -53,6 +53,10 @@ h1,h2,h3{margin:0;text-wrap:balance;font-family:var(--display);font-weight:800}
 @keyframes micp{0%{box-shadow:0 0 0 0 rgba(226,85,143,.45)}100%{box-shadow:0 0 0 14px rgba(226,85,143,0)}}
 .vheard{position:fixed;left:50%;top:96px;transform:translate(-50%,-10px);z-index:75;background:#4A3F38;color:#FFF6E0;border-radius:999px;padding:9px 20px;font-family:var(--body);font-weight:700;font-size:18px;opacity:0;transition:all .25s;pointer-events:none;max-width:80vw;text-align:center}
 .vheard.on{opacity:1;transform:translate(-50%,0)}
+.vpriv{display:flex;flex-direction:column;gap:6px;background:#D4F2DF;border-radius:16px;padding:12px 16px}
+.vpriv.warn{background:#FFE1CC}
+.vpriv b{font-family:var(--display);font-size:20px}
+.vpriv span{font-size:15px;line-height:1.4}
 .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
 .vrow{background:var(--panel);border-radius:14px;padding:10px 14px;display:flex;flex-direction:column;gap:2px}
 .vrow b{font-family:var(--display);font-size:20px;color:var(--gum-d)}
@@ -915,7 +919,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 (function(){
 'use strict';
 const STUDENT=/[?&]join(=|&|$)/.test(location.search);
-const VERSION='Roomie v1.4 · 12 Nov 2026';
+const VERSION='Roomie v1.4.1 · 12 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -2473,8 +2477,15 @@ function vHandle(cmd){ cmd=cmd.toLowerCase().replace(/[.!?]/g,' ').replace(/\s+/
   Bird.say('Sorry, I didn’t get that.'); vShow('Try: “Hey Roomie, brain break” or “Hey Roomie, timer 5 minutes”'); V.awake=0; vMark(); }
 function vShow(t){ let el=document.getElementById('vheard'); if(!el){ el=document.createElement('div'); el.id='vheard'; el.className='vheard'; document.body.appendChild(el); } el.textContent=t; el.classList.add('on'); clearTimeout(V.ht); V.ht=setTimeout(()=>el.classList.remove('on'),3500); }
 function vMark(){ const b=document.getElementById('micBtn'); if(!b) return; b.classList.toggle('on',V.on); b.classList.toggle('awake',V.on&&Date.now()<V.awake); b.title=V.on?'Roomie is listening for “Hey Roomie”. Tap to stop.':'Turn on “Hey Roomie” voice commands'; }
-function vStart(){ if(!SR){ toast('Voice commands need Chrome or Edge.'); return; }
-  const r=new SR(); r.lang='en-AU'; r.continuous=true; r.interimResults=false; r.maxAlternatives=3; V.rec=r; V.on=true; S.voice=true; save(); vMark();
+async function vLocalReady(){ if(!SR||!SR.available) return 'unsupported';
+  try{ let a=await SR.available({langs:['en-US'],processLocally:true});
+    if(a==='downloadable'||a==='downloading'){ vShow('Downloading Roomie’s listening pack… (one time only)'); const ok=await SR.install({langs:['en-US'],processLocally:true}); a=ok?'available':'unavailable'; }
+    return a; }catch(_){ return 'unsupported'; } }
+async function vStart(){ if(!SR){ toast('Voice commands need Chrome or Edge.'); return; }
+  const local=S.voiceCloud!==true; let lang='en-AU';
+  if(local){ const a=await vLocalReady(); if(a!=='available'){ V.blocked=true; openOverlay('voicehelp'); return; } lang='en-US'; }
+  V.blocked=false; V.local=local;
+  const r=new SR(); r.lang=lang; if(local) r.processLocally=true; r.continuous=true; r.interimResults=false; r.maxAlternatives=3; V.rec=r; V.on=true; S.voice=true; save(); vMark();
   r.onresult=e=>{ for(let i=e.resultIndex;i<e.results.length;i++){ if(!e.results[i].isFinal) continue; const alts=[...e.results[i]].map(a=>a.transcript);
       const hit=alts.find(t=>WAKE.test(t));
       if(hit){ const after=hit.split(WAKE).pop().replace(/^[\s,]+/,''); const rest=hit.replace(/.*?(roomie|roomy|rumi|rooney|ruby|rumie|roomies|room ?e|roomee)\b[\s,]*/i,''); if(rest.trim()) vHandle(rest); else { V.awake=Date.now()+7000; vMark(); Bird.say('Yes?'); chime(1); setTimeout(vMark,7100); } }
@@ -2486,7 +2497,10 @@ function vStart(){ if(!SR){ toast('Voice commands need Chrome or Edge.'); return
 function vStop(){ V.on=false; S.voice=false; save(); try{ V.rec&&V.rec.stop(); }catch(_){ } V.rec=null; vMark(); }
 document.addEventListener('click',e=>{ if(e.target.closest('#micBtn')){ audio(); V.on?vStop():vStart(); } if(e.target.closest('[data-vhelp]')){ openOverlay('voicehelp'); } });
 function renderVoiceHelp(full){ if(!full) return; const L=[['Brain break','“Hey Roomie, it’s time for a brain break” · “…a quiet break” · “…a movement break”'],['Timer','“Hey Roomie, timer 5 minutes” · “…30 seconds” · “…one more minute” · “…pause”'],['Students','“Hey Roomie, pick a name” · “…groups of 3” · “…seating plan” · “…helpers”'],['Tickets','“Hey Roomie, exit ticket” · “…entry ticket”'],['Thinking','“Hey Roomie, thinking routine” · “…see think wonder” · “…next step” · “…reflection”'],['Class','“Hey Roomie, check-in” · “…poll” · “…quiz” · “…pack up”'],['Calm','“Hey Roomie, attention” · “…reset the room” · “…give us a point”'],['Anywhere','“Hey Roomie, home”']];
-  setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">Voice commands</div><h1 class="mid" style="color:var(--gum-d)">Just say “Hey Roomie…”</h1></div>'+backBtn('Got it')+'</div><div class="vgrid">'+L.map(([a,b])=>'<div class="vrow"><b>'+esc(a)+'</b><span>'+esc(b)+'</span></div>').join('')+'</div><p class="hint" style="margin:0">You can also say “Hey Roomie”, wait for the beep, then say what you need. The microphone button at the top turns pink while Roomie listens. Nothing is recorded or saved by Roomie. Chrome and Edge send what you say to Google or Microsoft to turn it into words.</p></section>'); }
+  setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">Voice commands</div><h1 class="mid" style="color:var(--gum-d)">Just say “Hey Roomie…”</h1></div>'+backBtn('Got it')+'</div><div class="vgrid">'+L.map(([a,b])=>'<div class="vrow"><b>'+esc(a)+'</b><span>'+esc(b)+'</span></div>').join('')+'</div><p class="hint" style="margin:0">You can also say “Hey Roomie”, wait for the beep, then say what you need. The microphone button at the top turns pink while Roomie listens.</p>'+vPrivacyHTML()+'</section>'); }
+function vPrivacyHTML(){ const cloud=S.voiceCloud===true;
+  return '<div class="vpriv'+(V.blocked?' warn':'')+'"><b>'+(V.blocked?'This browser can’t listen on this computer yet':cloud?'Listening is using Google or Microsoft':'Listening stays on this computer')+'</b><span>'+(V.blocked?'Roomie only listens on the computer itself, so nothing you say leaves the room. This browser doesn’t support that yet. Update Chrome (Settings → About Chrome), then try the microphone again.':cloud?'Your browser sends what it hears to Google (Chrome) or Microsoft (Edge) to turn it into words. Roomie itself never records or saves anything.':'Your browser turns speech into words on this computer. Nothing you say is sent anywhere, recorded or saved.')+'</span><label class="chk"><input type="checkbox" id="vCloud" '+(cloud?'checked':'')+'><span>Allow Google or Microsoft to do the listening if this computer can’t</span></label></div>'; }
+document.addEventListener('change',e=>{ if(e.target.id==='vCloud'){ S.voiceCloud=e.target.checked; save(); V.blocked=false; render(true); } });
 setTimeout(()=>{ vMark(); if(S.voice&&SR&&!STUDENT){ /* browsers need a tap before the mic can start again */ const once=()=>{ document.removeEventListener('click',once,true); if(S.voice&&!V.on) vStart(); }; document.addEventListener('click',once,true); } },400);
 
 /* ---- v1.1: welcome tour ---- */
