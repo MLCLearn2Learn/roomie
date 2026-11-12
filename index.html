@@ -59,6 +59,25 @@ h1,h2,h3{margin:0;text-wrap:balance;font-family:var(--display);font-weight:800}
 .vpriv span{font-size:15px;line-height:1.4}
 .vsug{position:fixed;left:50%;top:140px;transform:translateX(-50%);z-index:76;background:#FFFDF3;border:3px solid #F5B700;border-radius:20px;padding:12px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:0 12px 28px rgba(60,40,20,.2);font-family:var(--body);max-width:90vw}
 .vsug small{font-weight:700;font-size:15px}
+.mirpill{display:inline-flex;align-items:center;gap:7px;border:0;cursor:pointer;background:#4A3F38;color:#FFF6E0;border-radius:999px;padding:7px 14px;font-family:var(--body);font-weight:800;font-size:15px;font-variant-numeric:tabular-nums;flex-shrink:0}
+.mirpill i{width:10px;height:10px;border-radius:50%;background:#9A8F86}.mirpill i.t{background:#E2558F}.mirpill i.s{background:#2F8F6B}
+.mstats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.mstats div{background:var(--panel);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column}
+.mstats b{font-family:var(--display);font-size:clamp(28px,2.6vw,40px);line-height:1;color:var(--gum-d)}
+.mstats span{font-size:14px;font-weight:700;opacity:.75}
+.mtl{display:flex;height:44px;border-radius:10px;overflow:hidden;background:#EFE6D2;gap:1px}
+.mtl i{flex:1;min-width:1px;background:linear-gradient(to top,#E2558F 0 calc(var(--t)*100%),#2F8F6B calc(var(--t)*100%) calc((var(--t) + var(--s))*100%),#E8DCC4 calc((var(--t) + var(--s))*100%))}
+.mkey{display:flex;gap:16px;font-size:13px;font-weight:700}.mkey span:before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}.kt:before{background:#E2558F}.ks:before{background:#2F8F6B}.kq:before{background:#E8DCC4}
+.mgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:14px;min-height:0}
+.mstep{background:#FFF1A8;border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.mstep small,.mqs small{font-weight:800;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--gum-d)}
+.mstep b{font-family:var(--display);font-size:26px}.mstep p{margin:0;font-size:16px;line-height:1.4}.mtry{font-weight:800}
+.mstep textarea{font:inherit;font-size:15px;padding:8px 10px;border-radius:10px;border:2px solid rgba(74,63,56,.2);background:#FFFDF6;width:100%;box-sizing:border-box}
+.mqs{background:var(--panel);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;overflow:auto;max-height:340px}
+.mq{display:grid;grid-template-columns:62px 1fr 44px;gap:8px;align-items:center;font-size:15px}.mq p{margin:0}.mq b{text-align:right}
+.mq span{font-size:11px;font-weight:800;text-transform:uppercase;border-radius:6px;padding:2px 6px;text-align:center}.mq .o{background:#D4F2DF;color:#1F6B4E}.mq .c{background:#EFE6D2}
+.cmics{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}.cmics .row{grid-column:1/-1}
+.mhist{display:flex;flex-direction:column;gap:6px}.mh{display:flex;justify-content:space-between;gap:10px;border:0;background:var(--panel);border-radius:12px;padding:10px 14px;font:inherit;cursor:pointer;text-align:left}.mh span{opacity:.75;font-size:14px}
 .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
 .vrow{background:var(--panel);border-radius:14px;padding:10px 14px;display:flex;flex-direction:column;gap:2px}
 .vrow b{font-family:var(--display);font-size:20px;color:var(--gum-d)}
@@ -711,6 +730,10 @@ body.mode-tools .livetray{right:330px}
 .livebtn.has{animation:none}
 .lwcode{font-family:var(--display);font-size:22px;align-self:center;margin-right:8px}
 .lwcode b{color:#B5306A;letter-spacing:.08em}
+.card.mirror{gap:12px;overflow:hidden}
+.card.mirror .mgrid{flex:1 1 auto;min-height:0}
+.card.mirror .mstep{overflow:auto}
+.card.mirror .mstep textarea{min-height:56px;resize:none}
 
 /* ---------- Scrapbook look ---------- */
 body.scrap{--acc:#E2558F;--sky:#EFE6CC;--sky-calm:#E8E3D2;--dusk:#F2E0C4;--panel:#FFFDF3;--ink:#2B2B2B;--muted:#6A6458;--line:#E6DDC4;
@@ -922,7 +945,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 (function(){
 'use strict';
 const STUDENT=/[?&]join(=|&|$)/.test(location.search);
-const VERSION='Roomie v1.5 · 12 Nov 2026';
+const VERSION='Roomie v1.6 · 12 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1534,7 +1557,7 @@ function openSetup(){ if(Music.isYT&&!Music.paused) Music.pause(); editDay=editD
 function closeSetup(){ $('#sheetHost').innerHTML=''; refreshLabels(); A.phaseKey=''; tick(true); }
 function opt(v,l,cur){ return '<option value="'+esc(v)+'"'+(v===cur?' selected':'')+'>'+esc(l)+'</option>'; }
 function renderSetup(){
-  const tabs=[['plan','Day plan'],['look','Look & colours'],['class','Class'],['routines','Routines'],['expect','Expectations'],['reminders','Reminders & goal'],['relief','Relief teacher page'],['fun','Fun & rotations'],['demo','Demo clock'],['privacy','Privacy & backup']];
+  const tabs=[['plan','Day plan'],['look','Look & colours'],['class','Class'],['routines','Routines'],['expect','Expectations'],['reminders','Reminders & goal'],['relief','Relief teacher page'],['fun','Fun & rotations'],['demo','Demo clock'],['privacy','Privacy & backup'],['coach','Coach (early access)']];
   let body='';
   if(tab==='plan'){ const list=S.days[editDay]||[]; const rOpts=c=>opt('','—',c)+S.routines.map(r=>opt(r.id,r.name,c)).join(''); const eOpts=c=>opt('','—',c)+Object.entries(S.expect).map(([k,e])=>opt(k,e.name,c)).join('');
     body='<div class="okbox" style="font-size:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center"><b>Use Roomie as:</b><button class="btn sm'+(S.mode==='tools'?' alt':'')+'" type="button" data-mode="day">My whole day, with subjects</button><button class="btn sm'+(S.mode==='tools'?'':' alt')+'" type="button" data-mode="tools">Just the toolkit, no timetable</button></div>'+(S.mode==='tools'?'<p class="lead" style="margin:0">Roomie is in toolkit mode. The board shows your tools and nothing changes by itself. Switch to “My whole day” to use the plan below.</p>':'')+'<div class="row">'+DAYS.map(k=>'<button class="tab" type="button" data-day="'+k+'" aria-selected="'+(k===editDay)+'">'+DAYNAME[k]+'</button>').join('')+'</div><p class="hint" style="margin:0">Tap a block to change it: times, routines, expectations, tickets and planned activities. Roomie changes over by itself and pops up planned activities when they’re due.</p><div class="tablewrap"><div class="plan">'+
@@ -1553,6 +1576,7 @@ function renderSetup(){
     body='<h3>Colour</h3>'+(S.theme==='scrap'?'':'<p class="hint" style="margin:0">Colours apply to the Scrapbook look.</p>')+sw('data-acc',S.accent||'pink',SW)+'<h3>Roomie’s colour</h3>'+sw('data-rc',S.roomieCol||'match',RC)+'<h3>Look</h3>'+sw('data-look',S.theme,LK)+'<h3>Today’s timetable</h3>'+sw('data-daypos',S.dayPos||'side',[['side','Down the side','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="9" height="28" rx="2" fill="#E2558F"/><rect x="16" y="6" width="20" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['top','Across the top','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="6" rx="2" fill="#E2558F"/><rect x="4" y="15" width="32" height="19" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['hide','Hidden','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover']])+'<p class="hint" style="margin:0">Changes show on the board straight away. Tap Done to see them.</p>'; }
   if(tab==='fun'){ body='<div class="row" style="align-items:flex-end"><div class="fld" style="width:220px"><label for="fFun">Fun level</label><select id="fFun">'+opt('calm','Calm: just the essentials',S.fun)+opt('lively','Lively (recommended)',S.fun)+opt('party','Party: everything on',S.fun)+'</select></div><button class="btn gold" type="button" data-sact="testFun">Test a celebration</button></div><label class="chk"><input type="checkbox" id="fMascot" '+(S.mascot!==false?'checked':'')+'><span>Show Roomie the mascot<span class="hint" style="display:block">Sings with the music, cheers for points, says hello at each change</span></span></label><label class="chk"><input type="checkbox" id="fSfx" '+(S.sfx!==false?'checked':'')+'><span>Celebration sounds<span class="hint" style="display:block">Fanfares, drumrolls and pops. The attention chime always plays.</span></span></label><p class="hint" style="margin:0">Fun comes in bursts: celebrations, races and reveals. During learning the board stays calm. If a computer is set to reduce motion, Roomie turns the animations off.</p><h3>Rotations</h3><div class="row" style="align-items:flex-start"><div class="fld" style="flex:1;min-width:240px"><label for="fStations">Stations, one per line (2 to 8)</label><textarea id="fStations" style="min-height:180px">'+esc(S.stations||'')+'</textarea></div><div class="fld" style="width:160px"><label for="fRotMin">Minutes at each</label><input id="fRotMin" type="number" min="2" max="40" value="'+(S.rotMin||12)+'"></div></div><p class="hint" style="margin:0">Roomie makes one crew per station from your class list. Crews move one station each round, with a 45-second move song.</p>'; }
   if(tab==='demo'){ const P=phaseAt(now()); body='<div class="okbox" style="font-size:16px">Try the whole day without waiting. The clock on the board jumps; nothing else changes.</div><div class="row"><button class="btn gold" type="button" data-sact="demoStart">Start the day at 8:40</button><button class="btn" type="button" data-sact="demoNext">Jump to 10 seconds before the next change</button><button class="btn alt" type="button" data-sact="demoReal">Back to the real time</button></div><p class="lead">Board time now: '+fmtClock(P.mins)+' · '+esc(P.phase)+(P.block?' · '+esc(P.block.name):'')+'</p>'; }
+  if(tab==='coach'){ body=coachTab(); setTimeout(coachFillMics,0); }
   if(tab==='privacy'){ body='<div class="okbox" style="font-size:16px;line-height:1.6"><b>What Roomie keeps:</b> your plan, routines, settings and students’ first names, only in this browser on this computer. Your own audio files stay here too.<br><b>What Roomie never keeps:</b> recordings, noise levels, check-in taps or anything about individual students.</div><div class="fld"><label for="fBackup">Backup: copy this somewhere safe, or paste a backup here to restore</label><textarea id="fBackup" style="font-size:12px;font-family:ui-monospace,monospace">'+esc(JSON.stringify(S))+'</textarea></div><div class="row"><button class="btn alt sm" type="button" data-sact="copyBackup">Copy backup</button><button class="btn alt sm" type="button" data-sact="restore">Restore from the box</button><button class="btn alt sm" type="button" data-sact="erase">Erase everything on this computer</button></div><div id="privMsg"></div>'; }
   $('#sheetHost').innerHTML='<div class="sheet" role="dialog" aria-label="Setup"><div class="sheet-in"><div class="row" style="justify-content:space-between"><h1 style="font-size:34px;color:var(--gum-d)">Setup</h1><button class="btn" type="button" data-sact="done"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px"><path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/></svg>Done, back to Home</button></div><div class="tabs" role="tablist">'+tabs.map(([k,l])=>'<button class="tab" role="tab" type="button" data-tab="'+k+'" aria-selected="'+(tab===k)+'">'+l+'</button>').join('')+'</div>'+body+'<p class="hint">Changes save as you go. '+esc(VERSION)+'</p></div></div>';
 }
@@ -1824,6 +1848,7 @@ function renderFunOverlay(o,full){
   if(o==='jobs'){ renderJobs(full); return true; }
   if(o==='join'){ renderJoin(full); return true; }
   if(o==='voicehelp'){ renderVoiceHelp(full); return true; }
+  if(o==='mirror'){ renderMirror(full); return true; }
   if(o==='poll'){ renderPoll(full); return true; }
   if(o==='finish'){ renderFinish(full); return true; }
   if(o==='quiz'){ renderQuiz(full); return true; }
@@ -2535,6 +2560,8 @@ const INTENTS=[
  {id:'fullscreen',k:[[/ full ?screen /,4],[/ (make it|go) big(ger)? /,2]], run(){ document.getElementById('fsBtn').click(); return null; }},
  {id:'float',k:[[/ (float|over (my|the) slides|mini (mode|roomie)|small window|picture in picture) /,3.5]], run(){ vclick({'data-tool':'float'}); return null; }},
  {id:'devices',k:[[/ (student devices|join code|class code|ipads?|chromebooks?|devices|laptops) /,3]], run(s){ goHome(); if(/ (turn on|start|switch on|let them) /.test(s)&&!S.liveOn){ liveOn(); } openOverlay('join'); return null; }},
+ {id:'mirror',k:[[/ (mirror|record|listen to|coach me|watch) (this|my|the) (lesson|class|teaching) /,6],[/ (lesson )?mirror /,4],[/ coach me /,4]],
+  run(s){ if(!(S.coach&&S.coach.unlocked)) return 'The lesson mirror isn’t switched on yet.'; if(/ (stop|end|finish|done|turn off) /.test(s)){ if(!M.on) return 'The mirror isn’t running.'; mirStop(); return 'Mirror saved for later.'; } if(M.on) return 'I’m already listening to this lesson.'; mirStart(); return null; }},
  {id:'help',k:[[/ (help|what can (you|i) (do|say)|commands|what do i say) /,3]], run(){ openOverlay('voicehelp'); return 'Here’s what I can do.'; }},
  {id:'setup',k:[[/ (setup|set up|settings|day plan|class list) /,2.5]], run(){ goHome(); openSetup(); return null; }}
 ];
@@ -2610,6 +2637,7 @@ async function vStart(){ if(!SR){ toast('Voice commands need Chrome or Edge.'); 
   const r=new SR(); r.lang=lang; if(local) r.processLocally=true; r.continuous=true; r.interimResults=true; r.maxAlternatives=3; V.rec=r; V.on=true; S.voice=true; save(); vMark();
   r.onresult=e=>{ for(let i=e.resultIndex;i<e.results.length;i++){ const res=e.results[i], alts=[...res].map(a=>a.transcript);
       if(!res.isFinal){ const t=alts[0]||''; if(wakeIn(t)!==null||Date.now()<V.awake) vShow('🎙 '+t+'…'); continue; }
+      if(typeof M!=='undefined'&&M.on) mirFeed(alts[0]);
       let cmd=null; for(const t of alts){ const c=wakeIn(t); if(c!==null){ cmd=c; break; } }
       if(cmd!==null) vHandle(cmd); else if(Date.now()<V.awake) vHandle(alts[0]); } };
   r.onerror=e=>{ if(e.error==='not-allowed'||e.error==='service-not-allowed'){ V.on=false; S.voice=false; save(); vMark(); toast('Roomie needs permission to use the microphone. Allow it in the address bar and try again.'); } };
@@ -2624,6 +2652,83 @@ function vPrivacyHTML(){ const cloud=S.voiceCloud===true;
   return '<div class="vpriv'+(V.blocked?' warn':'')+'"><b>'+(V.blocked?'This browser can’t listen on this computer yet':cloud?'Listening is using Google or Microsoft':'Listening stays on this computer')+'</b><span>'+(V.blocked?'Roomie only listens on the computer itself, so nothing you say leaves the room. This browser doesn’t support that yet. Update Chrome (Settings → About Chrome), then try the microphone again.':cloud?'Your browser sends what it hears to Google (Chrome) or Microsoft (Edge) to turn it into words. Roomie itself never records or saves anything.':'Your browser turns speech into words on this computer. Nothing you say is sent anywhere, recorded or saved.')+'</span><label class="chk"><input type="checkbox" id="vCloud" '+(cloud?'checked':'')+'><span>Allow Google or Microsoft to do the listening if this computer can’t</span></label></div>'; }
 document.addEventListener('change',e=>{ if(e.target.id==='vCloud'){ S.voiceCloud=e.target.checked; save(); V.blocked=false; render(true); } });
 setTimeout(()=>{ vMark(); if(S.voice&&SR&&!STUDENT){ /* browsers need a tap before the mic can start again */ const once=()=>{ document.removeEventListener('click',once,true); if(S.voice&&!V.on) vStart(); }; document.addEventListener('click',once,true); } },400);
+
+/* ---- v1.6: Lesson mirror (early access). Everything is measured on this computer; no audio is kept or sent. ---- */
+const MIR_CODE='coach';
+const OPEN_RE=/^(why|how (do|does|did|would|could|might|can|come)|what (do|does|did) you (think|notice|wonder|reckon)|what (would|might|could|if)|what makes you|explain|tell me|describe|in what ways|how might|what else|what's your|what is your|how are .* (alike|different|connected)|compare)/;
+const Q_RE=/^(what|why|how|who|when|where|which|whose|can|could|would|will|do|does|did|is|are|was|were|should|have|has|had|any|anyone|does anyone|tell me|explain|describe)\b/;
+const M={on:false};
+function mirFmt(s){ s=Math.max(0,Math.round(s)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+async function mirDevices(){ try{ const d=await navigator.mediaDevices.enumerateDevices(); return d.filter(x=>x.kind==='audioinput'); }catch(_){ return []; } }
+async function mirOpen(id){ const st=await navigator.mediaDevices.getUserMedia({audio:{deviceId:id?{exact:id}:undefined,echoCancellation:false,noiseSuppression:false,autoGainControl:false}}); const ac=M.ac||(M.ac=new (window.AudioContext||window.webkitAudioContext)()); const src=ac.createMediaStreamSource(st), an=ac.createAnalyser(); an.fftSize=1024; src.connect(an); return {st,an,buf:new Float32Array(an.fftSize),floor:0.004,hist:[]}; }
+function mirLevel(ch){ ch.an.getFloatTimeDomainData(ch.buf); let s=0; for(const v of ch.buf) s+=v*v; const r=Math.sqrt(s/ch.buf.length); ch.hist.push(r); if(ch.hist.length>600) ch.hist.shift(); if(ch.hist.length%20===0){ const so=[...ch.hist].sort((a,b)=>a-b); ch.floor=Math.max(0.002,so[Math.floor(so.length*0.15)]); } return r; }
+async function mirCalibrate(){ const C=S.coach||{}; const ch=await mirOpen(C.worn||C.room||''); let peak=[]; const t0=Date.now(); await new Promise(ok=>{ const h=setInterval(()=>{ peak.push(mirLevel(ch)); if(Date.now()-t0>4500){ clearInterval(h); ok(); } },100); }); ch.st.getTracks().forEach(t=>t.stop()); peak.sort((a,b)=>b-a); const lvl=peak.slice(0,Math.max(3,Math.floor(peak.length*0.3))).reduce((a,b)=>a+b,0)/Math.max(3,Math.floor(peak.length*0.3)); S.coach=Object.assign(S.coach||{},{tLevel:lvl}); save(); return lvl; }
+async function mirStart(){ if(M.on) return; const C=S.coach||{};
+  try{ M.room=await mirOpen(C.room||''); M.worn=C.worn?await mirOpen(C.worn):null; }catch(e){ toast('Roomie needs the microphone. Allow it in the address bar.'); return; }
+  Object.assign(M,{on:true,t0:Date.now(),tick:0,teacher:0,students:0,quiet:0,buckets:[],cur:{t:0,s:0,q:0},lastVoice:Date.now(),lastTeacher:0,run:0,longest:0,qs:[],pendQ:null,state:'q'});
+  const tl=C.tLevel||0.05;
+  M.h=setInterval(()=>{ const rr=mirLevel(M.room), wr=M.worn?mirLevel(M.worn):0; const now=Date.now();
+    const roomOn=rr>Math.max(M.room.floor*2.6,0.006);
+    let st; if(M.worn){ const tOn=wr>Math.max(M.worn.floor*3,tl*0.3); st=tOn?'t':roomOn?'s':'q'; } else st=roomOn?(rr>=tl*0.45?'t':'s'):'q';
+    M[st==='t'?'teacher':st==='s'?'students':'quiet']+=0.1; M.cur[st]+=0.1;
+    if(st==='t'){ M.lastTeacher=now; M.run+=0.1; M.longest=Math.max(M.longest,M.run); } else if(now-M.lastTeacher>2500) M.run=0;
+    if(M.pendQ&&st!=='q'&&now>M.pendQ.end+300&&!(st==='t'&&now-M.pendQ.end<600)){ M.pendQ.wait=(now-M.pendQ.end)/1000; M.pendQ.by=st; M.pendQ=null; }
+    if(M.pendQ&&now-M.pendQ.end>20000){ M.pendQ.wait=20; M.pendQ=null; }
+    if(st!=='q') M.lastVoice=now; M.state=st;
+    if(++M.tick%100===0){ M.buckets.push(M.cur); M.cur={t:0,s:0,q:0}; }
+    mirMark(); },100);
+  if(!(typeof V!=='undefined'&&V.on)) mirSR();
+  Bird.say('I’m listening to this lesson.'); mirMark(); }
+function mirSR(){ if(!SR) return; const local=S.voiceCloud!==true; const r=new SR(); r.lang=local?'en-US':'en-AU'; if(local) r.processLocally=true; r.continuous=true; r.interimResults=false; M.sr=r;
+  r.onresult=e=>{ for(let i=e.resultIndex;i<e.results.length;i++) if(e.results[i].isFinal) mirFeed(e.results[i][0].transcript); };
+  r.onend=()=>{ if(M.on&&M.sr===r) setTimeout(()=>{ try{ r.start(); }catch(_){ } },300); };
+  try{ (M.worn&&r.start.length>=0)?r.start(M.worn.st.getAudioTracks()[0]):r.start(); }catch(_){ try{ r.start(); }catch(__){ } } }
+function mirFeed(text){ if(!M.on) return; const now=Date.now(); if(now-M.lastTeacher>1500) return; /* only the teacher’s own words */
+  text=String(text).trim(); if(!text) return; const parts=text.split(/(?<=[?.!])\s+/).map(x=>x&&x.trim()).filter(Boolean);
+  parts.forEach(p=>{ const low=p.toLowerCase().replace(/^(so|ok|okay|and|now|right|alright|um|uh|well)\s+/,''); if(/\?$/.test(p)||Q_RE.test(low)){ if(/^(hey roomie|roomie)/.test(low)) return; const q={text:p.slice(0,140),open:OPEN_RE.test(low),at:(now-M.t0)/1000,end:M.lastTeacher||now,wait:null};
+    if(M.pendQ&&M.pendQ.wait==null){ M.pendQ.wait=Math.max(0,(q.end-M.pendQ.end)/1000-1); M.pendQ.by='t'; } M.qs.push(q); M.pendQ=q; } }); }
+function mirStop(){ if(!M.on) return; M.on=false; clearInterval(M.h); try{ M.sr&&M.sr.stop(); }catch(_){ } M.sr=null; [M.room,M.worn].forEach(c=>c&&c.st.getTracks().forEach(t=>t.stop())); if(M.cur.t+M.cur.s+M.cur.q>0) M.buckets.push(M.cur);
+  const tot=Math.max(1,M.teacher+M.students+M.quiet), Q=M.qs, wq=Q.filter(q=>q.wait!=null);
+  const rep={id:uid(),date:now().toISOString(),mins:Math.round((Date.now()-M.t0)/60000),block:(A.P&&A.P.block&&A.P.block.name)||'',teacher:M.teacher/tot,students:M.students/tot,quiet:M.quiet/tot,qs:Q.map(q=>({text:q.text,open:q.open,wait:q.wait==null?null:Math.round(q.wait*10)/10,at:Math.round(q.at)})),wait:wq.length?wq.reduce((a,q)=>a+q.wait,0)/wq.length:null,longest:M.longest,buckets:M.buckets.map(b=>{ const s=b.t+b.s+b.q||1; return [b.t/s,b.s/s,b.q/s].map(x=>Math.round(x*100)/100); }),worn:!!M.worn,note:''};
+  S.mirrors=[rep].concat(S.mirrors||[]).slice(0,30); save(); mirMark(); A.mirId=rep.id; Bird.say('Your lesson mirror is ready.');
+  toast('Lesson mirror saved. Open it in Setup → Coach when students have gone.'); }
+function mirMark(){ let p=document.getElementById('mirPill'); if(!M.on){ if(p) p.remove(); return; } if(!p){ p=document.createElement('button'); p.id='mirPill'; p.type='button'; p.className='mirpill'; p.title='Lesson mirror is listening. Tap to stop.'; const t=document.querySelector('.top'); (t||document.body).appendChild(p); }
+  p.innerHTML='<i class="'+M.state+'"></i>Mirror '+mirFmt((Date.now()-M.t0)/1000); }
+document.addEventListener('click',e=>{ if(e.target.closest('#mirPill')){ mirStop(); } });
+/* one next step, chosen by rule (no AI yet) */
+function mirStep(r){ const open=r.qs.filter(q=>q.open).length, n=r.qs.length;
+  if(r.wait!=null&&n>=3&&r.wait<3) return ['Wait time','After your questions, students had about '+r.wait.toFixed(1)+' seconds before someone spoke. Research on wait time suggests 3 seconds or more leads to longer, more thoughtful answers.','Next lesson, after each big question, silently count to five before taking an answer.'];
+  if(r.teacher>0.7) return ['Talk balance','You were talking for about '+Math.round(r.teacher*100)+'% of the voice time. That leaves students less room to think aloud.','Pick one part of the next lesson where students explain to each other while you listen.'];
+  if(n>=4&&open/n<0.3) return ['Open questions','Most of your questions ('+(n-open)+' of '+n+') had one right answer. Open questions get students reasoning.','Plan two “why” or “how do you know” questions before the lesson and ask them.'];
+  if(r.longest>240) return ['Long stretches','Your longest stretch of talking was '+mirFmt(r.longest)+'. Attention drops after a few minutes of listening.','Break long explanations with a turn-and-talk every 3–4 minutes.'];
+  return ['Keep it up','Good balance today: students talked, you asked open questions and gave them time.','Choose one thing you want to grow and try it next lesson.']; }
+function renderMirror(full){ if(!full) return; const r=(S.mirrors||[]).find(x=>x.id===A.mirId)||(S.mirrors||[])[0]; if(!r){ goHome(); return; } const st=mirStep(r), pct=x=>Math.round(x*100)+'%';
+  const d=new Date(r.date), open=r.qs.filter(q=>q.open).length;
+  setStage('one','<section class="card mirror"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">Lesson mirror · early access · just for you</div><h1 class="mid" style="color:var(--gum-d)">'+esc(r.block||'Your lesson')+' · '+d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'})+' · '+r.mins+' min</h1></div>'+backBtn('Close')+'</div>'+
+   '<div class="mstats"><div><b>'+pct(r.teacher)+'</b><span>you talking</span></div><div><b>'+pct(r.students)+'</b><span>students talking</span></div><div><b>'+pct(r.quiet)+'</b><span>quiet and think time</span></div><div><b>'+r.qs.length+'</b><span>questions ('+open+' open)</span></div><div><b>'+(r.wait==null?'–':r.wait.toFixed(1)+'s')+'</b><span>average wait time</span></div></div>'+
+   '<div class="mtl" title="Each bar is 10 seconds">'+r.buckets.map(b=>'<i style="--t:'+b[0]+';--s:'+b[1]+'"></i>').join('')+'</div><div class="mkey"><span class="kt">You</span><span class="ks">Students</span><span class="kq">Quiet</span></div>'+
+   '<div class="mgrid"><div class="mstep"><small>One thing to try</small><b>'+esc(st[0])+'</b><p>'+esc(st[1])+'</p><p class="mtry">'+esc(st[2])+'</p><label class="thin"><span>Your reflection <em>(only on this computer)</em></span><textarea id="mirNote" rows="2" placeholder="What did you notice? What will you try?">'+esc(r.note||'')+'</textarea></label></div>'+
+   '<div class="mqs"><small>Your questions</small>'+(r.qs.length?r.qs.slice(0,40).map(q=>'<div class="mq"><span class="'+(q.open?'o':'c')+'">'+(q.open?'open':'closed')+'</span><p>'+esc(q.text)+'</p><b>'+(q.wait==null?'':q.wait.toFixed(1)+'s')+'</b></div>').join(''):'<p class="hint">Roomie didn’t catch any questions. Try wearing a microphone, or check the listening box in Setup → Coach.</p>')+'</div></div>'+
+   '<p class="hint" style="margin:0">These are estimates from sound levels and Roomie’s on-computer listening'+(r.worn?' with your worn microphone':', using the laptop microphone only (wear a microphone for better accuracy)')+'. No audio was kept or sent anywhere. Only your own words are listed.</p></section>'); }
+document.addEventListener('input',e=>{ if(e.target.id==='mirNote'){ const r=(S.mirrors||[]).find(x=>x.id===A.mirId)||(S.mirrors||[])[0]; if(r){ r.note=e.target.value; save(); } } });
+/* Setup → Coach tab */
+async function coachTabHTML(){ return ''; }
+function coachTab(){ const C=S.coach||{};
+  if(!C.unlocked) return '<div class="okbox" style="font-size:16px;line-height:1.6"><b>Lesson mirror (early access)</b><br>Roomie listens to a lesson on this computer and shows you, privately, how much you talked, how much students talked, your questions and your wait time. No audio is kept or sent anywhere.</div><div class="row"><input id="coachCode" type="text" placeholder="Early access code" style="max-width:240px"><button class="btn" type="button" data-cx="unlock">Unlock</button></div>';
+  const M2=(S.mirrors||[]);
+  return '<div class="row" style="justify-content:space-between;align-items:center"><div><h2 style="margin:0">Lesson mirror</h2><p class="hint" style="margin:0">Early access. Measured on this computer. No audio is kept or sent.</p></div>'+(M.on?'<button class="btn" type="button" data-cx="stop">Stop and see my mirror</button>':'<button class="btn gold" type="button" data-cx="start">Start listening to this lesson</button>')+'</div>'+
+   '<div class="cmics"><label class="thin"><span>Room microphone</span><select id="micRoom"><option value="">Laptop / default microphone</option></select></label><label class="thin"><span>Your worn microphone <em>(optional, much more accurate)</em></span><select id="micWorn"><option value="">None</option></select></label><div class="row"><button class="btn alt sm" type="button" data-cx="cal">Set my teaching voice</button><span class="hint">'+(C.tLevel?'Voice set ✓':'Do this once: Roomie listens to you say a sentence in your normal teaching voice.')+'</span></div></div>'+
+   '<p class="hint" style="margin:0">You can also say “Hey Roomie, mirror this lesson” and “Hey Roomie, stop the mirror”.</p>'+
+   '<h3 style="margin:6px 0 0">Past lessons</h3>'+(M2.length?'<div class="mhist">'+M2.map(r=>'<button type="button" class="mh" data-cx="open:'+r.id+'"><b>'+esc(r.block||'Lesson')+'</b><span>'+new Date(r.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'})+' · '+r.mins+' min · you '+Math.round(r.teacher*100)+'% · wait '+(r.wait==null?'–':r.wait.toFixed(1)+'s')+'</span></button>').join('')+'</div>':'<p class="hint">No lessons yet.</p>')+(M2.length?'<button class="btn alt sm" type="button" data-cx="clear">Delete all mirrors</button>':''); }
+async function coachFillMics(){ const L=await mirDevices(); const C=S.coach||{}; [['micRoom',C.room],['micWorn',C.worn]].forEach(([id,v])=>{ const s=document.getElementById(id); if(!s) return; L.forEach((d,i)=>{ const o=document.createElement('option'); o.value=d.deviceId; o.textContent=d.label||('Microphone '+(i+1)); if(d.deviceId===v) o.selected=true; s.appendChild(o); }); }); }
+document.addEventListener('change',e=>{ const id=e.target.id; if(id==='micRoom'||id==='micWorn'){ S.coach=Object.assign(S.coach||{},{[id==='micRoom'?'room':'worn']:e.target.value}); save(); } });
+document.addEventListener('click',async e=>{ const b=e.target.closest('[data-cx]'); if(!b) return; audio(); const [a,v]=b.dataset.cx.split(':');
+  if(a==='unlock'){ const c=(document.getElementById('coachCode').value||'').trim().toLowerCase(); if(c!==MIR_CODE){ toast('That code isn’t right.'); return; } S.coach=Object.assign(S.coach||{},{unlocked:true}); save(); try{ const s=await navigator.mediaDevices.getUserMedia({audio:true}); s.getTracks().forEach(t=>t.stop()); }catch(_){ } renderSetup(); }
+  if(a==='cal'){ b.disabled=true; b.textContent='Say: “Good morning everyone, let’s get started.”'; try{ await mirCalibrate(); toast('Got it. Your teaching voice is set.'); }catch(_){ toast('Couldn’t use the microphone.'); } renderSetup(); }
+  if(a==='start'){ closeSetup(); await mirStart(); }
+  if(a==='stop'){ mirStop(); A.mirId=null; closeSetup(); openOverlay('mirror'); }
+  if(a==='open'){ A.mirId=v; closeSetup(); openOverlay('mirror'); }
+  if(a==='clear'){ if(b.dataset.sure){ S.mirrors=[]; save(); renderSetup(); } else { b.dataset.sure='1'; b.textContent='Tap again to delete them all'; } } });
 
 /* ---- v1.1: welcome tour ---- */
 function tourSteps(){ const tools=S.mode==='tools';
