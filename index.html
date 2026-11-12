@@ -94,6 +94,7 @@ h1,h2,h3{margin:0;text-wrap:balance;font-family:var(--display);font-weight:800}
 .mgoalfoot{display:grid;gap:10px;margin:12px 0}.mgoalfoot .mqs{max-height:none}.mgoalfoot textarea{height:64px;min-height:0}
 .gfb{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.gfb>div{border-radius:14px;padding:10px 12px}.gfb .w{background:#D4F2DF}.gfb .s{background:#FFD9CC}.gfb .t{background:#FFF1A8}.gfb .r{background:#E6DDFF}.gfb p{margin:2px 0 0;font-size:15px;line-height:1.4}.gfb .r p{font-size:14px}
 .gself{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;justify-content:space-between;font-size:15px}.gself-r{display:flex;gap:6px;align-items:center}.gself-r b{margin-right:4px}.gself-r button{width:38px;height:38px;border-radius:50%;border:2px solid var(--line,#E8DCC8);background:#fff;font:inherit;font-weight:800;cursor:pointer}.gself-r button.on{background:var(--gum,#E2558F);color:#fff;border-color:transparent}
+.gmom{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:10px}.gmom>div{background:#fff;border-radius:14px;padding:10px 12px;border:2px solid #EFE4D2}.gmom small{font-weight:800;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--gum-d)}.gmom ul{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:6px}.gmom li{font-size:14.5px;line-height:1.4;padding-left:22px;position:relative}.gmom li:before{position:absolute;left:0;top:0;font-weight:900}.gmom li.good:before{content:'✓';color:#2F8F6B}.gmom li.fix:before{content:'!';color:#B5306A;left:5px}.gmom li.pat:before{content:'↗';color:#6A4BC4}
 .grefs summary{cursor:pointer;font-weight:800;font-size:14px}.grefs ol{margin:4px 0 0;padding-left:20px;font-size:13px;line-height:1.45}.grefs p{margin:4px 0}.gmoved{margin:0;font-size:15px;background:#D4F2DF;border-radius:12px;padding:8px 12px}.gchart circle.me{fill:#8C6BE0}
 .mall summary{cursor:pointer;font-weight:800;font-size:14px}.mall[open]{display:flex;flex-direction:column;gap:8px}
 .gcur,.gpick{background:#FFF1A8;border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
@@ -970,7 +971,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 (function(){
 'use strict';
 const STUDENT=/[?&]join(=|&|$)/.test(location.search);
-const VERSION='Roomie v1.9 · 12 Nov 2026';
+const VERSION='Roomie v2.0 · 12 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -2700,6 +2701,7 @@ const REF={
  kounin:'Kounin, J. S. (1970). Discipline and Group Management in Classrooms. Holt, Rinehart & Winston.',
  alexander:'Alexander, R. (2020). A Dialogic Teaching Companion. Routledge.',
  eefdia:'Jay, T. et al. (2017). Dialogic Teaching: Evaluation report and executive summary. Education Endowment Foundation.',
+ colvin:'Colvin, G., Sugai, G. & Patching, B. (1993). Precorrection: An instructional approach for managing predictable problem behaviors. Intervention in School and Clinic, 28(3), 143–150.',
  mercer:'Mercer, N. & Littleton, K. (2007). Dialogue and the Development of Children’s Thinking. Routledge.'
 };
 const n1=v=>v.toFixed(1), n0=v=>Math.round(v)+'', mmss=m=>mirFmt(m*60);
@@ -2746,6 +2748,18 @@ const MET={
    bad:s=>'You took '+n0(s.tt)+'% of the voice time. That leaves students little room to think aloud.',
    tip:'Choose one part of the next lesson where students explain while you only listen and note what you hear.',
    ask:'What were students doing while you were talking?'},
+ allchk:{label:'Checks the whole class answered',unit:'% of checks',better:'up',target:50,fmt:n0,refs:['wiliam','rosenshine'],
+   why:'Rosenshine (2012) found less effective teachers asked “Any questions?” and took silence as understanding. Wiliam (2011) recommends checks every student must answer, so you see the whole class’s thinking, not one volunteer’s.',
+   good:s=>n0(s.allchk)+'% of your checks made every student show their thinking, so your evidence covered the whole class.',
+   bad:s=>s.weakN+' of your '+(s.weakN+s.strongN)+' checks were questions like “Does that make sense?” that invite a nod, not evidence.',
+   tip:'Swap “Does that make sense?” for a check everyone answers: “Show me on your whiteboard”, “Fingers 1 to 4: how sure are you?”, or “Write the next step, then hold it up.”',
+   ask:'When students nod at “Does that make sense?”, what do you actually know?'},
+ probe:{label:'Follow-up probes',unit:'per 10 min',better:'up',target:2,fmt:n1,refs:['alexander','eefdia'],
+   why:'Alexander (2020) describes follow-ups like “How do you know?” and “Who can add to that?” as the heart of dialogic teaching: they turn a one-word answer into reasoning. The EEF Dialogic Teaching trial (2017) found about two months’ extra progress.',
+   good:s=>'You followed up '+s.probeN+' time'+(s.probeN===1?'':'s')+' with probes like “how do you know?”, pushing answers into reasoning.',
+   bad:s=>(s.probeN?'You probed only '+s.probeN+' time'+(s.probeN===1?'':'s'):'Roomie didn’t hear any follow-up probes')+'. Most answers were accepted and the lesson moved on, so students weren’t asked to explain their thinking.',
+   tip:'After the next answer, right or wrong, ask one more: “How do you know?”, “Say more”, or “Who agrees and why?”',
+   ask:'Which answer today would have been worth one more question?'},
  ratio:{label:'Praise to corrections',unit:'praise per correction',better:'up',target:1,research:true,fmt:v=>n1(v)+' : 1',refs:['caldarella20','caldarella21'],
    why:'In 151 classrooms, Caldarella et al. (2020) found that the higher a teacher’s praise-to-reprimand ratio, the more students were on task. In a 2021 middle-school study, teachers who lifted their ratio to at least 1 : 1 saw on-task behaviour rise 60–70%. Those teachers started out reprimanding 4–9 times more than they praised.',
    good:s=>'You praised '+s.praise+' time'+(s.praise===1?'':'s')+' and corrected '+s.corr+' time'+(s.corr===1?'':'s')+'. Students heard more about what was going right than what was going wrong.',
@@ -2778,7 +2792,7 @@ const MET={
    ask:'After the first time you said it, what could your next step have been?'}
 };
 const FOCI={
- ei:{name:'Explicit instruction',part:'explicit teaching',blurb:'Clear, chunked explanations with frequent checks for understanding (I do, we do, you do).',metrics:['cfu','stretch','resp','wait'],
+ ei:{name:'Explicit instruction',part:'explicit teaching',blurb:'Clear, chunked explanations with frequent checks for understanding (I do, we do, you do).',metrics:['cfu','allchk','stretch','resp','wait'],
    cant:'Roomie hears how you teach, not what you teach. It can’t judge the clarity of your examples or whether every student’s answer was right.'},
  beh:{name:'Behaviour management',part:null,blurb:'Calm, positive, consistent responses: more praise than corrections, specific praise, corrections that land the first time.',metrics:['ratio','spec','repeats','loud','settle'],
    cant:'Roomie hears your words and your volume, not the room. It can’t see body language, where you stand, or whether students are on task. A colleague’s observation completes the picture.'},
@@ -2786,9 +2800,9 @@ const FOCI={
    cant:'Roomie times the sound in the room after your signal (use the Attention button or say your signal). It can’t see whether students are moving to the right place.'},
  praise:{name:'Praise and positive feedback',part:null,blurb:'Specific, genuine praise that tells students exactly what to repeat.',metrics:['ratio','spec','repeats'],
    cant:'Roomie recognises common praise and correction phrases in your words. It will miss non-verbal praise like a nod or a thumbs up.'},
- q:{name:'Questioning and wait time',part:'questioning',blurb:'Questions that make every student think, and time for them to answer.',metrics:['wait','openp','resp','cfu'],
+ q:{name:'Questioning and wait time',part:'questioning',blurb:'Questions that make every student think, and time for them to answer.',metrics:['wait','openp','probe','resp','allchk'],
    cant:'Roomie hears your questions and the silence after them. It can’t see whose hands went up or what students wrote on whiteboards.'},
- talk:{name:'Student talk and discussion',part:'discussion',blurb:'Students doing more of the talking and the thinking.',metrics:['stud','tt','openp','stretch'],
+ talk:{name:'Student talk and discussion',part:'discussion',blurb:'Students doing more of the talking and the thinking.',metrics:['stud','tt','openp','probe','stretch'],
    cant:'Roomie measures talk by sound. In a pair-talk activity it hears noise, not whether the talk was on task.'},
  open:{hidden:true,name:'Open questions',part:'questioning',blurb:'More questions that get students reasoning.',metrics:['openp','wait','resp']}
 };
@@ -2806,6 +2820,47 @@ function matchFocus(text){ const t=' '+String(text||'').toLowerCase()+' '; for(c
 function setFocus(key,why,name){ const C=S.coach=S.coach||{}; C.goals=C.goals||[]; C.goals.forEach(g=>{ if(g.status==='active') g.status='paused'; });
   const g={id:uid(),focus:key,why:why||'',created:now().toISOString(),attempts:[],status:'active'}; if(key==='custom') g.name=name; C.goals.push(g); save(); return g; }
 function focusFromWords(words){ const w=String(words||'').replace(/^(my|the|on|with|how i|how to)\s+/i,'').trim(); if(!w) return null; const k=matchFocus(w); const g=k?setFocus(k,w):setFocus('custom','',w.charAt(0).toUpperCase()+w.slice(1)); return g; }
+/* moments: what the teacher actually said, matched to research. All on this computer. */
+const MOM=[
+ {k:'weak',re:/\b(any questions|does (that|this|everyone|everybody) (make sense|get it|understand)|(everyone|everybody|we) (all )?(got|get|good|ok|okay|clear|understand)( with)?( (that|it|this))?\b|is that clear|are we (all )?(good|ok|okay|clear|right)|do you (all )?(understand|get it)|make sense\??$|got it\??$|yeah\?$)/,foci:['ei','q'],bad:true,
+   note:'invites a nod, not evidence. Rosenshine (2012) found less effective teachers asked “Any questions?” and took silence as understanding. Try “Show me on your whiteboard.”'},
+ {k:'strong',re:/\b(show me|whiteboards?|thumbs (up|down|sideways|to)|fingers|hold (it|them|your [a-z]+) up|on (the count of )?(three|3)|write (it|your answer|the answer|down|the next)|tell (your partner|the person next to you|your neighbour)|turn and (talk|tell)|exit ticket|everyone (write|show|hold|try))/,foci:['ei','q'],
+   note:'a check every student had to answer, so you saw the whole class’s thinking (Wiliam, 2011).'},
+ {k:'ido',re:/\b(watch (me|how i|as i|what i)|i('ll| will) (show|model|demonstrate|do the first)|my turn|let me show you|follow along as i|here's how i|i'm going to show)/,foci:['ei']},
+ {k:'wedo',re:/\b(let's (do|try|work|solve|have a go at|look at) (one|this|it|the next|another)( (together|with me))?|together|we do|our turn|help me (with|solve|do|work)|what should i do next|what('s| is) my next step|what do i do (next|now))/,foci:['ei']},
+ {k:'youdo',re:/\b(now you try|your turn|on your own|you do|independently|have a go|off you go|by yourself|by yourselves|now it's your turn|start (on|with) (question|number|the first))/,foci:['ei']},
+ {k:'probe',re:/\b(how do you know|why do you (think|say)|what makes you (think|say)|can you (explain|tell me more|say more|justify)|who (can|could|wants to) add|do you agree|who agrees|say more|what's your evidence|prove it|build on|what do you mean by|tell me why)/,foci:['q','talk'],
+   note:'a follow-up that pushed the answer into reasoning, the heart of dialogic teaching (Alexander, 2020).'},
+ {k:'hands',re:/\b(hands up|put your hands? up|raise your hands?|hand up if)\b/,foci:['q','talk','ei'],bad:true,
+   note:'lets the same confident few do the thinking. Wiliam (2011) recommends no hands up and choosing who answers.'},
+ {k:'cold',re:/\b(no hands|hands down|i('m| am) going to (pick|choose|call on)|i('ll| will) (pick|choose|call on)|pick a name|lolly ?sticks?|pop ?sticks?|random name)/,foci:['q','ei'],
+   note:'you chose who answered, so every student had to be ready to think (Wiliam, 2011).'},
+ {k:'precorr',re:/\b(before (we|you) (start|begin|go|move|pack|line)|remember (to|that|we)|when you (get|go|move|come|arrive)|the expectation is|what does .{2,30} look like|i expect|you should be)/,foci:['beh','trans'],
+   note:'a reminder before the activity, not after the problem. That’s precorrection (Colvin et al., 1993), one of the cheapest ways to prevent behaviour issues.'},
+ {k:'vague',re:/\b(be good|behave( yourselves)?|settle down|be sensible|do the right thing|calm down|sort (it|yourselves) out|grow up|act your age)\b/,foci:['beh','trans','praise'],bad:true,
+   note:'tells students to stop, not what to do. Simonsen et al. (2008) found expectations work when they are explicit: name the exact behaviour you want.'},
+ {k:'spraise',re:SPEC_RE_G(),foci:['beh','praise','trans'],
+   note:'specific praise: it names exactly what to repeat (Brophy, 1981).'}
+];
+function SPEC_RE_G(){ return /(thank(s| you) (for|to)|i (like|love|noticed|can see|appreciate) (how|the way|that|you)|well done (for|on)|for (using|showing|being|getting|sitting|listening|explaining|trying|working|waiting|helping|starting|putting|remembering|following))/; }
+function mMoments(r,F,from,to){ const W=(r.words||[]).filter(w=>w.at>=(from||0)&&(to==null||w.at<=to)); const fk=F.custom?['ei','q','beh']:(F===FOCI.open?['q']:Object.keys(FOCI).filter(k=>FOCI[k]===F));
+  const hits={}; MOM.forEach(m=>hits[m.k]=[]); W.forEach(w=>{ const t=' '+String(w.t).toLowerCase()+' '; MOM.forEach(m=>{ if(m.re.test(t)) hits[m.k].push(w); }); });
+  const rel=m=>m.foci.some(x=>fk.includes(x)), q=w=>'“'+String(w.t).replace(/^\s+/,'').slice(0,90)+'”';
+  const good=[], fix=[];
+  MOM.filter(m=>m.note&&rel(m)).forEach(m=>{ const h=hits[m.k]; if(!h.length) return; const w=m.bad?h[0]:h[h.length-1]; (m.bad?fix:good).push({at:w.at,quote:q(w)+(m.bad&&h.length>1?' (and '+(h.length-1)+' more like it)':''),note:m.note,sep:m.bad?' ':': ',k:m.k}); });
+  let phase=null; if(fk.includes('ei')&&W.length>=6){ const has=k=>hits[k].length>0; const names={ido:'I do',wedo:'We do',youdo:'You do'}; const heard=['ido','wedo','youdo'].filter(has), miss=['ido','wedo','youdo'].filter(k=>!has(k));
+    if(heard.length&&miss.includes('wedo')) phase={bad:true,text:'Roomie heard '+heard.map(k=>names[k]+' (at '+mirFmt(hits[k][0].at)+', '+q(hits[k][0])+')').join(' and ')+' but no “We do” step. Rosenshine (2012) found guided practice, where students try with your support before working alone, is what separates the most effective teachers. Without it, errors get practised.'};
+    else if(heard.length===3) phase={bad:false,text:'Roomie heard all three steps: I do at '+mirFmt(hits.ido[0].at)+', We do at '+mirFmt(hits.wedo[0].at)+' and You do at '+mirFmt(hits.youdo[0].at)+'. That gradual release is the structure Rosenshine (2012) and Archer & Hughes (2011) describe.'}; }
+  return {good:good.slice(0,3),fix:fix.slice(0,3),phase,n:W.length,hits:Object.fromEntries(Object.entries(hits).map(([k,v])=>[k,v.length]))}; }
+/* patterns across this focus’s lessons */
+function mPatterns(g,upto){ const F=focusOf(g); const L=g.attempts.slice(0,upto+1).map(id=>(S.mirrors||[]).find(x=>x.id===id)).filter(Boolean); if(L.length<3) return []; const last=L.slice(-3), out=[];
+  const sts=last.map(rStats); const key=F.metrics.find(id=>sts.every(x=>x[id]!=null));
+  if(key){ const v=sts.map(x=>x[key]), up=MET[key].better==='up'; const imp=(a,b)=>up?b>a*1.05:b<a*0.95; const same=(a,b)=>Math.abs(b-a)<=Math.max(0.05*Math.abs(a),0.05);
+    if(imp(v[0],v[1])&&imp(v[1],v[2])) out.push(MET[key].label+' has improved three lessons in a row ('+v.map(MET[key].fmt).join(' → ')+'). That is a habit forming, not a good day.');
+    else if(same(v[0],v[1])&&same(v[1],v[2])&&!mMet(key,v[2])) out.push(MET[key].label+' has stayed about the same for three lessons ('+v.map(MET[key].fmt).join(', ')+'). Trying harder isn’t moving it, so change the strategy: try the technique below in a planned spot, written into your lesson plan.'); }
+  if(F.metrics.includes('ratio')){ const late=last.filter(r=>{ const cs=(r.ev||[]).filter(x=>x.k==='c'); const end=(r.trace||'').length/2; return cs.length>=3&&cs.filter(x=>x.at>end*2/3).length/cs.length>0.6; }).length; if(late>=2) out.push('In '+late+' of your last 3 lessons, most corrections came in the final third. Plan a reset or a movement break about two-thirds of the way through, and precorrect before the last activity.'); }
+  const wk={}; last.forEach(r=>{ const seen=new Set(); (r.words||[]).forEach(w=>{ const t=' '+w.t.toLowerCase()+' '; if(MOM[0].re.test(t)){ const m=t.match(MOM[0].re)[0].trim(); if(!seen.has(m)){ seen.add(m); wk[m]=(wk[m]||0)+1; } } }); }); const rep=Object.entries(wk).find(([,n])=>n>=2); if(rep&&(F.metrics.includes('allchk')||F.metrics.includes('cfu'))) out.push('“'+rep[0]+'” has come up in '+rep[1]+' of your last 3 lessons. It’s become a habit phrase. Pick its replacement now, e.g. “Show me on your whiteboard.”');
+  return out.slice(0,2); }
 /* statistics from the saved 0.5 s trace (t = you, s = students, q = quiet) and events */
 function mStats(r,from,to){ const tr=r.trace||'', a=Math.max(0,Math.floor((from||0)*2)), b=Math.min(tr.length,to!=null?Math.ceil(to*2):tr.length), seg=tr.slice(a,b);
   let t=0,s=0,q=0,run=0,longest=0,gap=0,runStart=0,longestAt=null; for(let i=0;i<seg.length;i++){ const c=seg[i]; if(c==='t'){ if(!run) runStart=i; t++; run+=1+gap; gap=0; if(run>longest){ longest=run; longestAt=(a+runStart)/2; } } else { if(c==='s'){ s++; } else q++; if(run){ gap++; if(gap>5){ run=0; gap=0; } } } }
@@ -2813,16 +2868,16 @@ function mStats(r,from,to){ const tr=r.trace||'', a=Math.max(0,Math.floor((from|
   const ev=(r.ev||[]).filter(x=>x.at>=a/2&&x.at<=b/2), praise=ev.filter(x=>x.k==='p'||x.k==='ps').length, specN=ev.filter(x=>x.k==='ps').length, cs=ev.filter(x=>x.k==='c'), corr=cs.length, louds=ev.filter(x=>x.k==='loud'), atts=ev.filter(x=>x.k==='att');
   const settles=atts.map(x=>{ const i0=Math.floor(x.at*2); for(let j=i0+1;j<Math.min(tr.length-3,i0+60);j++){ const w=tr.slice(j,j+4); if(!w.includes('s')&&(w.match(/q/g)||[]).length>=2) return (j-i0)/2; } return 30; });
   let repeats=0; const seen={}, cnt={}; cs.forEach(x=>{ const k=(x.n||'').trim(); if(!k) return; cnt[k]=(cnt[k]||0)+1; if(seen[k]!=null&&x.at-seen[k]<=120) repeats++; seen[k]=x.at; }); const top=Object.entries(cnt).sort((x,y)=>y[1]-x[1])[0];
-  const selfAns=qs.filter(x=>x.by==='t').length;
+  const selfAns=qs.filter(x=>x.by==='t').length; const ws=(r.words||[]).filter(w=>w.at>=a/2&&w.at<=b/2), wt=w=>' '+String(w.t).toLowerCase()+' ', strongN=ws.filter(w=>MOM[1].re.test(wt(w))).length, weakN=ws.filter(w=>MOM[0].re.test(wt(w))).length, probeN=ws.filter(w=>MOM[5].re.test(wt(w))).length;
   return {mins, tt:t/voice*100, stud:s/voice*100, quiet:q/n*100, qn:qs.length, selfAns, openp:qs.length>=2?qs.filter(x=>x.open).length/qs.length*100:null, wait:wq.length?wq.reduce((x,y)=>x+y.wait,0)/wq.length:null, resp:qs.length?qs.filter(x=>x.by==='s'||(x.by==null&&x.wait!=null&&x.wait<15)).length/qs.length*100:null, cfu:mins>0.5?qs.length/mins*5:null, stretch:longest/2/60, stretchAt:longestAt, qs,
-    praise, specN, corr, ratio:(praise+corr)>=2?(corr?praise/corr:praise):null, spec:praise>=2?specN/praise*100:null, loud:mins>0.5?louds.length:null, loudAt:louds.map(x=>x.at), settle:settles.length?settles.reduce((x,y)=>x+y,0)/settles.length:null, repeats:corr?repeats:(mins>0.5?0:null), topCorr:top&&top[1]>1?top[0]:''}; }
+    praise, specN, corr, ratio:(praise+corr)>=2?(corr?praise/corr:praise):null, spec:praise>=2?specN/praise*100:null, loud:mins>0.5?louds.length:null, loudAt:louds.map(x=>x.at), settle:settles.length?settles.reduce((x,y)=>x+y,0)/settles.length:null, repeats:corr?repeats:(mins>0.5?0:null), topCorr:top&&top[1]>1?top[0]:'', strongN, weakN, probeN, allchk:(strongN+weakN)>=2?strongN/(strongN+weakN)*100:null, probe:ws.length>=6&&mins>1?probeN/mins*10:null}; }
 function mPart(r){ const m=r.marks||[]; const st=m.find(x=>x.type==='start'); if(!st) return null; const en=m.find(x=>x.type==='end'&&x.t>st.t); return [st.t,en?en.t:(r.trace||'').length/2]; }
 function mGoal(){ return ((S.coach||{}).goals||[]).find(g=>g.status==='active'); }
-function mMet(id,v){ const M2=MET[id]; if(v==null) return null; return M2.better==='up'?v>=M2.target:v<=M2.target; }
+function mMet(id,v){ const M2=MET[id]; if(v==null) return null; v=Math.round(v*10)/10; return M2.better==='up'?v>=M2.target:v<=M2.target; }
 function mGap(id,v){ const M2=MET[id]; if(v==null) return -1; const d=Math.max(M2.target,1); return M2.better==='up'?(M2.target-v)/d:(v-M2.target)/d; }
 function rStats(r){ const p=mPart(r); return p?mStats(r,p[0],p[1]):mStats(r); }
 /* feedback: honest and specific. What’s working, the straight talk, one thing to try, the research, one question */
-function mFeedback(goal,st,prev){ const F=focusOf(goal); const ids=F.metrics.filter(id=>st[id]!=null), missing=F.metrics.filter(id=>st[id]==null);
+function mFeedback(goal,st,prev,mom){ const F=focusOf(goal); const ids=F.metrics.filter(id=>st[id]!=null), missing=F.metrics.filter(id=>st[id]==null);
   if(!ids.length) return {work:['Roomie didn’t hear enough of this part to give honest feedback.'],straight:'There isn’t enough here to judge. Treat this lesson as a practice run.',tip:'Wear a microphone if you can, and run the mirror for at least 10 minutes'+(F.part?' with your '+F.part+' marked':'')+'.',ask:'What did you notice about this part of the lesson?',refs:[]};
   const met=ids.filter(id=>mMet(id,st[id])), notMet=ids.filter(id=>!mMet(id,st[id])).sort((x,y)=>mGap(y,st[y])-mGap(x,st[x]));
   const better=(id)=>prev&&prev[id]!=null&&st[id]!=null&&(MET[id].better==='up'?st[id]>prev[id]*1.1:st[id]<prev[id]*0.9)&&Math.abs(st[id]-prev[id])>0.05;
@@ -2834,21 +2889,24 @@ function mFeedback(goal,st,prev){ const F=focusOf(goal); const ids=F.metrics.fil
   if(key){ straight=MET[key].bad(st); const also=notMet.slice(1,2).map(id=>MET[id].label+' was also below the aim ('+MET[id].fmt(st[id])+', aim '+(MET[id].better==='up'?'at least ':'no more than ')+MET[id].fmt(MET[id].target)+').'); const slip=ids.filter(worse).filter(id=>id!==key&&!mMet(id,st[id])).slice(0,1).map(id=>MET[id].label+' slipped from '+MET[id].fmt(prev[id])+' to '+MET[id].fmt(st[id])+'.');
     straight+=' '+also.concat(slip).join(' '); tip=MET[key].tip; ask=MET[key].ask; }
   else { const close=ids.slice().sort((x,y)=>mGap(y,st[y])-mGap(x,st[x]))[0]; key=close;
-    straight='You met every aim for this focus, so the aims are now too easy for you. Your closest call was '+MET[close].label.toLowerCase()+' ('+MET[close].fmt(st[close])+'). '+(F.cant||'');
+    const fm=mom&&(mom.phase&&mom.phase.bad?{note:mom.phase.text}:mom.fix[0]);
+    straight='You met every aim for this focus, so the aims are now too easy for you. '+(fm?'But the numbers aren’t the whole story. '+(fm.quote?'At '+mirFmt(fm.at)+' you said '+fm.quote+': that '+fm.note.charAt(0).toLowerCase()+fm.note.slice(1):fm.note):'Your closest call was '+MET[close].label.toLowerCase()+' ('+MET[close].fmt(st[close])+'). '+(F.cant||''));
     tip=(missing.length?'Roomie couldn’t measure '+missing.map(id=>MET[id].label.toLowerCase()).join(' or ')+' this time. Make sure that happens next lesson. ':'')+'Hold this for two more lessons to show it’s a habit, not a good day. Then choose a new focus, or push this one further: '+MET[close].tip.charAt(0).toLowerCase()+MET[close].tip.slice(1);
     ask='What did you do differently in this lesson, and what would make it stick?'; }
   if(st.qn!=null&&F.metrics.some(id=>['cfu','resp','wait','openp'].includes(id))&&st.qn<3&&st.mins>2) straight+=' Roomie only caught '+st.qn+' question'+(st.qn===1?'':'s')+', so treat the question numbers as rough.';
   return {work,straight,tip,ask,why:MET[key].why,refs:MET[key].refs.slice(),key}; }
 /* goal attempt view, shown inside the mirror report */
 function goalReportHTML(r){ const g=((S.coach||{}).goals||[]).find(x=>x.id===r.goal); if(!g) return ''; const F=focusOf(g), part=mPart(r), st=part?mStats(r,part[0],part[1]):mStats(r);
-  const i=g.attempts.indexOf(r.id), prevR=i>0?(S.mirrors||[]).find(x=>x.id===g.attempts[i-1]):null, prev=prevR?rStats(prevR):null, fb=mFeedback(g,st,prev);
+  const i=g.attempts.indexOf(r.id), prevR=i>0?(S.mirrors||[]).find(x=>x.id===g.attempts[i-1]):null, prev=prevR?rStats(prevR):null, mom=mMoments(r,F,part?part[0]:0,part?part[1]:null), pats=mPatterns(g,i), fb=mFeedback(g,st,prev,mom);
+  const mids=F.metrics.filter(id=>st[id]!=null), metN=mids.filter(id=>mMet(id,st[id])).length; let gap=''; if(r.self&&mids.length){ if(r.self<=2&&metN/mids.length>=0.5) gap='You rated this lesson '+r.self+'/5, but you met '+metN+' of '+mids.length+' aims. Teachers often judge a lesson by its hardest moment. What went better than it felt?'; else if(r.self>=4&&metN/mids.length<0.5) gap='You rated this lesson '+r.self+'/5, but you met '+metN+' of '+mids.length+' aims. It may have felt smooth from the front. Look at the moments below: do they match how it felt?'; }
+  const momItems=(mom.phase?[{cls:mom.phase.bad?'fix':'good',html:esc(mom.phase.text)}]:[]).concat(mom.fix.map(m=>({cls:'fix',html:'<b>'+mirFmt(m.at)+'</b> '+esc(m.quote)+m.sep+esc(m.note)})),mom.good.map(m=>({cls:'good',html:'<b>'+mirFmt(m.at)+'</b> '+esc(m.quote)+m.sep+esc(m.note)}))).slice(0,4);
   const tile=id=>{ const v=st[id], M2=MET[id], ok=mMet(id,v), pv=prev&&prev[id]; let arrow=''; if(pv!=null&&v!=null){ const same=Math.abs(v-pv)<0.05*Math.max(1,pv), up=v>pv, good=(M2.better==='up')===up; arrow='<em class="'+(same?'':good?'up':'down')+'">'+(same?'same as last time':(up?'▲ ':'▼ ')+'from '+M2.fmt(pv))+'</em>'; }
     return '<div class="gt'+(ok==null?'':ok?' ok':' no')+'"><b>'+(v==null?'–':M2.fmt(v))+'</b><span>'+esc(M2.label)+' <i>('+esc(M2.unit)+')</i></span><small>Aim: '+(M2.better==='up'?'at least ':'no more than ')+M2.fmt(M2.target)+(M2.research?' · from research':'')+'</small>'+(v==null?'<em>not heard this lesson</em>':arrow)+'</div>'; };
   const allRefs=[...new Set(F.metrics.flatMap(id=>MET[id].refs))], scope=part?'your '+F.part+', '+mirFmt(part[0])+' to '+mirFmt(part[1])+' ('+n1(st.mins)+' min)':'the whole lesson ('+n1(st.mins)+' min)';
   return '<div class="greport"><div class="row" style="justify-content:space-between;align-items:center"><div><small>Your focus · attempt '+(i+1)+'</small><h2>'+esc(F.name)+'</h2><p class="hint" style="margin:0">Feedback is on '+scope+'.'+(F.part&&!part?' Next time say “Hey Roomie, I’m starting my '+F.part+'” to focus on just that part.':'')+'</p></div><button class="btn alt sm" type="button" data-gx="progress:'+g.id+'">See my progress</button></div>'+
    '<div class="gtiles" style="--n:'+F.metrics.length+'">'+F.metrics.map(tile).join('')+'</div>'+
    '<div class="gfb"><div class="w"><small>What’s working</small>'+fb.work.map(x=>'<p>'+esc(x)+'</p>').join('')+'</div><div class="s"><small>Straight talk</small><p>'+esc(fb.straight)+'</p></div><div class="t"><small>Try this next lesson</small><p>'+esc(fb.tip)+'</p></div><div class="r"><small>Why it matters · the research</small><p>'+esc(fb.why)+'</p></div></div>'+
-   '<div class="gself"><span><b>Think about:</b> '+esc(fb.ask)+'</span><span class="gself-r"><b>How do you think it went?</b>'+[1,2,3,4,5].map(n=>'<button type="button" class="'+(r.self===n?'on':'')+'" data-gx="self:'+r.id+'|'+n+'" aria-label="'+n+' out of 5">'+n+'</button>').join('')+'</span></div>'+
+   (momItems.length||pats.length||gap?'<div class="gmom">'+(momItems.length?'<div><small>Moments from your lesson</small><ul>'+momItems.map(x=>'<li class="'+x.cls+'">'+x.html+'</li>').join('')+'</ul></div>':'')+(pats.length||gap?'<div><small>Across your lessons</small><ul>'+pats.map(x=>'<li class="pat">'+esc(x)+'</li>').join('')+(gap?'<li class="pat">'+esc(gap)+'</li>':'')+'</ul></div>':'')+'</div>':(r.words&&!mom.n?'':(!r.words?'<p class="hint" style="margin:0">This lesson was recorded before Roomie kept your words, so there are no quoted moments.</p>':'')))+'<div class="gself"><span><b>Think about:</b> '+esc(fb.ask)+'</span><span class="gself-r"><b>How do you think it went?</b>'+[1,2,3,4,5].map(n=>'<button type="button" class="'+(r.self===n?'on':'')+'" data-gx="self:'+r.id+'|'+n+'" aria-label="'+n+' out of 5">'+n+'</button>').join('')+'</span></div>'+
    '<details class="grefs"><summary>Research behind this focus ('+allRefs.length+')</summary><p class="hint">'+esc(F.cant||'')+' Aims marked “from research” come from the studies below; the others are Roomie’s starting aims, which you can outgrow.</p><ol>'+allRefs.map(k=>'<li>'+esc(REF[k])+'</li>').join('')+'</ol></details></div>'; }
 /* progress view */
 function renderProgress(full){ if(!full) return; const g=((S.coach||{}).goals||[]).find(x=>x.id===A.goalId)||mGoal(); if(!g){ goHome(); return; } const F=focusOf(g);
@@ -2870,7 +2928,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-gx]'); if
   if(a==='ask'){ const w=((document.getElementById('goalAsk')||{}).value||'').trim(); if(!w){ toast('Type what you want coaching on.'); return; } const g=focusFromWords(w); const why=((document.getElementById('goalWhy')||{}).value||'').trim(); if(why) g.why=why; save(); toast(g.focus==='custom'?'Focus set: '+g.name+'. Roomie will track what it can hear and your rating.':'Focus set: '+FOCI[g.focus].name+'.'); renderSetup(); }
   if(a==='change'){ C.goals.forEach(g=>{ if(g.status==='active') g.status='paused'; }); save(); renderSetup(); }
   if(a==='done'){ const g=C.goals.find(x=>x.id===v); if(g){ g.status='done'; save(); celebrate('Goal achieved!','big'); render(true); } }
-  if(a==='self'){ const [id,n]=v.split('|'); const r=(S.mirrors||[]).find(x=>x.id===id); if(r){ r.self=+n; save(); b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); } }
+  if(a==='self'){ const [id,n]=v.split('|'); const r=(S.mirrors||[]).find(x=>x.id===id); if(r){ r.self=+n; save(); if(A.overlay==='mirror') render(true); else b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); } }
   if(a==='progress'){ A.goalId=v; if(document.getElementById('sheetHost').innerHTML) closeSetup(); openOverlay('mprogress'); } });
 /* marking the focus part */
 function mirMarkPart(type){ if(!M.on) return false; M.marks=M.marks||[]; const t=(Date.now()-M.t0)/1000; if(type==='toggle') type=M.inPart?'end':'start'; M.marks.push({type,t}); M.inPart=type==='start'; chime(1); mirMark(); return true; }
