@@ -78,6 +78,26 @@ h1,h2,h3{margin:0;text-wrap:balance;font-family:var(--display);font-weight:800}
 .mq span{font-size:11px;font-weight:800;text-transform:uppercase;border-radius:6px;padding:2px 6px;text-align:center}.mq .o{background:#D4F2DF;color:#1F6B4E}.mq .c{background:#EFE6D2}
 .cmics{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}.cmics .row{grid-column:1/-1}
 .mhist{display:flex;flex-direction:column;gap:6px}.mh{display:flex;justify-content:space-between;gap:10px;border:0;background:var(--panel);border-radius:12px;padding:10px 14px;font:inherit;cursor:pointer;text-align:left}.mh span{opacity:.75;font-size:14px}
+.mirpill{padding:4px 5px 4px 12px!important;gap:6px!important}.mpm{display:inline-flex;align-items:center;gap:7px}.mpm i{width:10px;height:10px;border-radius:50%;background:#9A8F86}.mpm i.t{background:#E2558F}.mpm i.s{background:#2F8F6B}
+.mpmark,.mpstop{cursor:pointer;border-radius:999px;padding:4px 10px;background:#FFF6E0;color:#4A3F38;font-size:13px}.mpmark.on{background:#F5B700}.mpstop{background:#E2558F;color:#fff}
+.mtl i.inp{box-shadow:inset 0 -6px 0 #F5B700}
+.greport{background:#FFFDF6;border:3px solid #F5B700;border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.greport small,.gcur small,.gpick small,.gfb small{font-weight:800;font-size:12px;letter-spacing:.07em;text-transform:uppercase;color:var(--gum-d)}
+.greport h2{margin:0;font-family:var(--display);font-size:28px}
+.gtiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.gt{background:var(--panel);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;border:2.5px solid transparent}.gt.ok{border-color:#2F8F6B}.gt.no{border-color:#F5B700}
+.gt b{font-family:var(--display);font-size:32px;line-height:1}.gt span{font-size:14px;font-weight:700}.gt span i{font-style:normal;font-weight:600;opacity:.65}.gt small{font-size:12px;opacity:.75}
+.gt em{font-style:normal;font-size:13px;font-weight:800}.gt em.up{color:#1F6B4E}.gt em.down{color:#B5306A}
+.mgoalfoot{display:grid;gap:10px;margin:12px 0}.mgoalfoot .mqs{max-height:none}.mgoalfoot textarea{height:64px;min-height:0}
+.gfb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.gfb>div{background:#FFF1A8;border-radius:14px;padding:10px 12px}.gfb>div:first-child{background:#D4F2DF}.gfb>div:last-child{background:#E6DDFF}.gfb p{margin:2px 0 0;font-size:15px;line-height:1.4}
+.mall summary{cursor:pointer;font-weight:800;font-size:14px}.mall[open]{display:flex;flex-direction:column;gap:8px}
+.gcur,.gpick{background:#FFF1A8;border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.gopts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.gopt{border:2.5px solid transparent;background:#FFFDF6;border-radius:14px;padding:10px 12px;text-align:left;font:inherit;cursor:pointer;display:flex;flex-direction:column;gap:2px}.gopt:hover{border-color:#E2558F}.gopt b{font-family:var(--display);font-size:19px}.gopt span{font-size:14px}
+.gcharts{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}.gchart{background:var(--panel);border-radius:16px;padding:10px 12px}.gchart b{font-size:15px}.gchart b i{font-style:normal;opacity:.6;font-weight:600}
+.gchart svg{width:100%;height:auto;display:block}.gchart .ln{fill:none;stroke:#E2558F;stroke-width:3}.gchart .tgt{stroke:#2F8F6B;stroke-dasharray:6 5;stroke-width:2}.gchart .tgtl{fill:#2F8F6B;font-size:13px;font-weight:700}
+.gchart circle.ok{fill:#2F8F6B}.gchart circle.no{fill:#F5B700}.gchart .vl{font-size:14px;font-weight:800;fill:#4A3F38}.gchart .xl{font-size:12px;fill:#7A6E64}
+.gatt{display:flex;flex-direction:column;gap:6px}.linkbtn{border:0;background:none;font:inherit;text-decoration:underline;cursor:pointer;padding:0;color:inherit}
+
 .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
 .vrow{background:var(--panel);border-radius:14px;padding:10px 14px;display:flex;flex-direction:column;gap:2px}
 .vrow b{font-family:var(--display);font-size:20px;color:var(--gum-d)}
@@ -945,7 +965,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 (function(){
 'use strict';
 const STUDENT=/[?&]join(=|&|$)/.test(location.search);
-const VERSION='Roomie v1.6 · 12 Nov 2026';
+const VERSION='Roomie v1.7 · 12 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1849,6 +1869,7 @@ function renderFunOverlay(o,full){
   if(o==='join'){ renderJoin(full); return true; }
   if(o==='voicehelp'){ renderVoiceHelp(full); return true; }
   if(o==='mirror'){ renderMirror(full); return true; }
+  if(o==='mprogress'){ renderProgress(full); return true; }
   if(o==='poll'){ renderPoll(full); return true; }
   if(o==='finish'){ renderFinish(full); return true; }
   if(o==='quiz'){ renderQuiz(full); return true; }
@@ -2560,6 +2581,8 @@ const INTENTS=[
  {id:'fullscreen',k:[[/ full ?screen /,4],[/ (make it|go) big(ger)? /,2]], run(){ document.getElementById('fsBtn').click(); return null; }},
  {id:'float',k:[[/ (float|over (my|the) slides|mini (mode|roomie)|small window|picture in picture) /,3.5]], run(){ vclick({'data-tool':'float'}); return null; }},
  {id:'devices',k:[[/ (student devices|join code|class code|ipads?|chromebooks?|devices|laptops) /,3]], run(s){ goHome(); if(/ (turn on|start|switch on|let them) /.test(s)&&!S.liveOn){ liveOn(); } openOverlay('join'); return null; }},
+ {id:'mark',k:[[/ (i'm |i am |we're |now )?(starting|beginning|start|begin) (my |the )?(explicit|explicit teaching|explicit instruction|instruction|i do|teaching part|focus part|questioning|discussion|modelling|modeling) /,6],[/ (that's the |this is the )?(end|finish|finished|stop|ending) (of )?(my |the )?(explicit|explicit teaching|explicit instruction|instruction|i do|teaching part|focus part|questioning|discussion|modelling|modeling) /,6],[/ mark (this|the|my) (part|bit|section) /,5]],
+  run(s){ if(!M.on) return 'Start the lesson mirror first.'; const end=/ (end|finish|finished|stop|ending) /.test(s); mirMarkPart(end?'end':'start'); return end?'Got it. That part is marked.':'Okay, I’m watching this part closely.'; }},
  {id:'mirror',k:[[/ (mirror|record|listen to|coach me|watch) (this|my|the) (lesson|class|teaching) /,6],[/ (lesson )?mirror /,4],[/ coach me /,4]],
   run(s){ if(!(S.coach&&S.coach.unlocked)) return 'The lesson mirror isn’t switched on yet.'; if(/ (stop|end|finish|done|turn off) /.test(s)){ if(!M.on) return 'The mirror isn’t running.'; mirStop(); return 'Mirror saved for later.'; } if(M.on) return 'I’m already listening to this lesson.'; mirStart(); return null; }},
  {id:'help',k:[[/ (help|what can (you|i) (do|say)|commands|what do i say) /,3]], run(){ openOverlay('voicehelp'); return 'Here’s what I can do.'; }},
@@ -2653,6 +2676,77 @@ function vPrivacyHTML(){ const cloud=S.voiceCloud===true;
 document.addEventListener('change',e=>{ if(e.target.id==='vCloud'){ S.voiceCloud=e.target.checked; save(); V.blocked=false; render(true); } });
 setTimeout(()=>{ vMark(); if(S.voice&&SR&&!STUDENT){ /* browsers need a tap before the mic can start again */ const once=()=>{ document.removeEventListener('click',once,true); if(S.voice&&!V.on) vStart(); }; document.addEventListener('click',once,true); } },400);
 
+/* ---- v1.7: Coaching goals: focus, feedback on the focus part, try again, see progress ---- */
+const MET={
+ cfu:{label:'Checks for understanding',unit:'every 5 min',better:'up',target:1.7,fmt:v=>v.toFixed(1),
+   good:'You checked in with the class often, so you could see who was with you.',tip:'Stop every 2–3 minutes and check: a quick question, mini whiteboards or thumbs. Plan where these checks go before the lesson.'},
+ stretch:{label:'Longest time you talked without a break',unit:'minutes',better:'down',target:4,fmt:v=>v.toFixed(1),
+   good:'You kept explanations short and chunked.',tip:'Break the explanation into small steps. After each step, ask a question or have students try one before you go on.'},
+ resp:{label:'Questions students answered',unit:'%',better:'up',target:75,fmt:v=>Math.round(v)+'',
+   good:'Most of your questions got a student answer.',tip:'If a question gets silence, rephrase it or have students tell a partner first, then take answers.'},
+ wait:{label:'Average wait time after a question',unit:'seconds',better:'up',target:3,fmt:v=>v.toFixed(1),
+   good:'You gave students time to think before taking answers.',tip:'After each question, silently count to five before you take an answer or add a hint.'},
+ stud:{label:'Student talk',unit:'% of voice time',better:'up',target:30,fmt:v=>Math.round(v)+'',
+   good:'Students did a good share of the talking.',tip:'Add a turn-and-talk after your key question, and let students explain answers to each other before you do.'},
+ openp:{label:'Open questions',unit:'% of questions',better:'up',target:40,fmt:v=>Math.round(v)+'',
+   good:'You asked plenty of questions that made students reason.',tip:'Plan two “why” or “how do you know” questions before the lesson and ask them.'},
+ tt:{label:'Your talk',unit:'% of voice time',better:'down',target:70,fmt:v=>Math.round(v)+'',
+   good:'You left room for students to talk.',tip:'Pick one part of the lesson where students explain while you listen.'}
+};
+const FOCI={
+ ei:{name:'Explicit instruction',part:'explicit teaching',blurb:'Clear, chunked explanations with frequent checks for understanding (I do, we do, you do).',metrics:['cfu','stretch','resp','wait'],key:'cfu'},
+ q:{name:'Questioning and wait time',part:'questioning',blurb:'Asking questions that make students think, and giving them time to answer.',metrics:['wait','openp','resp'],key:'wait'},
+ talk:{name:'Student talk',part:'discussion',blurb:'Students doing more of the talking and thinking.',metrics:['stud','tt','stretch'],key:'stud'},
+ open:{name:'Open questions',part:'questioning',blurb:'More questions that get students reasoning, not just recalling.',metrics:['openp','wait','resp'],key:'openp'}
+};
+/* statistics from the saved 0.5 s trace (t = you, s = students, q = quiet) */
+function mStats(r,from,to){ const tr=r.trace||'', a=Math.max(0,Math.floor((from||0)*2)), b=Math.min(tr.length,to!=null?Math.ceil(to*2):tr.length), seg=tr.slice(a,b);
+  let t=0,s=0,q=0,run=0,longest=0,gap=0; for(const c of seg){ if(c==='t'){ t++; run+=1+gap; gap=0; longest=Math.max(longest,run); } else { if(c==='s'){ s++; } else q++; if(run){ gap++; if(gap>5){ run=0; gap=0; } } } }
+  const n=Math.max(1,seg.length), voice=Math.max(1,t+s), qs=(r.qs||[]).filter(x=>x.at>=a/2&&x.at<=b/2), wq=qs.filter(x=>x.wait!=null), mins=seg.length/120;
+  return {mins, tt:t/voice*100, stud:s/voice*100, quiet:q/n*100, qn:qs.length, openp:qs.length?qs.filter(x=>x.open).length/qs.length*100:null, wait:wq.length?wq.reduce((x,y)=>x+y.wait,0)/wq.length:null, resp:qs.length?qs.filter(x=>x.by==='s'||(x.by==null&&x.wait!=null&&x.wait<15)).length/qs.length*100:null, cfu:mins>0.5?qs.length/mins*5:null, stretch:longest/2/60, qs}; }
+function mPart(r){ const m=r.marks||[]; const st=m.find(x=>x.type==='start'); if(!st) return null; const en=m.find(x=>x.type==='end'&&x.t>st.t); return [st.t,en?en.t:(r.trace||'').length/2]; }
+function mGoal(){ return ((S.coach||{}).goals||[]).find(g=>g.status==='active'); }
+function mMet(id,v){ const M2=MET[id]; if(v==null) return null; return M2.better==='up'?v>=M2.target:v<=M2.target; }
+function mGap(id,v){ const M2=MET[id]; if(v==null) return -1; return M2.better==='up'?(M2.target-v)/M2.target:(v-M2.target)/M2.target; }
+/* coaching feedback: one strength, one next step, one question */
+function mFeedback(goal,st,prev){ const F=FOCI[goal.focus]; const ids=F.metrics.filter(id=>st[id]!=null);
+  if(!ids.length) return {strength:'Roomie didn’t hear enough of this part to give feedback.',step:'Next time, wear a microphone and mark the start and end of your '+F.part+'.',ask:'What did you notice about this part of the lesson?'};
+  const met=ids.filter(id=>mMet(id,st[id])), notMet=ids.filter(id=>!mMet(id,st[id])).sort((x,y)=>mGap(y,st[y])-mGap(x,st[x]));
+  let strength; const improved=prev?ids.filter(id=>prev[id]!=null&&(MET[id].better==='up'?st[id]>prev[id]*1.1:st[id]<prev[id]*0.9)):[];
+  if(improved.length) { const id=improved[0]; strength='Progress: '+MET[id].label.toLowerCase()+' went from '+MET[id].fmt(prev[id])+' to '+MET[id].fmt(st[id])+' ('+MET[id].unit+').'; }
+  else strength=met.length?MET[met[0]].good:'You chose a focus and tried it. That’s how change starts.';
+  const step=notMet.length?MET[notMet[0]].tip:'You met every target for this focus. Keep it steady for another lesson, or raise the bar with a new focus.';
+  const ask=notMet.length?{cfu:'Where in the lesson could a quick check have told you who was lost?',stretch:'Which part of your explanation could become two smaller steps?',resp:'What happened when a question got silence?',wait:'What do you do in the first few seconds after you ask a question?',stud:'Where could students have explained this instead of you?',openp:'Which of your questions could start with “why” or “how do you know”?',tt:'What would students have been doing while you were talking?'}[notMet[0]]:'What made this lesson work, and how will you keep doing it?';
+  return {strength,step,ask,focusId:notMet[0]||null}; }
+/* goal attempt view, shown inside the mirror report */
+function goalReportHTML(r){ const g=((S.coach||{}).goals||[]).find(x=>x.id===r.goal); if(!g) return ''; const F=FOCI[g.focus], part=mPart(r), st=part?mStats(r,part[0],part[1]):mStats(r);
+  const i=g.attempts.indexOf(r.id), prevR=i>0?(S.mirrors||[]).find(x=>x.id===g.attempts[i-1]):null, prevPart=prevR&&mPart(prevR), prev=prevR?(prevPart?mStats(prevR,prevPart[0],prevPart[1]):mStats(prevR)):null, fb=mFeedback(g,st,prev);
+  const tile=id=>{ const v=st[id], M2=MET[id], ok=mMet(id,v), pv=prev&&prev[id]; let arrow=''; if(pv!=null&&v!=null){ const up=v>pv; const better=(M2.better==='up')===up; arrow='<em class="'+(Math.abs(v-pv)<0.05*Math.max(1,pv)?'':better?'up':'down')+'">'+(Math.abs(v-pv)<0.05*Math.max(1,pv)?'same as last time':(up?'▲ ':'▼ ')+'from '+M2.fmt(pv))+'</em>'; }
+    return '<div class="gt'+(ok==null?'':ok?' ok':' no')+'"><b>'+(v==null?'–':M2.fmt(v))+'</b><span>'+esc(M2.label)+' <i>('+esc(M2.unit)+')</i></span><small>Aim: '+(M2.better==='up'?'at least ':'no more than ')+M2.fmt(M2.target)+'</small>'+arrow+'</div>'; };
+  return '<div class="greport"><div class="row" style="justify-content:space-between;align-items:center"><div><small>Your focus · attempt '+(i+1)+'</small><h2>'+esc(F.name)+'</h2><p class="hint" style="margin:0">'+(part?'Feedback is on your '+F.part+', '+mirFmt(part[0])+' to '+mirFmt(part[1])+' ('+st.mins.toFixed(1)+' min).':'You didn’t mark your '+F.part+', so this is the whole lesson. Next time say “Hey Roomie, I’m starting my '+F.part+'”.')+'</p></div><button class="btn alt sm" type="button" data-gx="progress:'+g.id+'">See my progress</button></div>'+
+   '<div class="gtiles">'+F.metrics.map(tile).join('')+'</div>'+
+   '<div class="gfb"><div><small>What went well</small><p>'+esc(fb.strength)+'</p></div><div><small>One next step</small><p>'+esc(fb.step)+'</p></div><div><small>Think about</small><p>'+esc(fb.ask)+'</p></div></div></div>'; }
+/* progress view */
+function renderProgress(full){ if(!full) return; const g=((S.coach||{}).goals||[]).find(x=>x.id===A.goalId)||mGoal(); if(!g){ goHome(); return; } const F=FOCI[g.focus];
+  const rows=g.attempts.map(id=>(S.mirrors||[]).find(x=>x.id===id)).filter(Boolean).map(r=>{ const p=mPart(r); return {r,st:p?mStats(r,p[0],p[1]):mStats(r)}; });
+  const chart=id=>{ const M2=MET[id], pts=rows.map(x=>x.st[id]).filter(v=>v!=null); if(!pts.length) return ''; const mx=Math.max(M2.target*1.4,...pts)*1.05, W=520,H=150,pad=28, X=i=>pad+(rows.length<2?(W-2*pad)/2:i*(W-2*pad)/(rows.length-1)), Y=v=>H-pad-(v/mx)*(H-2*pad);
+    const path=rows.map((x,i)=>x.st[id]==null?'':(i?'L':'M')+X(i)+' '+Y(x.st[id])).join(' ').replace(/^ *L/,'M');
+    return '<div class="gchart"><b>'+esc(M2.label)+' <i>('+esc(M2.unit)+')</i></b><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(M2.label)+' over your attempts"><line x1="'+pad+'" x2="'+(W-pad)+'" y1="'+Y(M2.target)+'" y2="'+Y(M2.target)+'" class="tgt"/><text x="'+(W-pad)+'" y="'+(Y(M2.target)-6)+'" text-anchor="end" class="tgtl">aim '+M2.fmt(M2.target)+'</text><path d="'+path+'" class="ln"/>'+rows.map((x,i)=>x.st[id]==null?'':'<circle cx="'+X(i)+'" cy="'+Y(x.st[id])+'" r="7" class="'+(mMet(id,x.st[id])?'ok':'no')+'"/><text x="'+X(i)+'" y="'+(Y(x.st[id])-12)+'" text-anchor="middle" class="vl">'+M2.fmt(x.st[id])+'</text><text x="'+X(i)+'" y="'+(H-6)+'" text-anchor="middle" class="xl">'+new Date(x.r.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'})+'</text>').join('')+'</svg></div>'; };
+  setStage('one','<section class="card mirror"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">My coaching focus · '+(g.status==='done'?'achieved':'in progress')+' · '+rows.length+' attempt'+(rows.length===1?'':'s')+'</div><h1 class="mid" style="color:var(--gum-d)">'+esc(F.name)+'</h1>'+(g.why?'<p class="lead" style="margin:0">“'+esc(g.why)+'”</p>':'')+'</div><div class="row">'+(g.status==='active'?'<button class="btn alt sm" type="button" data-gx="done:'+g.id+'">I’ve achieved this</button>':'')+backBtn('Close')+'</div></div>'+
+   (rows.length?'<div class="gcharts">'+F.metrics.map(chart).join('')+'</div><div class="gatt">'+rows.map((x,i)=>'<button type="button" class="mh" data-cx="open:'+x.r.id+'"><b>Attempt '+(i+1)+' · '+new Date(x.r.date).toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'})+'</b><span>'+(x.r.note?'“'+esc(x.r.note.slice(0,90))+'”':'No reflection written')+'</span></button>').join('')+'</div>':'<p class="lead">No attempts yet. Start listening in a lesson and mark your '+esc(F.part)+'.</p>')+
+   '<p class="hint" style="margin:0">Saved only on this computer. Each dot is one lesson; green means you met the aim.</p></section>'); }
+/* Coach tab: goal section (shown above the mirror controls) */
+function goalTabHTML(){ const C=S.coach||{}, g=mGoal(), done=(C.goals||[]).filter(x=>x.status==='done');
+  if(g){ const F=FOCI[g.focus]; return '<div class="gcur"><small>My focus</small><h2 style="margin:0">'+esc(F.name)+'</h2><p class="hint" style="margin:0">'+esc(F.blurb)+(g.why?' · “'+esc(g.why)+'”':'')+'</p><p style="margin:4px 0 0"><b>'+g.attempts.length+'</b> attempt'+(g.attempts.length===1?'':'s')+' so far. During the lesson, say “Hey Roomie, I’m starting my '+esc(F.part)+'” and “…that’s the end of my '+esc(F.part)+'”, or tap <b>Mark</b> on the Mirror timer.</p><div class="row"><button class="btn sm" type="button" data-gx="progress:'+g.id+'">See my progress</button><button class="btn alt sm" type="button" data-gx="change">Change focus</button></div></div>'; }
+  return '<div class="gpick"><small>Choose a focus</small><p class="hint" style="margin:0">Pick one thing to work on. Roomie gives feedback on that part of your lesson and keeps your progress across lessons.</p><div class="gopts">'+Object.entries(FOCI).map(([k,F])=>'<button type="button" class="gopt" data-gx="pick:'+k+'"><b>'+esc(F.name)+'</b><span>'+esc(F.blurb)+'</span></button>').join('')+'</div><label class="thin"><span>Why this focus? <em>(optional, helps you remember)</em></span><input id="goalWhy" type="text" maxlength="120" placeholder="e.g. Students are lost by the time they start independent work"></label></div>'+(done.length?'<p class="hint">Achieved: '+done.map(x=>'<button type="button" class="linkbtn" data-gx="progress:'+x.id+'">'+esc(FOCI[x.focus].name)+'</button>').join(', ')+'</p>':''); }
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-gx]'); if(!b) return; audio(); const [a,v]=b.dataset.gx.split(':'); const C=S.coach=S.coach||{}; C.goals=C.goals||[];
+  if(a==='pick'){ const why=((document.getElementById('goalWhy')||{}).value||'').trim(); C.goals.forEach(g=>{ if(g.status==='active') g.status='paused'; }); C.goals.push({id:uid(),focus:v,why,created:now().toISOString(),attempts:[],status:'active'}); save(); toast('Focus set: '+FOCI[v].name+'.'); renderSetup(); }
+  if(a==='change'){ C.goals.forEach(g=>{ if(g.status==='active') g.status='paused'; }); save(); renderSetup(); }
+  if(a==='done'){ const g=C.goals.find(x=>x.id===v); if(g){ g.status='done'; save(); celebrate('Goal achieved!','big'); render(true); } }
+  if(a==='progress'){ A.goalId=v; if(document.getElementById('sheetHost').innerHTML) closeSetup(); openOverlay('mprogress'); } });
+/* marking the focus part */
+function mirMarkPart(type){ if(!M.on) return false; M.marks=M.marks||[]; const t=(Date.now()-M.t0)/1000; if(type==='toggle') type=M.inPart?'end':'start'; M.marks.push({type,t}); M.inPart=type==='start'; chime(1); mirMark(); return true; }
+
 /* ---- v1.6: Lesson mirror (early access). Everything is measured on this computer; no audio is kept or sent. ---- */
 const MIR_CODE='coach';
 const OPEN_RE=/^(why|how (do|does|did|would|could|might|can|come)|what (do|does|did) you (think|notice|wonder|reckon)|what (would|might|could|if)|what makes you|explain|tell me|describe|in what ways|how might|what else|what's your|what is your|how are .* (alike|different|connected)|compare)/;
@@ -2665,7 +2759,7 @@ function mirLevel(ch){ ch.an.getFloatTimeDomainData(ch.buf); let s=0; for(const 
 async function mirCalibrate(){ const C=S.coach||{}; const ch=await mirOpen(C.worn||C.room||''); let peak=[]; const t0=Date.now(); await new Promise(ok=>{ const h=setInterval(()=>{ peak.push(mirLevel(ch)); if(Date.now()-t0>4500){ clearInterval(h); ok(); } },100); }); ch.st.getTracks().forEach(t=>t.stop()); peak.sort((a,b)=>b-a); const lvl=peak.slice(0,Math.max(3,Math.floor(peak.length*0.3))).reduce((a,b)=>a+b,0)/Math.max(3,Math.floor(peak.length*0.3)); S.coach=Object.assign(S.coach||{},{tLevel:lvl}); save(); return lvl; }
 async function mirStart(){ if(M.on) return; const C=S.coach||{};
   try{ M.room=await mirOpen(C.room||''); M.worn=C.worn?await mirOpen(C.worn):null; }catch(e){ toast('Roomie needs the microphone. Allow it in the address bar.'); return; }
-  Object.assign(M,{on:true,t0:Date.now(),tick:0,teacher:0,students:0,quiet:0,buckets:[],cur:{t:0,s:0,q:0},lastVoice:Date.now(),lastTeacher:0,run:0,longest:0,qs:[],pendQ:null,state:'q'});
+  Object.assign(M,{marks:[],inPart:false,trace:'',goal:(mGoal()||{}).id||null,on:true,t0:Date.now(),tick:0,teacher:0,students:0,quiet:0,buckets:[],cur:{t:0,s:0,q:0},lastVoice:Date.now(),lastTeacher:0,run:0,longest:0,qs:[],pendQ:null,state:'q'});
   const tl=C.tLevel||0.05;
   M.h=setInterval(()=>{ const rr=mirLevel(M.room), wr=M.worn?mirLevel(M.worn):0; const now=Date.now();
     const roomOn=rr>Math.max(M.room.floor*2.6,0.006);
@@ -2674,7 +2768,7 @@ async function mirStart(){ if(M.on) return; const C=S.coach||{};
     if(st==='t'){ M.lastTeacher=now; M.run+=0.1; M.longest=Math.max(M.longest,M.run); } else if(now-M.lastTeacher>2500) M.run=0;
     if(M.pendQ&&st!=='q'&&now>M.pendQ.end+300&&!(st==='t'&&now-M.pendQ.end<600)){ M.pendQ.wait=(now-M.pendQ.end)/1000; M.pendQ.by=st; M.pendQ=null; }
     if(M.pendQ&&now-M.pendQ.end>20000){ M.pendQ.wait=20; M.pendQ=null; }
-    if(st!=='q') M.lastVoice=now; M.state=st;
+    if(st!=='q') M.lastVoice=now; M.state=st; if(M.tick%5===0) M.trace+=st;
     if(++M.tick%100===0){ M.buckets.push(M.cur); M.cur={t:0,s:0,q:0}; }
     mirMark(); },100);
   if(!(typeof V!=='undefined'&&V.on)) mirSR();
@@ -2689,12 +2783,12 @@ function mirFeed(text){ if(!M.on) return; const now=Date.now(); if(now-M.lastTea
     if(M.pendQ&&M.pendQ.wait==null){ M.pendQ.wait=Math.max(0,(q.end-M.pendQ.end)/1000-1); M.pendQ.by='t'; } M.qs.push(q); M.pendQ=q; } }); }
 function mirStop(){ if(!M.on) return; M.on=false; clearInterval(M.h); try{ M.sr&&M.sr.stop(); }catch(_){ } M.sr=null; [M.room,M.worn].forEach(c=>c&&c.st.getTracks().forEach(t=>t.stop())); if(M.cur.t+M.cur.s+M.cur.q>0) M.buckets.push(M.cur);
   const tot=Math.max(1,M.teacher+M.students+M.quiet), Q=M.qs, wq=Q.filter(q=>q.wait!=null);
-  const rep={id:uid(),date:now().toISOString(),mins:Math.round((Date.now()-M.t0)/60000),block:(A.P&&A.P.block&&A.P.block.name)||'',teacher:M.teacher/tot,students:M.students/tot,quiet:M.quiet/tot,qs:Q.map(q=>({text:q.text,open:q.open,wait:q.wait==null?null:Math.round(q.wait*10)/10,at:Math.round(q.at)})),wait:wq.length?wq.reduce((a,q)=>a+q.wait,0)/wq.length:null,longest:M.longest,buckets:M.buckets.map(b=>{ const s=b.t+b.s+b.q||1; return [b.t/s,b.s/s,b.q/s].map(x=>Math.round(x*100)/100); }),worn:!!M.worn,note:''};
-  S.mirrors=[rep].concat(S.mirrors||[]).slice(0,30); save(); mirMark(); A.mirId=rep.id; Bird.say('Your lesson mirror is ready.');
+  const rep={id:uid(),date:now().toISOString(),mins:Math.round((Date.now()-M.t0)/60000),block:(A.P&&A.P.block&&A.P.block.name)||'',teacher:M.teacher/tot,students:M.students/tot,quiet:M.quiet/tot,qs:Q.map(q=>({text:q.text,open:q.open,wait:q.wait==null?null:Math.round(q.wait*10)/10,at:Math.round(q.at)})),wait:wq.length?wq.reduce((a,q)=>a+q.wait,0)/wq.length:null,longest:M.longest,trace:M.trace,marks:M.marks,goal:M.goal,buckets:M.buckets.map(b=>{ const s=b.t+b.s+b.q||1; return [b.t/s,b.s/s,b.q/s].map(x=>Math.round(x*100)/100); }),worn:!!M.worn,note:''};
+  S.mirrors=[rep].concat(S.mirrors||[]).slice(0,60); const G=rep.goal&&((S.coach||{}).goals||[]).find(x=>x.id===rep.goal); if(G) G.attempts.push(rep.id); save(); mirMark(); A.mirId=rep.id; Bird.say('Your lesson mirror is ready.');
   toast('Lesson mirror saved. Open it in Setup → Coach when students have gone.'); }
-function mirMark(){ let p=document.getElementById('mirPill'); if(!M.on){ if(p) p.remove(); return; } if(!p){ p=document.createElement('button'); p.id='mirPill'; p.type='button'; p.className='mirpill'; p.title='Lesson mirror is listening. Tap to stop.'; const t=document.querySelector('.top'); (t||document.body).appendChild(p); }
-  p.innerHTML='<i class="'+M.state+'"></i>Mirror '+mirFmt((Date.now()-M.t0)/1000); }
-document.addEventListener('click',e=>{ if(e.target.closest('#mirPill')){ mirStop(); } });
+function mirMark(){ let p=document.getElementById('mirPill'); if(!M.on){ if(p) p.remove(); return; } if(!p){ p=document.createElement('div'); p.id='mirPill'; p.className='mirpill'; p.title='Lesson mirror is listening. Tap to stop.'; const t=document.querySelector('.top'); (t||document.body).appendChild(p); }
+  const g=M.goal&&FOCI[(((S.coach||{}).goals||[]).find(x=>x.id===M.goal)||{}).focus]; p.innerHTML='<span class="mpm"><i class="'+M.state+'"></i>Mirror '+mirFmt((Date.now()-M.t0)/1000)+'</span>'+(g?'<span class="mpmark'+(M.inPart?' on':'')+'" data-mark="1">'+(M.inPart?'End '+g.part:'Mark '+g.part)+'</span>':'')+'<span class="mpstop" data-mstop="1">Stop</span>'; }
+document.addEventListener('click',e=>{ if(e.target.closest('[data-mstop]')){ mirStop(); } else if(e.target.closest('[data-mark]')){ mirMarkPart('toggle'); } });
 /* one next step, chosen by rule (no AI yet) */
 function mirStep(r){ const open=r.qs.filter(q=>q.open).length, n=r.qs.length;
   if(r.wait!=null&&n>=3&&r.wait<3) return ['Wait time','After your questions, students had about '+r.wait.toFixed(1)+' seconds before someone spoke. Research on wait time suggests 3 seconds or more leads to longer, more thoughtful answers.','Next lesson, after each big question, silently count to five before taking an answer.'];
@@ -2702,13 +2796,13 @@ function mirStep(r){ const open=r.qs.filter(q=>q.open).length, n=r.qs.length;
   if(n>=4&&open/n<0.3) return ['Open questions','Most of your questions ('+(n-open)+' of '+n+') had one right answer. Open questions get students reasoning.','Plan two “why” or “how do you know” questions before the lesson and ask them.'];
   if(r.longest>240) return ['Long stretches','Your longest stretch of talking was '+mirFmt(r.longest)+'. Attention drops after a few minutes of listening.','Break long explanations with a turn-and-talk every 3–4 minutes.'];
   return ['Keep it up','Good balance today: students talked, you asked open questions and gave them time.','Choose one thing you want to grow and try it next lesson.']; }
-function renderMirror(full){ if(!full) return; const r=(S.mirrors||[]).find(x=>x.id===A.mirId)||(S.mirrors||[])[0]; if(!r){ goHome(); return; } const st=mirStep(r), pct=x=>Math.round(x*100)+'%';
+function renderMirror(full){ if(!full) return; const r=(S.mirrors||[]).find(x=>x.id===A.mirId)||(S.mirrors||[])[0]; if(!r){ goHome(); return; } const st=r.goal?(()=>{ const g=((S.coach||{}).goals||[]).find(x=>x.id===r.goal), p=mPart(r), f=g&&mFeedback(g,p?mStats(r,p[0],p[1]):mStats(r),null); return ['Try this next',f?f.step:'','']; })():mirStep(r), pct=x=>Math.round(x*100)+'%';
   const d=new Date(r.date), open=r.qs.filter(q=>q.open).length;
   setStage('one','<section class="card mirror"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">Lesson mirror · early access · just for you</div><h1 class="mid" style="color:var(--gum-d)">'+esc(r.block||'Your lesson')+' · '+d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'})+' · '+r.mins+' min</h1></div>'+backBtn('Close')+'</div>'+
-   '<div class="mstats"><div><b>'+pct(r.teacher)+'</b><span>you talking</span></div><div><b>'+pct(r.students)+'</b><span>students talking</span></div><div><b>'+pct(r.quiet)+'</b><span>quiet and think time</span></div><div><b>'+r.qs.length+'</b><span>questions ('+open+' open)</span></div><div><b>'+(r.wait==null?'–':r.wait.toFixed(1)+'s')+'</b><span>average wait time</span></div></div>'+
-   '<div class="mtl" title="Each bar is 10 seconds">'+r.buckets.map(b=>'<i style="--t:'+b[0]+';--s:'+b[1]+'"></i>').join('')+'</div><div class="mkey"><span class="kt">You</span><span class="ks">Students</span><span class="kq">Quiet</span></div>'+
-   '<div class="mgrid"><div class="mstep"><small>One thing to try</small><b>'+esc(st[0])+'</b><p>'+esc(st[1])+'</p><p class="mtry">'+esc(st[2])+'</p><label class="thin"><span>Your reflection <em>(only on this computer)</em></span><textarea id="mirNote" rows="2" placeholder="What did you notice? What will you try?">'+esc(r.note||'')+'</textarea></label></div>'+
-   '<div class="mqs"><small>Your questions</small>'+(r.qs.length?r.qs.slice(0,40).map(q=>'<div class="mq"><span class="'+(q.open?'o':'c')+'">'+(q.open?'open':'closed')+'</span><p>'+esc(q.text)+'</p><b>'+(q.wait==null?'':q.wait.toFixed(1)+'s')+'</b></div>').join(''):'<p class="hint">Roomie didn’t catch any questions. Try wearing a microphone, or check the listening box in Setup → Coach.</p>')+'</div></div>'+
+   (r.goal?'<details class="mall"><summary>Whole lesson numbers</summary>':'')+'<div class="mstats"><div><b>'+pct(r.teacher)+'</b><span>you talking</span></div><div><b>'+pct(r.students)+'</b><span>students talking</span></div><div><b>'+pct(r.quiet)+'</b><span>quiet and think time</span></div><div><b>'+r.qs.length+'</b><span>questions ('+open+' open)</span></div><div><b>'+(r.wait==null?'–':r.wait.toFixed(1)+'s')+'</b><span>average wait time</span></div></div>'+
+   '<div class="mtl" title="Each bar is 10 seconds">'+r.buckets.map((b,i)=>{ const p=mPart(r); const inP=p&&i*10+10>p[0]&&i*10<p[1]; return '<i class="'+(inP?'inp':'')+'" style="--t:'+b[0]+';--s:'+b[1]+'"></i>'; }).join('')+'</div><div class="mkey"><span class="kt">You</span><span class="ks">Students</span><span class="kq">Quiet</span></div>'+(r.goal?'</details>':'')+
+   goalReportHTML(r)+(r.goal?'<div class="mgoalfoot"><label class="thin"><span>Your reflection <em>(only on this computer, shows on your progress page)</em></span><textarea id="mirNote" rows="2" placeholder="What did you notice? What will you try next time?">'+esc(r.note||'')+'</textarea></label><details class="mall"><summary>Your questions ('+r.qs.length+')</summary><div class="mqs">'+r.qs.slice(0,40).map(q=>'<div class="mq"><span class="'+(q.open?'o':'c')+'">'+(q.open?'open':'closed')+'</span><p>'+esc(q.text)+'</p><b>'+(q.wait==null?'':q.wait.toFixed(1)+'s')+'</b></div>').join('')+'</div></details></div>':'<div class="mgrid"><div class="mstep"><small>One thing to try</small><b>'+esc(st[0])+'</b><p>'+esc(st[1])+'</p><p class="mtry">'+esc(st[2])+'</p><label class="thin"><span>Your reflection <em>(only on this computer)</em></span><textarea id="mirNote" rows="2" placeholder="What did you notice? What will you try?">'+esc(r.note||'')+'</textarea></label></div>'+
+   '<div class="mqs"><small>Your questions</small>'+(r.qs.length?r.qs.slice(0,40).map(q=>'<div class="mq"><span class="'+(q.open?'o':'c')+'">'+(q.open?'open':'closed')+'</span><p>'+esc(q.text)+'</p><b>'+(q.wait==null?'':q.wait.toFixed(1)+'s')+'</b></div>').join(''):'<p class="hint">Roomie didn’t catch any questions. Try wearing a microphone, or check the listening box in Setup → Coach.</p>')+'</div></div>')+
    '<p class="hint" style="margin:0">These are estimates from sound levels and Roomie’s on-computer listening'+(r.worn?' with your worn microphone':', using the laptop microphone only (wear a microphone for better accuracy)')+'. No audio was kept or sent anywhere. Only your own words are listed.</p></section>'); }
 document.addEventListener('input',e=>{ if(e.target.id==='mirNote'){ const r=(S.mirrors||[]).find(x=>x.id===A.mirId)||(S.mirrors||[])[0]; if(r){ r.note=e.target.value; save(); } } });
 /* Setup → Coach tab */
@@ -2716,7 +2810,7 @@ async function coachTabHTML(){ return ''; }
 function coachTab(){ const C=S.coach||{};
   if(!C.unlocked) return '<div class="okbox" style="font-size:16px;line-height:1.6"><b>Lesson mirror (early access)</b><br>Roomie listens to a lesson on this computer and shows you, privately, how much you talked, how much students talked, your questions and your wait time. No audio is kept or sent anywhere.</div><div class="row"><input id="coachCode" type="text" placeholder="Early access code" style="max-width:240px"><button class="btn" type="button" data-cx="unlock">Unlock</button></div>';
   const M2=(S.mirrors||[]);
-  return '<div class="row" style="justify-content:space-between;align-items:center"><div><h2 style="margin:0">Lesson mirror</h2><p class="hint" style="margin:0">Early access. Measured on this computer. No audio is kept or sent.</p></div>'+(M.on?'<button class="btn" type="button" data-cx="stop">Stop and see my mirror</button>':'<button class="btn gold" type="button" data-cx="start">Start listening to this lesson</button>')+'</div>'+
+  return goalTabHTML()+'<div class="row" style="justify-content:space-between;align-items:center"><div><h2 style="margin:0">Lesson mirror</h2><p class="hint" style="margin:0">Early access. Measured on this computer. No audio is kept or sent.</p></div>'+(M.on?'<button class="btn" type="button" data-cx="stop">Stop and see my mirror</button>':'<button class="btn gold" type="button" data-cx="start">Start listening to this lesson</button>')+'</div>'+
    '<div class="cmics"><label class="thin"><span>Room microphone</span><select id="micRoom"><option value="">Laptop / default microphone</option></select></label><label class="thin"><span>Your worn microphone <em>(optional, much more accurate)</em></span><select id="micWorn"><option value="">None</option></select></label><div class="row"><button class="btn alt sm" type="button" data-cx="cal">Set my teaching voice</button><span class="hint">'+(C.tLevel?'Voice set ✓':'Do this once: Roomie listens to you say a sentence in your normal teaching voice.')+'</span></div></div>'+
    '<p class="hint" style="margin:0">You can also say “Hey Roomie, mirror this lesson” and “Hey Roomie, stop the mirror”.</p>'+
    '<h3 style="margin:6px 0 0">Past lessons</h3>'+(M2.length?'<div class="mhist">'+M2.map(r=>'<button type="button" class="mh" data-cx="open:'+r.id+'"><b>'+esc(r.block||'Lesson')+'</b><span>'+new Date(r.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'})+' · '+r.mins+' min · you '+Math.round(r.teacher*100)+'% · wait '+(r.wait==null?'–':r.wait.toFixed(1)+'s')+'</span></button>').join('')+'</div>':'<p class="hint">No lessons yet.</p>')+(M2.length?'<button class="btn alt sm" type="button" data-cx="clear">Delete all mirrors</button>':''); }
