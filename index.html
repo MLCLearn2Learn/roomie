@@ -47,6 +47,10 @@ h1,h2,h3{margin:0;text-wrap:balance;font-family:var(--display);font-weight:800}
 .seg.next{background:var(--wattle);color:#2A1E00}
 /* check-in */
 .fslot{display:block;font-family:var(--body);font-size:13px;font-weight:800;color:var(--gum-d);letter-spacing:.04em;text-transform:uppercase}
+/* home button */
+.homebtn{display:inline-flex;align-items:center;gap:8px;border:0;cursor:pointer;font-family:var(--display);font-weight:800;font-size:20px;color:#4A3F38;background:#FFF1A8;border-radius:999px;padding:8px 18px 8px 14px;box-shadow:0 3px 0 rgba(120,90,60,.18);margin-right:6px}
+.homebtn:hover{transform:translateY(-1px)}
+body.at-home .homebtn{opacity:.55}
 /* class menu in the header */
 .classbtn{display:inline-flex;align-items:center;gap:10px;border:0;background:transparent;padding:4px 14px 4px 6px;border-radius:16px;cursor:pointer;color:inherit;font:inherit}
 .classbtn[aria-expanded="true"] .cbsub{outline:3px solid rgba(255,255,255,.9)}
@@ -741,7 +745,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 
 <div class="app" id="app">
   <header class="top">
-    <button class="classbtn" id="classBtn" type="button" aria-haspopup="true" aria-expanded="false" title="My class: seating plan, pick a name, groups"><span class="room" id="roomLabel">Room 7</span><span class="cbsub"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.2 3-5 6-5s5.4 1.8 6 5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.2c2.6.1 4.4 1.7 5 4.8"/></svg>Students <span id="classCount"></span> ▾</span></button>
+    <button class="homebtn" id="homeBtn" type="button" title="Back to the home screen (Esc)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/></svg><span>Home</span></button><button class="classbtn" id="classBtn" type="button" aria-haspopup="true" aria-expanded="false" title="My class: seating plan, pick a name, groups"><span class="room" id="roomLabel">Room 7</span><span class="cbsub"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.2 3-5 6-5s5.4 1.8 6 5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.2c2.6.1 4.4 1.7 5 4.8"/></svg>Students <span id="classCount"></span> ▾</span></button>
     <span class="date" id="dateLabel"></span>
     <span class="demo" id="demoTag" hidden>Demo clock</span>
     <div class="top-r">
@@ -822,7 +826,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 <script>
 (function(){
 'use strict';
-const VERSION='Roomie v1.2 · 12 Nov 2026';
+const VERSION='Roomie v1.2.1 · 12 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1452,7 +1456,7 @@ function renderSetup(){
   if(tab==='fun'){ body='<div class="row" style="align-items:flex-end"><div class="fld" style="width:220px"><label for="fFun">Fun level</label><select id="fFun">'+opt('calm','Calm: just the essentials',S.fun)+opt('lively','Lively (recommended)',S.fun)+opt('party','Party: everything on',S.fun)+'</select></div><button class="btn gold" type="button" data-sact="testFun">Test a celebration</button></div><label class="chk"><input type="checkbox" id="fMascot" '+(S.mascot!==false?'checked':'')+'><span>Show Roomie the mascot<span class="hint" style="display:block">Sings with the music, cheers for points, says hello at each change</span></span></label><label class="chk"><input type="checkbox" id="fSfx" '+(S.sfx!==false?'checked':'')+'><span>Celebration sounds<span class="hint" style="display:block">Fanfares, drumrolls and pops. The attention chime always plays.</span></span></label><p class="hint" style="margin:0">Fun comes in bursts: celebrations, races and reveals. During learning the board stays calm. If a computer is set to reduce motion, Roomie turns the animations off.</p><h3>Rotations</h3><div class="row" style="align-items:flex-start"><div class="fld" style="flex:1;min-width:240px"><label for="fStations">Stations, one per line (2 to 8)</label><textarea id="fStations" style="min-height:180px">'+esc(S.stations||'')+'</textarea></div><div class="fld" style="width:160px"><label for="fRotMin">Minutes at each</label><input id="fRotMin" type="number" min="2" max="40" value="'+(S.rotMin||12)+'"></div></div><p class="hint" style="margin:0">Roomie makes one crew per station from your class list. Crews move one station each round, with a 45-second move song.</p>'; }
   if(tab==='demo'){ const P=phaseAt(now()); body='<div class="okbox" style="font-size:16px">Try the whole day without waiting. The clock on the board jumps; nothing else changes.</div><div class="row"><button class="btn gold" type="button" data-sact="demoStart">Start the day at 8:40</button><button class="btn" type="button" data-sact="demoNext">Jump to 10 seconds before the next change</button><button class="btn alt" type="button" data-sact="demoReal">Back to the real time</button></div><p class="lead">Board time now: '+fmtClock(P.mins)+' · '+esc(P.phase)+(P.block?' · '+esc(P.block.name):'')+'</p>'; }
   if(tab==='privacy'){ body='<div class="okbox" style="font-size:16px;line-height:1.6"><b>What Roomie keeps:</b> your plan, routines, settings and students’ first names, only in this browser on this computer. Your own audio files stay here too.<br><b>What Roomie never keeps:</b> recordings, noise levels, check-in taps or anything about individual students.</div><div class="fld"><label for="fBackup">Backup: copy this somewhere safe, or paste a backup here to restore</label><textarea id="fBackup" style="font-size:12px;font-family:ui-monospace,monospace">'+esc(JSON.stringify(S))+'</textarea></div><div class="row"><button class="btn alt sm" type="button" data-sact="copyBackup">Copy backup</button><button class="btn alt sm" type="button" data-sact="restore">Restore from the box</button><button class="btn alt sm" type="button" data-sact="erase">Erase everything on this computer</button></div><div id="privMsg"></div>'; }
-  $('#sheetHost').innerHTML='<div class="sheet" role="dialog" aria-label="Setup"><div class="sheet-in"><div class="row" style="justify-content:space-between"><h1 style="font-size:34px;color:var(--gum-d)">Setup</h1><button class="btn" type="button" data-sact="done">Done</button></div><div class="tabs" role="tablist">'+tabs.map(([k,l])=>'<button class="tab" role="tab" type="button" data-tab="'+k+'" aria-selected="'+(tab===k)+'">'+l+'</button>').join('')+'</div>'+body+'<p class="hint">Changes save as you go. '+esc(VERSION)+'</p></div></div>';
+  $('#sheetHost').innerHTML='<div class="sheet" role="dialog" aria-label="Setup"><div class="sheet-in"><div class="row" style="justify-content:space-between"><h1 style="font-size:34px;color:var(--gum-d)">Setup</h1><button class="btn" type="button" data-sact="done"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px"><path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/></svg>Done, back to Home</button></div><div class="tabs" role="tablist">'+tabs.map(([k,l])=>'<button class="tab" role="tab" type="button" data-tab="'+k+'" aria-selected="'+(tab===k)+'">'+l+'</button>').join('')+'</div>'+body+'<p class="hint">Changes save as you go. '+esc(VERSION)+'</p></div></div>';
 }
 function reliefHTML(){ const k=isWeekend(now())?'mon':dayKey(now()); const day=(S.days[k]||[]).slice().sort((a,b)=>toMin(a.start)-toMin(b.start));
   return '<div class="relief" id="reliefDoc"><h2>Relief teacher guide · '+esc(S.room)+'</h2><p style="margin:0">'+esc(DAYNAME[k])+'. Roomie runs the timetable, warnings and routines on the board. You only need to follow along.</p><h3>Today</h3><table><tbody>'+day.map(b=>'<tr><td style="width:90px">'+fmtClock(toMin(b.start))+'</td><td>'+esc(b.name)+'</td><td>'+esc([b.startR&&('Starts with '+(routineById(b.startR)||{}).name), b.endR&&('ends with '+(routineById(b.endR)||{}).name), b.exp&&S.expect[b.exp]&&S.expect[b.exp].name].filter(Boolean).join(' · '))+'</td></tr>').join('')+'</tbody></table><h3>Signals the class knows</h3><ul style="margin:0"><li><b>Attention:</b> press A (or the coral Attention button). A chime plays and the board says “Eyes this way”.</li><li><b>Voice levels:</b> 0 silent, 1 whisper, 2 partner, 3 group, 4 presenting.</li><li><b>Tickets:</b> tap Tickets for an entry or exit ticket.</li><li><b>Someone at the door:</b> press D. The board tells the class to keep going.</li><li><b>Late arrival:</b> press L. The board shows them what to do.</li></ul><h3>Routines</h3>'+S.routines.map(r=>'<p style="margin:0"><b>'+esc(r.name)+'</b> ('+r.minutes+' min): '+esc(stepsOf(r).join(' → '))+'</p>').join('')+(S.reliefNotes?'<h3>Notes from '+esc(S.teacher)+'</h3><p style="margin:0;white-space:pre-line">'+esc(S.reliefNotes)+'</p>':'')+'</div>'; }
@@ -1773,6 +1777,16 @@ document.addEventListener('click',e=>{ if(e.target.closest('#classBtn')){ audio(
   if(e.target.closest('[data-classlist]')){ closeClassPop(); tab='class'; openSetup(); return; }
   if(document.getElementById('classpop')) setTimeout(closeClassPop,0); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeClassPop(); });
+
+/* ---- v1.2.1: one Home button that always works ---- */
+function goHome(){ try{ if(typeof TOUR!=='undefined'&&TOUR) endTour(); }catch(_){}
+  ['classpop','segpop','dmenu'].forEach(id=>{ const el=document.getElementById(id); if(el) el.remove(); });
+  const sh=document.getElementById('sheetHost'); if(sh&&sh.innerHTML) closeSetup();
+  A.seatEdit=false; A.jobEdit=false; A.seatSel=null; A.qz=null; A.th=null;
+  if(A.overlay) closeOverlay(); else render(true); }
+document.addEventListener('click',e=>{ if(e.target.closest('#homeBtn')){ audio(); goHome(); } });
+document.addEventListener('keydown',e=>{ if(e.key!=='Escape') return; const tag=(e.target.tagName||'').toLowerCase(); if(tag==='input'||tag==='textarea'||tag==='select') return; if(typeof TOUR!=='undefined'&&TOUR) return; if(document.getElementById('classpop')||document.getElementById('segpop')) return; goHome(); });
+setInterval(()=>{ document.body.classList.toggle('at-home',!A.overlay&&!(document.getElementById('sheetHost')||{}).innerHTML); },500);
 
 /* ================= Ticket machine: entry and exit tickets (v0.4.1) ================= */
 const EXIT_MIN=3;
