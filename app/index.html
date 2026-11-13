@@ -924,13 +924,13 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 .card.scene h1.long{font-size:clamp(26px,3vw,46px)!important}
 .card.scene h1 .pl,.scn-attn .pl{display:inline-block;background:var(--pc);color:#1B1340;border:4px solid #1B1340;border-radius:14px;padding:.02em .28em .08em;box-shadow:4px 4px 0 #1B1340;transform:rotate(var(--pr));margin:0 .02em .16em}
 .scn-art{position:absolute;right:20px;z-index:2;pointer-events:none}
-.scn-art svg{display:block;width:100%;height:auto;animation:scnbob 4s ease-in-out infinite;filter:drop-shadow(3px 4px 0 rgba(27,19,64,.18))}
+.scn-art svg{display:block;width:100%;height:auto;filter:drop-shadow(3px 4px 0 rgba(27,19,64,.18))}
 .scn-art.pop{animation:scnpop .6s cubic-bezier(.2,1.6,.4,1) both}
 @keyframes scnpop{from{transform:scale(.3) rotate(-12deg);opacity:0}to{transform:none;opacity:1}}
 @keyframes scnbob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px)}}
 .attn.scn-attn{background:repeating-conic-gradient(from 0deg at 50% 40%,#FF8F6E 0 9deg,#FFB49C 9deg 18deg)}
 .scn-attn > svg,.scn-attn > b,.scn-attn > p{display:none}
-.atn-art{width:min(280px,36vw)} .atn-art svg{width:100%;display:block;animation:scnbob 3s ease-in-out infinite}
+.atn-art{width:min(280px,36vw)} .atn-art svg{width:100%;display:block;}
 .atn-t{font-family:'Lilita One','Baloo 2',sans-serif;font-weight:400;font-size:clamp(54px,8.5vw,124px);line-height:1.15;margin:0}
 .atn-steps{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
 .atn-steps span{background:var(--pc);color:#1B1340;border:4px solid #1B1340;border-radius:18px;box-shadow:5px 5px 0 #1B1340;padding:6px 22px;font-family:'Lilita One','Baloo 2',sans-serif;font-size:clamp(24px,3vw,40px);display:flex;align-items:center;gap:10px}
@@ -3587,15 +3587,16 @@ function scenify(){ const st=document.getElementById('stage'); if(!st) return; c
   if(card.dataset.ssig!==sig){ card.dataset.ssig=sig; scLayout(card,card.querySelector(':scope > .scn-band'),card.querySelector(':scope > .scn-art'),h); }
   if(fresh) setTimeout(scRelayout,350);
   if(fresh&&A.overlay==='brain'&&S.fun!=='calm'&&typeof burst==='function'){ const w=SC_WORD[A.brain&&A.brain.id]; if(w) burst(w); } }
-function scLayout(card,band,art,h){ const cr=card.getBoundingClientRect(); if(!cr.width) return;
+function scLayout(card,band,art,h){ const cr0=card.getBoundingClientRect(); if(!cr0.width) return; const Z=cr0.width/(card.offsetWidth||cr0.width)||1;
+  const R=el=>{ const r=el.getBoundingClientRect(); return {left:r.left/Z,right:r.right/Z,top:r.top/Z,bottom:r.bottom/Z,width:r.width/Z,height:r.height/Z}; }, cr=R(card);
   const hdr=(h?[...card.children].find(c=>c===h||c.contains(h)):null)||[...card.children].find(c=>!c.classList.contains('scn-band')&&!c.classList.contains('scn-art'));
   if(hdr&&!hdr.classList.contains('scn-hdr')){ hdr.classList.add('scn-hdr'); hdr.style.zoom=''; }
   if(!hdr){ band.style.height='0'; if(art) art.style.display='none'; return; }
   const tg=card.querySelector('.tgrid'), dense=(tg&&tg.children.length>8)||(parseFloat(getComputedStyle(hdr).zoom)||1)<0.98;
   const aw=art?(dense?100:Math.round(Math.max(100,Math.min(180,cr.width*0.2)))):0; card.style.setProperty('--aw',dense?'0px':aw+'px');
   if(art){ art.style.display=''; art.style.left=''; }
-  const hb=hdr.getBoundingClientRect().bottom-cr.top; let rb=4, bl=cr.width;
-  card.querySelectorAll('button,input,select,.eyebrow').forEach(x=>{ const r=x.getBoundingClientRect(); if(!r.width||r.top-cr.top>=hb) return; if(r.right>cr.right-aw-70) rb=Math.max(rb,r.bottom-cr.top); if(r.left>cr.left+cr.width*0.4) bl=Math.min(bl,r.left-cr.left); });
+  const hb=R(hdr).bottom-cr.top; let rb=4, bl=cr.width;
+  card.querySelectorAll('button,input,select,.eyebrow').forEach(x=>{ const r=R(x); if(!r.width||r.top-cr.top>=hb) return; if(r.right>cr.right-aw-70) rb=Math.max(rb,r.bottom-cr.top); if(r.left>cr.left+cr.width*0.4) bl=Math.min(bl,r.left-cr.left); });
   const top=dense?8:rb+10, need=art?top+aw*0.875*0.92:0, extra=Math.max(dense?18:26,need-hb+12);
   const hz=parseFloat(getComputedStyle(hdr).zoom)||1, mb=Math.round(extra/hz)+'px'; if(hdr.style.marginBottom!==mb) hdr.style.marginBottom=mb; band.style.height=Math.round(hb+extra-12)+'px';
   if(art){ art.style.width=aw+'px'; art.style.top=Math.round(top)+'px'; if(dense) art.style.left=Math.round(bl-aw-34)+'px'; } }
