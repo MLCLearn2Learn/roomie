@@ -954,6 +954,7 @@ body.scrap .door .task{background:#FFE88F;color:#1B1340}
 .picmore summary{cursor:pointer;font-weight:800;margin-top:4px}.picup{cursor:pointer}
 
 .scn-hdr{zoom:1!important}
+#homeFloat{position:fixed;z-index:9999;display:flex;align-items:center;gap:6px;background:#fff;color:#1B1340;border:3px solid #1B1340;border-radius:999px;padding:7px 16px;font:800 17px Nunito,sans-serif;box-shadow:3px 3px 0 #1B1340;cursor:pointer}
 
 /* v2.5 Reset */
 .rz{position:fixed;inset:0;z-index:50;color:#1B1340;display:flex;flex-direction:column;padding:18px max(24px,env(safe-area-inset-right)) 24px max(24px,env(safe-area-inset-left));box-sizing:border-box;background:repeating-conic-gradient(from 0deg at 50% 55%,#3FC1C9 0 9deg,#5FD0D6 9deg 18deg);font-family:var(--body)}
@@ -1698,7 +1699,7 @@ document.addEventListener('click',e=>{
   if(t.dataset.act) return act(t.dataset.act,t);
 });
 document.addEventListener('keydown',e=>{ if(e.target.closest('input,textarea,select')||$('#sheetHost').innerHTML) return; const k=e.key.toLowerCase();
-  if(k==='a') attention(); else if(k==='r') resetRoom(); else if(k==='d') openOverlay('door'); else if(k==='l') openOverlay('late'); else if(k==='escape'){ if(A.attnClose) A.attnClose(); else if(A.overlay) closeOverlay(); }
+  if(k==='a') attention(); else if(k==='r') resetRoom(); else if(k==='d') openOverlay('door'); else if(k==='l') openOverlay('late'); else if(k==='escape'){ goHome(); }
   else if(k==='arrowright'){ const P=A.P; if(A.overlay==='manualRoutine') act('mrNext'); else if(P&&P.phase==='routine'){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)+1; render(false); } }
   else if(k==='arrowleft'){ const P=A.P; if(A.overlay==='manualRoutine') act('mrBack'); else if(P&&P.phase==='routine'){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)-1; render(false); } } });
 document.addEventListener('dblclick',e=>{ const li=e.target.closest('.steps li'); if(!li) return; const P=A.P; if(P&&P.phase==='routine'&&!A.overlay){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)+1; render(false); } });
@@ -2072,7 +2073,7 @@ document.addEventListener('input',e=>{ if(e.target.id==='cpName'){ S.room=e.targ
 document.addEventListener('change',e=>{ if(e.target.id==='cpName'){ A.phaseKey=''; render(true); } });
 
 /* ---- v1.2.1: one Home button that always works ---- */
-function goHome(){ try{ if(typeof TOUR!=='undefined'&&TOUR) endTour(); }catch(_){} try{ if(A.attnClose) A.attnClose(); }catch(_){}
+function goHome(){ try{ if(typeof TOUR!=='undefined'&&TOUR) endTour(); }catch(_){} try{ if(A.attnClose) A.attnClose(); }catch(_){} try{ if(typeof RZ!=='undefined'&&RZ.on) rzEnd(); }catch(_){} try{ if(typeof rmkClose==='function'&&document.getElementById('rmkHost')) rmkClose(); }catch(_){}
   ['classpop','segpop','dmenu'].forEach(id=>{ const el=document.getElementById(id); if(el) el.remove(); });
   const sh=document.getElementById('sheetHost'); if(sh&&sh.innerHTML) closeSetup();
   A.seatEdit=false; A.jobEdit=false; A.seatSel=null; A.qz=null; A.th=null;
@@ -3608,6 +3609,13 @@ addEventListener('resize',scRelayout); if(document.fonts&&document.fonts.ready) 
 function scSetupHTML(){ return '<h3>Screen designs</h3><label class="chk"><input type="checkbox" data-scon '+(S.scenes===false?'':'checked')+'><span>Bright designs and pictures on each screen</span></label>'; }
 document.addEventListener('change',e=>{ const t=e.target; if(!t.matches||!t.matches('[data-scon]')) return; S.scenes=t.checked; save(); render(true); });
 
+document.addEventListener('click',e=>{ if(e.target.closest('[data-atnhome]')) goHome(); });
+/* Home always reachable: shows over full-screen layers (Attention, routine builder). Reset has its own Home. */
+{ const hf=document.createElement('button'); hf.type='button'; hf.id='homeFloat'; hf.hidden=true; hf.innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/></svg>Home'; hf.setAttribute('aria-label','Home');
+  document.body.appendChild(hf); hf.addEventListener('click',()=>{ audio&&audio(); goHome(); hf.hidden=true; });
+  const upd=()=>{ const on=!STUDENT&&!REMOTE&&!!document.querySelector('#overlayHost .attn, #rmkHost, #sheetHost .sheet'); if(on){ const b=document.getElementById('homeBtn'), r=b&&b.getBoundingClientRect(); hf.style.left=Math.max(10,r&&r.width?r.left:16)+'px'; hf.style.top=Math.max(10,r&&r.height?r.top:16)+'px'; } if(hf.hidden===on) hf.hidden=!on; };
+  new MutationObserver(upd).observe(document.body,{childList:true,subtree:false}); ['overlayHost','sheetHost'].forEach(id=>{ const oh=document.getElementById(id); if(oh) new MutationObserver(upd).observe(oh,{childList:true}); }); }
+
 /* ---- v2.5: the floating window shows the actual screen (live copy you can tap), or mini Roomie ---- */
 A.pipView=A.pipView||'screen';
 const PIP2_CSS='[hidden]{display:none!important}#pscr{position:fixed;inset:0 0 40px 0;overflow:hidden;background:var(--bg,#FFF6E0)}#pscr .pin{position:absolute;left:0;top:0;transform-origin:0 0}#pscr *{animation:none!important;transition:none!important}'+
@@ -3700,7 +3708,7 @@ function resetRoom(){ if(RZ.on){ rzEnd(); return; } if(A.attnClose) A.attnClose(
   RZ.on=true; RS.on=true; RZ.t0=Date.now(); RZ.step=0; RZ.stepT0=RZ.t0; RZ.last=-1; RZ.secs=0;
   const yc=$('#ytCard'); if(yc) yc.style.visibility='hidden'; if(typeof mirEvent==='function') mirEvent('att');
   const pic=(S.pics||{}).reset;
-  $('#overlayHost').innerHTML='<div class="rz" role="alertdialog" aria-label="Reset the room"><div class="rz-top"><div class="rz-steps">'+RZ_STEPS.map((s,i)=>'<span data-i="'+i+'"><b>'+(i+1)+'</b>'+s+'</span>').join('')+'</div><div class="rz-tc"><button type="button" data-rz="skip">Skip ahead</button><button type="button" data-rz="end">Back now</button></div></div><div class="rz-main" id="rzMain"></div>'+(pic?'<div class="rz-pic">'+picArtHTML(pic)+'</div>':'')+'</div>';
+  $('#overlayHost').innerHTML='<div class="rz" role="alertdialog" aria-label="Reset the room"><div class="rz-top"><div class="rz-steps">'+RZ_STEPS.map((s,i)=>'<span data-i="'+i+'"><b>'+(i+1)+'</b>'+s+'</span>').join('')+'</div><div class="rz-tc"><button type="button" data-rz="skip">Skip ahead</button><button type="button" data-rz="end">Back now</button><button type="button" data-rz="home">⌂ Home</button></div></div><div class="rz-main" id="rzMain"></div>'+(pic?'<div class="rz-pic">'+picArtHTML(pic)+'</div>':'')+'</div>';
   clearInterval(RZ.h); RZ.h=setInterval(rzDraw,100); rzDraw(); Bird.update(); pipRender(true); }
 function rzGo(step){ RZ.step=step; RZ.stepT0=Date.now(); RZ.last=-1; rzDraw(); }
 function rzDraw(){ if(!RZ.on) return; const m=document.getElementById('rzMain'); if(!m) return; const now=Date.now(), el=(now-RZ.stepT0)/1000;
@@ -3725,7 +3733,7 @@ function rzDraw(){ if(!RZ.on) return; const m=document.getElementById('rzMain');
     if(earn){ try{ act('point'); }catch(_){ } } else if(typeof ding==='function') ding(); } }
 function rzEnd(){ clearInterval(RZ.h); RZ.on=false; RS.on=false; $('#overlayHost').innerHTML=''; const yc=$('#ytCard'); if(yc) yc.style.visibility=''; if(RZ.was) Music.resume(); Focus.resume(); Bird.update(); pipRender(true); }
 function endReset(){ rzEnd(); }
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-rz]'); if(!b||!RZ.on) return; const a=b.dataset.rz;
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-rz]'); if(!b||!RZ.on) return; const a=b.dataset.rz; if(a==='home'){ rzEnd(); goHome(); return; }
   if(a==='end') rzEnd(); else if(a==='skip'){ if(RZ.step<2) rzGo(RZ.step+1); else if(RZ.step===2){ RZ.secs=Math.round((Date.now()-RZ.t0)/1000); rzGo(3); } else rzEnd(); }
   else if(a==='ready'){ RZ.secs=Math.round((Date.now()-RZ.t0)/1000); rzGo(3); } else if(a==='again'){ rzGo(0); } });
 
