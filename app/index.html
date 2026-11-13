@@ -907,8 +907,8 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 @media (min-width:600px){ .top{flex-wrap:nowrap} .top>*{flex-shrink:0} .top .date,.top #dateLabel{flex-shrink:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} }
 
 /* v2.4 screen designs */
-#stage .card.scene{position:relative;overflow:hidden;border:4px solid #1B1340;box-shadow:7px 7px 0 #1B1340}
-#stage.scened > .card:not(.scene),#stage.scened > .side > .card{border:3px solid #1B1340;box-shadow:5px 5px 0 #1B1340}
+.stage .card.scene{position:relative;overflow:hidden;border:4px solid #1B1340;box-shadow:7px 7px 0 #1B1340}
+.stage.scened > .card:not(.scene),.stage.scened > .side > .card{border:3px solid #1B1340;box-shadow:5px 5px 0 #1B1340}
 .card.scene > :not(.scn-band):not(.scn-art){position:relative;z-index:1}
 .scn-band{position:absolute;left:0;right:0;top:0;z-index:0;border-bottom:4px solid #1B1340;background-color:var(--b1)}
 .pat-dots{background:radial-gradient(var(--b2) 23%,transparent 24%) 0 0/36px 36px,radial-gradient(var(--b2) 23%,transparent 24%) 18px 18px/36px 36px,var(--b1)}
@@ -927,7 +927,7 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 .scn-art svg{display:block;width:100%;height:auto;animation:scnbob 4s ease-in-out infinite;filter:drop-shadow(3px 4px 0 rgba(27,19,64,.18))}
 .scn-art.pop{animation:scnpop .6s cubic-bezier(.2,1.6,.4,1) both}
 @keyframes scnpop{from{transform:scale(.3) rotate(-12deg);opacity:0}to{transform:none;opacity:1}}
-@keyframes scnbob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-5px) rotate(1.5deg)}}
+@keyframes scnbob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px)}}
 .attn.scn-attn{background:repeating-conic-gradient(from 0deg at 50% 40%,#FF8F6E 0 9deg,#FFB49C 9deg 18deg)}
 .scn-attn > svg,.scn-attn > b,.scn-attn > p{display:none}
 .atn-art{width:min(280px,36vw)} .atn-art svg{width:100%;display:block;animation:scnbob 3s ease-in-out infinite}
@@ -942,6 +942,74 @@ body.scrap .dacts .tool{font-size:21px;min-height:52px;padding:4px 16px}
 body.scrap .card.door{color:var(--ink,#2B2B2B)} body.scrap .card.door [style*="CDEBD9"]{color:#5A5550!important} body.scrap #doorLeft{color:var(--gum-d)!important}
 body.scrap .door .task{background:#FFE88F;color:#1B1340}
 .scn-band,.scn-art{zoom:1!important}
+.picframe{width:86%;margin-left:auto;aspect-ratio:160/140;display:grid;place-items:center;background:#fff;border:4px solid #1B1340;border-radius:18px;box-shadow:5px 5px 0 #1B1340;padding:8px;box-sizing:border-box;transform:rotate(2deg)}
+.picframe img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.atn-art .picframe{transform:rotate(-2deg)}
+#crestTop{height:42px;width:auto;max-width:90px;object-fit:contain;margin-right:8px;flex:none;border-radius:6px}
+.picrow{display:flex;gap:12px;align-items:center;padding:8px;border:1px solid #E5DCCB;border-radius:12px;background:#fff}
+.picthumb{width:88px;height:66px;flex:none;display:grid;place-items:center;background:#F6F1E6;border-radius:10px;overflow:hidden}
+.picthumb img{max-width:100%;max-height:100%}.picthumb span{font-size:12px;color:#8A8073}
+.picinfo{display:flex;flex-direction:column;gap:2px;min-width:0}.picinfo small{color:#8A8073;font-size:13px}
+.picgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:8px;margin-top:8px}
+.picmore summary{cursor:pointer;font-weight:800;margin-top:4px}.picup{cursor:pointer}
+
+.scn-hdr{zoom:1!important}
+
+/* v2.5 Reset */
+.rz{position:fixed;inset:0;z-index:50;color:#1B1340;display:flex;flex-direction:column;padding:18px max(24px,env(safe-area-inset-right)) 24px max(24px,env(safe-area-inset-left));box-sizing:border-box;background:repeating-conic-gradient(from 0deg at 50% 55%,#3FC1C9 0 9deg,#5FD0D6 9deg 18deg);font-family:var(--body)}
+.rz-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.rz-steps{display:flex;gap:8px;flex-wrap:wrap}
+.rz-steps span{display:flex;align-items:center;gap:8px;background:#ffffffaa;border:3px solid #1B1340;border-radius:99px;padding:5px 14px 5px 6px;font:400 20px 'Lilita One','Baloo 2',sans-serif;letter-spacing:.5px;opacity:.6}
+.rz-steps span b{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#fff;border:3px solid #1B1340;font-size:15px}
+.rz-steps span.cur{opacity:1;background:#FFD84D;box-shadow:4px 4px 0 #1B1340;transform:scale(1.08)}
+.rz-steps span.done{opacity:1;background:#6FD6A0}
+.rz-tc{display:flex;gap:8px}.rz-tc button{font:800 15px var(--body);border:3px solid #1B1340;border-radius:99px;background:#fff;color:#1B1340;padding:6px 14px;cursor:pointer}
+.rz-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center;min-height:0}
+.rz-t{font-family:'Lilita One','Baloo 2',sans-serif;font-weight:400;font-size:clamp(48px,7.5vw,112px);line-height:1.15;margin:0}
+.rz .pl{display:inline-block;background:var(--pc);color:#1B1340;border:5px solid #1B1340;border-radius:18px;padding:.02em .3em .08em;box-shadow:6px 6px 0 #1B1340;transform:rotate(var(--pr));margin:0 .03em .1em}
+.rz-count{font:400 clamp(150px,26vh,280px)/1 'Lilita One','Baloo 2',sans-serif;color:#fff;-webkit-text-stroke:10px #1B1340;paint-order:stroke fill;text-shadow:10px 10px 0 #1B1340;animation:rzpop .9s cubic-bezier(.2,1.6,.4,1)}
+@keyframes rzpop{0%{transform:scale(.4);opacity:0}30%{transform:scale(1.12);opacity:1}100%{transform:scale(1)}}
+.rz-cues{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.rz-cues span{background:#fff;border:4px solid #1B1340;border-radius:18px;box-shadow:5px 5px 0 #1B1340;padding:8px 20px;font:400 clamp(22px,2.6vw,36px) 'Lilita One','Baloo 2',sans-serif}
+.rz-roo{width:min(34vh,320px);aspect-ratio:1;display:grid;place-items:center;background:#fff;border:5px solid #1B1340;border-radius:50%;box-shadow:8px 8px 0 #1B1340}
+.rz-ball{width:72%;transition:transform 2s ease-in-out;transform:scale(.5)}.rz-ball svg{width:100%;height:auto;display:block}
+.rz-say{font:400 clamp(36px,5vw,72px)/1.1 'Lilita One','Baloo 2',sans-serif;color:#fff;-webkit-text-stroke:6px #1B1340;paint-order:stroke fill}
+.rz-sub{font-weight:800;font-size:clamp(16px,1.6vw,22px);background:#ffffffcc;border-radius:99px;padding:4px 16px}
+.rz-ready{display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+.rz-ready div{background:var(--c);border:5px solid #1B1340;border-radius:24px;box-shadow:7px 7px 0 #1B1340;padding:16px 26px;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:180px}
+.rz-ready i{font-style:normal;font-size:clamp(54px,7vw,90px);line-height:1}.rz-ready b{font:400 clamp(22px,2.4vw,34px) 'Lilita One','Baloo 2',sans-serif}
+.rz-goal{font-weight:800;font-size:clamp(18px,1.9vw,26px);background:#1B1340;color:#fff;border-radius:99px;padding:8px 22px}.rz-goal b{color:#FFD84D}
+.rz-btn{font:400 clamp(22px,2.4vw,32px) 'Lilita One','Baloo 2',sans-serif;border:5px solid #1B1340;border-radius:20px;box-shadow:6px 6px 0 #1B1340;background:#fff;color:#1B1340;padding:12px 30px;cursor:pointer}
+.rz-btn.gold{background:#FFD84D}.rz-btn.big{font-size:clamp(28px,3vw,42px);padding:14px 44px}
+.rz-btn:active,.rz-tc button:active{transform:translate(3px,3px);box-shadow:3px 3px 0 #1B1340}
+.rz-praise{font-weight:800;font-size:clamp(20px,2.2vw,30px);max-width:900px;margin:0;background:#fff;border:4px solid #1B1340;border-radius:20px;padding:12px 22px;box-shadow:5px 5px 0 #1B1340}
+.rz-next{background:#1B1340;color:#fff;border-radius:22px;padding:14px 26px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.rz-next small{letter-spacing:2px;font-weight:800;color:#FFD84D}.rz-next b{font:400 clamp(30px,3.6vw,52px) 'Lilita One','Baloo 2',sans-serif}
+.rz-next div{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}.rz-next span{background:#fff;color:#1B1340;border-radius:99px;padding:6px 16px;font-weight:800;font-size:clamp(16px,1.6vw,22px)}
+.rz-pic{position:absolute;right:28px;bottom:24px;width:min(200px,18vw)}
+@media (prefers-reduced-motion:reduce){.rz-count{animation:none}.rz-ball{transition:none}}
+@media (max-width:600px){.rz-steps span{font-size:15px}.rz-pic{display:none}}
+@media (max-width:600px){.rz{overflow:auto}.rz-main{justify-content:flex-start;padding-top:14px;gap:14px}.rz-t{font-size:40px}.rz-ready div{min-width:0;padding:10px 16px}.rz-tc{width:100%;justify-content:flex-end}}
+/* v2.5 make-your-own routine + My music */
+.rmk{position:fixed;inset:0;z-index:60;background:rgba(27,19,64,.55);display:grid;place-items:center;padding:16px}
+.rmk-in{background:#FFF8EC;border:4px solid #1B1340;border-radius:24px;box-shadow:8px 8px 0 #1B1340;width:min(980px,100%);max-height:calc(100vh - 32px);overflow:auto;padding:20px 22px;display:flex;flex-direction:column;gap:14px;color:#1B1340}
+.rmk-in h2{margin:0;font:400 32px 'Lilita One','Baloo 2',sans-serif}
+.rmk-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:18px}
+.rmk-col{display:flex;flex-direction:column;gap:10px;min-width:0}.rmk-col label{display:flex;flex-direction:column;gap:4px;font-weight:800}
+.rmk-col input,.rmk-col textarea,.rmk-add input{font:600 16px var(--body);border:2px solid #CFC3AE;border-radius:12px;padding:8px 10px;background:#fff;color:#1B1340}
+.rmk-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.rmk-opt{display:flex;align-items:center;gap:8px;text-align:left;border:3px solid #CFC3AE;border-radius:14px;background:#fff;padding:8px 10px;cursor:pointer;font:800 15px var(--body);color:#1B1340;min-width:0}
+.rmk-opt i{font-style:normal;font-size:20px;flex:none}.rmk-opt span{display:flex;flex-direction:column;min-width:0;overflow:hidden;text-overflow:ellipsis}.rmk-opt small{font-weight:700;color:#8A8073;font-size:12px}
+.rmk-opt.on{border-color:#1B1340;background:#FFD84D;box-shadow:3px 3px 0 #1B1340}
+.rmk-opt select{border:0;background:transparent;font:800 14px var(--body);color:#1B1340;min-width:0;width:100%}
+.rmk-add{display:flex;flex-direction:column;gap:8px;background:#fff;border:2px dashed #CFC3AE;border-radius:14px;padding:10px}
+.rmusic{display:block;color:#7A6F62;font-weight:700;font-size:13px;margin-top:2px}
+.mymusic{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:auto;padding-top:12px;border-top:2px dashed #E5DCCB}
+.mymusic > b{font-family:'Lilita One','Baloo 2',sans-serif;font-weight:400;font-size:20px;margin-right:4px}
+.mm{display:inline-flex;align-items:center;gap:6px;background:#fff;border:2px solid #1B1340;border-radius:99px;padding:3px 6px 3px 3px}
+.mm input{border:0;font:800 14px var(--body);width:140px;background:transparent;color:#1B1340}.mm small{color:#8A8073;font-weight:700;font-size:11px}
+.mm-play{width:30px;height:30px;border-radius:50%;border:0;background:#F06AA8;color:#fff;font-size:13px;cursor:pointer}.mm-x{border:0;background:transparent;font-size:18px;cursor:pointer;color:#8A8073}
+@media (max-width:700px){.rmk-grid{grid-template-columns:1fr}}
 
 </style>
 
@@ -1037,7 +1105,7 @@ body.scrap .door .task{background:#FFE88F;color:#1B1340}
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.4 · 13 Nov 2026';
+const VERSION='Roomie v2.5 · 13 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1660,7 +1728,7 @@ function renderSetup(){
     '</div></div><div class="row"><button class="btn alt sm" type="button" data-sact="addBlock">+ Add a block</button>'+(DAYNAME[editDay]?'<button class="btn sm" type="button" data-sact="copyAll">Copy '+DAYNAME[editDay]+' to every day</button>':'')+'<label class="chk" style="margin-left:auto"><input type="checkbox" id="autoStart" '+(S.autoStart?'checked':'')+'><span>Start routines by themselves<span class="hint" style="display:block">Off: Roomie waits for you to tap Start</span></span></label></div>'; }
   if(tab==='class'){ body='<div class="row"><div class="fld" style="flex:1;min-width:200px"><label for="fRoom">Class name</label><input id="fRoom" type="text" value="'+esc(S.room)+'"></div><div class="fld" style="flex:1;min-width:200px"><label for="fTeacher">What students call you</label><input id="fTeacher" type="text" value="'+esc(S.teacher)+'"></div></div><div class="fld"><label for="fStudents">Students: first names only, one per line</label><textarea id="fStudents" style="min-height:260px">'+esc(names().join('\n'))+'</textarea><span class="hint">For the name picker and groups. Same first name twice? Add an initial: “Ava B”. Never surnames or other details.</span><div id="nameWarn"></div></div><label class="chk"><input type="checkbox" id="fRead" '+(S.readAloud?'checked':'')+'><span>Read routine steps aloud<span class="hint" style="display:block">Helps pre-readers and students learning English</span></span></label>'; }
   if(tab==='routines'){ const r=routineById(editR)||S.routines[0]; editR=r&&r.id;
-    body='<div class="two"><div class="list">'+S.routines.map(x=>'<button type="button" data-er="'+esc(x.id)+'" aria-current="'+(x.id===editR)+'">'+esc(x.name)+'</button>').join('')+'<button type="button" data-sact="addR" style="background:transparent;border:2px dashed var(--line)">+ New routine</button></div>'+(r?'<div style="display:flex;flex-direction:column;gap:12px"><div class="fld"><label for="rName">Name</label><input id="rName" type="text" value="'+esc(r.name)+'"></div><div class="fld"><label for="rSteps">Steps, one per line (pictures are added automatically)</label><textarea id="rSteps">'+esc(r.steps)+'</textarea></div><div class="row" style="align-items:flex-end"><div class="fld" style="width:120px"><label for="rMin">Minutes</label><input id="rMin" type="number" min="1" max="30" value="'+esc(r.minutes)+'"></div><div class="fld" style="flex:1;min-width:220px"><label for="rSong">Music</label><select id="rSong">'+Object.entries(SONGS).map(([k,s])=>opt(k,s.title+' (Roomie original)',r.song)).join('')+opt('youtube','A YouTube video',r.song)+opt('own','My own audio file',r.song)+opt('none','No music',r.song)+'</select></div></div><div class="fld" id="ytWrap"'+(r.song==='youtube'?'':' hidden')+'><label for="rYt">YouTube link</label><input id="rYt" type="url" value="'+esc(r.yt||'')+'" placeholder="https://www.youtube.com/watch?v=..."><label for="rYtStart">Start at (minutes:seconds)</label><input id="rYtStart" type="text" value="'+esc(r.ytStart||'')+'" placeholder="0:45" style="max-width:140px"><span class="hint">Plays in a small panel in the corner while the routine runs, as YouTube requires. Ads may play first. Won’t play if your school blocks YouTube.</span></div><div class="fld" id="ownWrap"'+(r.song==='own'?'':' hidden')+'><label for="rFile">Your audio file</label><input id="rFile" type="file" accept="audio/*"><span class="hint" id="ownState">Stays in this browser only. Use music you own or have a licence for.</span></div><label class="chk"><input type="checkbox" id="rAuto" '+(r.auto!==false?'checked':'')+'><span>Steps move on by themselves<span class="hint" style="display:block">You can still skip with the right arrow key</span></span></label>'+(r.best?'<div class="okbox">Class best: '+fmtLeft(r.best)+' <button class="btn alt sm" type="button" data-sact="resetBest">Reset</button></div>':'')+'<div class="row"><button class="btn" type="button" data-sact="tryR">Try it now</button><button class="btn alt sm" type="button" data-sact="delR">Delete routine</button></div><div id="delMsg"></div></div>':'')+'</div>'; }
+    body='<div class="two"><div class="list">'+S.routines.map(x=>'<button type="button" data-er="'+esc(x.id)+'" aria-current="'+(x.id===editR)+'">'+esc(x.name)+'</button>').join('')+'<button type="button" data-sact="addR" style="background:transparent;border:2px dashed var(--line)">+ New routine</button></div>'+(r?'<div style="display:flex;flex-direction:column;gap:12px"><div class="fld"><label for="rName">Name</label><input id="rName" type="text" value="'+esc(r.name)+'"></div><div class="fld"><label for="rSteps">Steps, one per line (pictures are added automatically)</label><textarea id="rSteps">'+esc(r.steps)+'</textarea></div><div class="row" style="align-items:flex-end"><div class="fld" style="width:120px"><label for="rMin">Minutes</label><input id="rMin" type="number" min="1" max="30" value="'+esc(r.minutes)+'"></div><div class="fld" style="flex:1;min-width:220px"><label for="rSong">Music</label><select id="rSong">'+Object.entries(SONGS).map(([k,s])=>opt(k,s.title+' (Roomie original)',r.song)).join('')+(S.media||[]).map(m=>opt('m:'+m.id,m.title+' (My music)',r.song)).join('')+opt('youtube','A YouTube video',r.song)+opt('own','My own audio file',r.song)+opt('none','No music',r.song)+'</select></div></div><div class="fld" id="ytWrap"'+(r.song==='youtube'?'':' hidden')+'><label for="rYt">YouTube link</label><input id="rYt" type="url" value="'+esc(r.yt||'')+'" placeholder="https://www.youtube.com/watch?v=..."><label for="rYtStart">Start at (minutes:seconds)</label><input id="rYtStart" type="text" value="'+esc(r.ytStart||'')+'" placeholder="0:45" style="max-width:140px"><span class="hint">Plays in a small panel in the corner while the routine runs, as YouTube requires. Ads may play first. Won’t play if your school blocks YouTube.</span></div><div class="fld" id="ownWrap"'+(r.song==='own'?'':' hidden')+'><label for="rFile">Your audio file</label><input id="rFile" type="file" accept="audio/*"><span class="hint" id="ownState">Stays in this browser only. Use music you own or have a licence for.</span></div><label class="chk"><input type="checkbox" id="rAuto" '+(r.auto!==false?'checked':'')+'><span>Steps move on by themselves<span class="hint" style="display:block">You can still skip with the right arrow key</span></span></label>'+(r.best?'<div class="okbox">Class best: '+fmtLeft(r.best)+' <button class="btn alt sm" type="button" data-sact="resetBest">Reset</button></div>':'')+'<div class="row"><button class="btn" type="button" data-sact="tryR">Try it now</button><button class="btn alt sm" type="button" data-sact="delR">Delete routine</button></div><div id="delMsg"></div></div>':'')+'</div>'; }
   if(tab==='expect'){ body='<p class="hint" style="margin:0">Four short lines each. They show during the lesson and in the floating window.</p><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">'+Object.entries(S.expect).map(([k,e])=>'<div class="card sm" style="gap:8px"><input type="text" data-ek="'+k+'" data-ef="name" value="'+esc(e.name)+'" aria-label="Expectation set name" style="font-weight:800">'+e.items.map((it,i)=>'<input type="text" data-ek="'+k+'" data-ei="'+i+'" value="'+esc(it[1])+'" aria-label="Line '+(i+1)+'">').join('')+'</div>').join('')+'</div>'; }
   if(tab==='reminders'){ body='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">'+DAYS.map(k=>'<div class="fld"><label for="rem'+k+'">'+DAYNAME[k]+' reminder</label><input id="rem'+k+'" data-rem="'+k+'" type="text" value="'+esc(S.reminders[k]||'')+'" placeholder="e.g. Library today. Bring your book."></div>').join('')+'</div><p class="hint" style="margin:0">Shown at arrival on the day, and the day before at home time.</p><h3>Class goal</h3><div class="row"><div class="fld" style="flex:2;min-width:220px"><label for="gName">Working towards</label><input id="gName" type="text" value="'+esc(S.goal.name)+'"></div><div class="fld" style="width:120px"><label for="gT">Points needed</label><input id="gT" type="number" min="5" max="40" value="'+S.goal.target+'"></div><div class="fld" style="width:120px"><label for="gP">Points now</label><input id="gP" type="number" min="0" max="40" value="'+S.goal.points+'"></div></div><p class="hint" style="margin:0">Whole-class points only. Roomie never shows individual scores.</p>'+(typeof growSetupHTML==='function'?growSetupHTML():'')+''; }
   if(tab==='relief'){ body=reliefHTML()+'<div class="fld"><label for="reliefNotes">Notes for the relief teacher (no student names or health information)</label><textarea id="reliefNotes" placeholder="e.g. Lunch orders go to the office by 9:15. Buddy class is Room 9.">'+esc(S.reliefNotes||'')+'</textarea></div><div class="row"><button class="btn" type="button" data-sact="copyRelief">Copy as text</button><span class="hint">Paste it into an email or your relief folder.</span></div><div id="reliefMsg"></div>'; }
@@ -1668,7 +1736,7 @@ function renderSetup(){
     const RC=[['match','Match my colour',''],['pink','Pink','#FF8CC6'],['blue','Blue','#7EC3FF'],['green','Green','#7FDCA6'],['orange','Orange','#FFAA6E'],['purple','Purple','#B49BFF']];
     const LK=[['scrap','Scrapbook','#EFE6CC'],['grape','Grape soda','#7B5CFA'],['tomato','Tomato and navy','#FF6B4A'],['mint','Mint and bubblegum','#6EE7C5'],['bush','Bush (original)','#BFE8FA']];
     const sw=(attr,cur,list)=>'<div class="swatches">'+list.map(([k,l,c])=>'<button type="button" class="swatch" '+attr+'="'+k+'" aria-pressed="'+(cur===k)+'"><i style="background:'+(c||'conic-gradient(#E2558F,#3B82C4,#2E9466,#E8613F,#7457C9,#E2558F)')+'"></i><span>'+esc(l)+'</span></button>').join('')+'</div>';
-    body='<h3>Colour</h3>'+(S.theme==='scrap'?'':'<p class="hint" style="margin:0">Colours apply to the Scrapbook look.</p>')+sw('data-acc',S.accent||'pink',SW)+'<h3>Roomie’s colour</h3>'+sw('data-rc',S.roomieCol||'match',RC)+'<h3>Look</h3>'+sw('data-look',S.theme,LK)+'<h3>Today’s timetable</h3>'+sw('data-daypos',S.dayPos||'side',[['side','Down the side','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="9" height="28" rx="2" fill="#E2558F"/><rect x="16" y="6" width="20" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['top','Across the top','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="6" rx="2" fill="#E2558F"/><rect x="4" y="15" width="32" height="19" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['hide','Hidden','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover']])+'<p class="hint" style="margin:0">Changes show on the board straight away. Tap Done to see them.</p>'+(typeof dockSetupHTML==='function'?scSetupHTML()+dockSetupHTML():''); }
+    body='<h3>Colour</h3>'+(S.theme==='scrap'?'':'<p class="hint" style="margin:0">Colours apply to the Scrapbook look.</p>')+sw('data-acc',S.accent||'pink',SW)+'<h3>Roomie’s colour</h3>'+sw('data-rc',S.roomieCol||'match',RC)+'<h3>Look</h3>'+sw('data-look',S.theme,LK)+'<h3>Today’s timetable</h3>'+sw('data-daypos',S.dayPos||'side',[['side','Down the side','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="9" height="28" rx="2" fill="#E2558F"/><rect x="16" y="6" width="20" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['top','Across the top','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="6" rx="2" fill="#E2558F"/><rect x="4" y="15" width="32" height="19" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['hide','Hidden','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover']])+'<p class="hint" style="margin:0">Changes show on the board straight away. Tap Done to see them.</p>'+(typeof dockSetupHTML==='function'?picsSetupHTML()+scSetupHTML()+dockSetupHTML():''); }
   if(tab==='fun'){ body='<div class="row" style="align-items:flex-end"><div class="fld" style="width:220px"><label for="fFun">Fun level</label><select id="fFun">'+opt('calm','Calm: just the essentials',S.fun)+opt('lively','Lively (recommended)',S.fun)+opt('party','Party: everything on',S.fun)+'</select></div><button class="btn gold" type="button" data-sact="testFun">Test a celebration</button></div><label class="chk"><input type="checkbox" id="fMascot" '+(S.mascot!==false?'checked':'')+'><span>Show Roomie the mascot<span class="hint" style="display:block">Sings with the music, cheers for points, says hello at each change</span></span></label><label class="chk"><input type="checkbox" id="fSfx" '+(S.sfx!==false?'checked':'')+'><span>Celebration sounds<span class="hint" style="display:block">Fanfares, drumrolls and pops. The attention chime always plays.</span></span></label><p class="hint" style="margin:0">Fun comes in bursts: celebrations, races and reveals. During learning the board stays calm. If a computer is set to reduce motion, Roomie turns the animations off.</p><h3>Rotations</h3><div class="row" style="align-items:flex-start"><div class="fld" style="flex:1;min-width:240px"><label for="fStations">Stations, one per line (2 to 8)</label><textarea id="fStations" style="min-height:180px">'+esc(S.stations||'')+'</textarea></div><div class="fld" style="width:160px"><label for="fRotMin">Minutes at each</label><input id="fRotMin" type="number" min="2" max="40" value="'+(S.rotMin||12)+'"></div></div><p class="hint" style="margin:0">Roomie makes one crew per station from your class list. Crews move one station each round, with a 45-second move song.</p>'; }
   if(tab==='demo'){ const P=phaseAt(now()); body='<div class="okbox" style="font-size:16px">Try the whole day without waiting. The clock on the board jumps; nothing else changes.</div><div class="row"><button class="btn gold" type="button" data-sact="demoStart">Start the day at 8:40</button><button class="btn" type="button" data-sact="demoNext">Jump to 10 seconds before the next change</button><button class="btn alt" type="button" data-sact="demoReal">Back to the real time</button></div><p class="lead">Board time now: '+fmtClock(P.mins)+' · '+esc(P.phase)+(P.block?' · '+esc(P.block.name):'')+'</p>'; }
   if(tab==='coach'){ body=coachTab(); setTimeout(coachFillMics,0); }
@@ -1983,7 +2051,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDMenu(); });
 function fitApp(){ const a=document.getElementById('app'); if(!a) return;
   if(innerWidth<600){ a.style.zoom=''; a.style.width=''; a.style.height=''; document.body.classList.remove('fitted'); return; }
   const cs=getComputedStyle(document.body), pw=innerWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight); const z=Math.min(pw/1408,innerHeight/860); a.style.zoom=z; a.style.width=(pw/z)+'px'; a.style.height=(innerHeight/z)+'px'; document.body.classList.add('fitted'); fitCards(); }
-function fitBox(box,lo){ lo=lo||0.55; const kids=[...box.children]; kids.forEach(k=>k.style.zoom=''); if(box.scrollHeight<=box.clientHeight) return; let f=1;
+function fitBox(box,lo){ lo=lo||0.55; const sig=box.clientWidth+'x'+box.clientHeight+':'+box.children.length+':'+box.innerHTML.length; if(box._fitSig===sig) return; box._fitSig=sig; const kids=[...box.children].filter(k=>!k.classList.contains('scn-band')&&!k.classList.contains('scn-art')&&!k.classList.contains('scn-hdr')); kids.forEach(k=>k.style.zoom=''); if(box.scrollHeight<=box.clientHeight) return; let f=1;
   for(let i=0;i<4&&box.scrollHeight>box.clientHeight&&f>lo;i++){ f=Math.max(lo,f*Math.min(0.97,(box.clientHeight-6)/box.scrollHeight)); kids.forEach(k=>k.style.zoom=f); } }
 function fitCards(){ if(innerWidth<600) return; document.querySelectorAll('#stage .card').forEach(b=>fitBox(b)); const st=document.getElementById('strip'); if(st) fitBox(st,0.4); document.querySelectorAll('.sheet').forEach(b=>fitBox(b,0.66)); }
 let fitQ=0; const fitSoon=()=>{ cancelAnimationFrame(fitQ); fitQ=requestAnimationFrame(()=>requestAnimationFrame(fitCards)); };
@@ -3505,35 +3573,230 @@ function scenify(){ const st=document.getElementById('stage'); if(!st) return; c
   st.classList.toggle('scened',!!key); if(!key) { A.scKey=''; return; }
   const card=[...st.querySelectorAll(':scope > .card, :scope > section.card')].find(c=>c.querySelector('h1'))||st.querySelector(':scope > .card'); if(!card) return;
   const th=SC_THEME[key]||['dots','#FFD84D','#FFE88F'], fresh=A.scKey!==key; A.scKey=key;
-  card.classList.add('scene'); card.dataset.sk=key; card.style.setProperty('--b1',th[1]); card.style.setProperty('--b2',th[2]);
-  let band=card.querySelector(':scope > .scn-band'); if(!band){ band=document.createElement('div'); band.className='scn-band'; band.setAttribute('aria-hidden','true'); card.prepend(band); }
-  band.className='scn-band pat-'+th[0];
-  let art=card.querySelector(':scope > .scn-art'); const artFn=SC_ART[key]||SC_ART[{tpick:'ticket',thpick:'think',rpick:'reflect',exit:'ticket'}[key]];
-  if(artFn&&!art){ art=document.createElement('div'); art.className='scn-art'+(fresh?' pop':''); art.setAttribute('aria-hidden','true'); art.innerHTML='<svg viewBox="0 0 160 140"><g stroke="'+SCK+'" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">'+artFn()+'</g></svg>'; card.appendChild(art); }
-  const h=card.querySelector('h1'); if(h&&!h.id) scPlate(h,key);
-  scLayout(card,band,art,h);
+  const h=card.querySelector('h1');
+  if(card.dataset.sk!==key||!card.querySelector(':scope > .scn-band')){
+    card.classList.add('scene'); card.dataset.sk=key; card.style.setProperty('--b1',th[1]); card.style.setProperty('--b2',th[2]);
+    const band=document.createElement('div'); band.className='scn-band pat-'+th[0]; band.setAttribute('aria-hidden','true'); card.prepend(band);
+    const artFn=SC_ART[key]||SC_ART[{tpick:'ticket',thpick:'think',rpick:'reflect',exit:'ticket'}[key]];
+    const pic=typeof picFor==='function'?picFor(key):null;
+    if(pic||artFn){ const art=document.createElement('div'); art.className='scn-art'+(fresh?' pop':''); art.setAttribute('aria-hidden','true'); art.innerHTML=pic?picArtHTML(pic):'<svg viewBox="0 0 160 140"><g stroke="'+SCK+'" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">'+artFn()+'</g></svg>'; card.appendChild(art); }
+    delete card.dataset.ssig; }
+  if(h&&!h.id) scPlate(h,key);
+  const sig=innerWidth+'x'+innerHeight+'|'+(h?h.textContent.length:0);
+  if(card.dataset.ssig!==sig){ card.dataset.ssig=sig; scLayout(card,card.querySelector(':scope > .scn-band'),card.querySelector(':scope > .scn-art'),h); }
   if(fresh) setTimeout(scRelayout,350);
   if(fresh&&A.overlay==='brain'&&S.fun!=='calm'&&typeof burst==='function'){ const w=SC_WORD[A.brain&&A.brain.id]; if(w) burst(w); } }
 function scLayout(card,band,art,h){ const cr=card.getBoundingClientRect(); if(!cr.width) return;
   const hdr=(h?[...card.children].find(c=>c===h||c.contains(h)):null)||[...card.children].find(c=>!c.classList.contains('scn-band')&&!c.classList.contains('scn-art'));
+  if(hdr&&!hdr.classList.contains('scn-hdr')){ hdr.classList.add('scn-hdr'); hdr.style.zoom=''; }
   if(!hdr){ band.style.height='0'; if(art) art.style.display='none'; return; }
   const tg=card.querySelector('.tgrid'), dense=(tg&&tg.children.length>8)||(parseFloat(getComputedStyle(hdr).zoom)||1)<0.98;
   const aw=art?(dense?100:Math.round(Math.max(100,Math.min(180,cr.width*0.2)))):0; card.style.setProperty('--aw',dense?'0px':aw+'px');
-  hdr.style.marginBottom=''; if(art){ art.style.display=''; art.style.left=''; }
+  if(art){ art.style.display=''; art.style.left=''; }
   const hb=hdr.getBoundingClientRect().bottom-cr.top; let rb=4, bl=cr.width;
   card.querySelectorAll('button,input,select,.eyebrow').forEach(x=>{ const r=x.getBoundingClientRect(); if(!r.width||r.top-cr.top>=hb) return; if(r.right>cr.right-aw-70) rb=Math.max(rb,r.bottom-cr.top); if(r.left>cr.left+cr.width*0.4) bl=Math.min(bl,r.left-cr.left); });
   const top=dense?8:rb+10, need=art?top+aw*0.875*0.92:0, extra=Math.max(dense?18:26,need-hb+12);
-  const hz=parseFloat(getComputedStyle(hdr).zoom)||1; hdr.style.marginBottom=Math.round(extra/hz)+'px'; band.style.height=Math.round(hb+extra-12)+'px';
+  const hz=parseFloat(getComputedStyle(hdr).zoom)||1, mb=Math.round(extra/hz)+'px'; if(hdr.style.marginBottom!==mb) hdr.style.marginBottom=mb; band.style.height=Math.round(hb+extra-12)+'px';
   if(art){ art.style.width=aw+'px'; art.style.top=Math.round(top)+'px'; if(dense) art.style.left=Math.round(bl-aw-34)+'px'; } }
 { const f=render; render=function(){ const r=f.apply(this,arguments); try{ scenify(); }catch(e){ console.warn(e); } return r; }; }
 function scRelayout(){ const c=document.querySelector('#stage > .card.scene'); if(c) scLayout(c,c.querySelector(':scope > .scn-band'),c.querySelector(':scope > .scn-art'),c.querySelector('h1')); }
 addEventListener('resize',scRelayout); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(scRelayout);
 /* attention: full-screen design */
 { const f=attention; attention=function(){ const r=f.apply(this,arguments); const a=document.querySelector('#overlayHost .attn'); if(a&&!a.querySelector('.atn-art')&&!STUDENT&&S.scenes!==false){ a.classList.add('scn-attn');
-    a.insertAdjacentHTML('afterbegin','<div class="atn-art" aria-hidden="true"><svg viewBox="0 0 160 140"><g stroke="'+SCK+'" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">'+SC_ART.attention()+'</g></svg></div><h2 class="atn-t"><span class="pl" style="--pc:#FFD84D;--pr:-2deg">Eyes</span> <span class="pl" style="--pc:#fff;--pr:1.5deg">this</span> <span class="pl" style="--pc:#7EC3FF;--pr:-1deg">way!</span></h2><div class="atn-steps"><span style="--pc:#FF8CC6"><b>1</b>Stop</span><span style="--pc:#FFD84D"><b>2</b>Look</span><span style="--pc:#6FD6A0"><b>3</b>Listen</span></div>'); }
+    a.insertAdjacentHTML('afterbegin','<div class="atn-art" aria-hidden="true">'+((S.pics||{}).attention?picArtHTML(S.pics.attention):'<svg viewBox="0 0 160 140"><g stroke="'+SCK+'" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">'+SC_ART.attention()+'</g></svg>')+'</div><h2 class="atn-t"><span class="pl" style="--pc:#FFD84D;--pr:-2deg">Eyes</span> <span class="pl" style="--pc:#fff;--pr:1.5deg">this</span> <span class="pl" style="--pc:#7EC3FF;--pr:-1deg">way!</span></h2><div class="atn-steps"><span style="--pc:#FF8CC6"><b>1</b>Stop</span><span style="--pc:#FFD84D"><b>2</b>Look</span><span style="--pc:#6FD6A0"><b>3</b>Listen</span></div>'); }
   return r; }; }
 function scSetupHTML(){ return '<h3>Screen designs</h3><label class="chk"><input type="checkbox" data-scon '+(S.scenes===false?'':'checked')+'><span>Bright designs and pictures on each screen</span></label>'; }
 document.addEventListener('change',e=>{ const t=e.target; if(!t.matches||!t.matches('[data-scon]')) return; S.scenes=t.checked; save(); render(true); });
+
+/* ---- v2.5: the floating window shows the actual screen (live copy you can tap), or mini Roomie ---- */
+A.pipView=A.pipView||'screen';
+const PIP2_CSS='[hidden]{display:none!important}#pscr{position:fixed;inset:0 0 40px 0;overflow:hidden;background:var(--bg,#FFF6E0)}#pscr .pin{position:absolute;left:0;top:0;transform-origin:0 0}#pscr *{animation:none!important;transition:none!important}'+
+ '#pscr .stage{display:grid!important}#pbar{position:fixed;left:0;right:0;bottom:0;height:40px;display:flex;gap:6px;align-items:center;justify-content:space-between;padding:0 8px;background:#1B1340;box-sizing:border-box;font-family:Nunito,system-ui,sans-serif}'+
+ '#pbar button{font:800 12px Nunito,system-ui,sans-serif;white-space:nowrap;border:0;border-radius:99px;padding:6px 10px;cursor:pointer;background:#fff;color:#1B1340}#pbar button.a{background:#F2785C;color:#fff}#pbar span{display:flex;gap:6px}#pbar button[data-pv=mirend]{background:#FFD84D}#pbar .t{white-space:nowrap;color:#fff;font:800 14px Nunito,system-ui,sans-serif}';
+function pipScreenSetup(){ const d=A.pipDoc; if(!d||d.getElementById('pscrCSS')) return;
+  const c=d.createElement('style'); c.id='pscrCSS'; c.textContent=PIP2_CSS; d.head.appendChild(c);
+  d.addEventListener('click',e=>{ const b=e.target.closest('#pbar [data-pv]'); if(!b) return; e.stopPropagation(); const v=b.dataset.pv;
+    if(v==='mini'){ A.pipView='mini'; A.pipBig=false; try{ A.pip.resizeTo(210,240); }catch(_){} }
+    else if(v==='mirend'){ mirStop(); } else if(v==='mirmark'){ mirMarkPart('toggle'); } else if(v==='attention') attention(); else if(v==='point') act('point');
+    A.pipSig=''; pipRender(true); }, true); }
+function pipFrame(){ const d=A.pipDoc; let box=d.getElementById('pscr');
+  if(!box){ box=d.createElement('div'); box.id='pscr'; d.body.appendChild(box); const bar=d.createElement('div'); bar.id='pbar'; d.body.appendChild(bar);
+    const f=d.createElement('iframe'); f.id='pfr'; f.style.cssText='position:absolute;left:0;top:0;border:0;transform-origin:0 0;background:transparent'; box.appendChild(f);
+    const fd=f.contentDocument; fd.open(); fd.write('<!doctype html><html><head><meta charset="utf-8"></head><body></body></html>'); fd.close();
+    document.querySelectorAll('link[rel="stylesheet"],style').forEach(s=>{ if(s.tagName==='STYLE'&&/file:\/\//.test(s.textContent)) return; fd.head.appendChild(fd.importNode(s,true)); });
+    const x=fd.createElement('style'); x.textContent='html,body{margin:0;padding:0!important;overflow:hidden;background:transparent!important}*{animation:none!important;transition:none!important}.stage{height:100%!important}'; fd.head.appendChild(x);
+    fd.addEventListener('click',e=>{ const t=e.target.closest('[data-pi]'); if(!t) return; const path=t.dataset.pi.split('.').map(Number); let n=document.getElementById('stage'); for(const i of path){ n=n&&n.children[i]; } if(n){ n.click(); setTimeout(()=>pipRender(true),60); } }); }
+  return box; }
+function pipScreen(){ const d=A.pipDoc, st=document.getElementById('stage'); if(!d||!st) return;
+  pipScreenSetup(); const root=d.getElementById('pip'); if(root) root.style.display='none';
+  const box=pipFrame(); box.hidden=false; const bar=d.getElementById('pbar'); bar.hidden=false;
+  const P=A.P||{}, left=P.to?fmtLeft((P.to-P.mins)*60):'', mir=typeof M!=='undefined'&&M.on;
+  const barH='<span class="t">'+(mir?'● Mirror':esc(left))+'</span><span>'+(mir?(()=>{ const gg=M.goal&&(((S.coach||{}).goals||[]).find(x=>x.id===M.goal)), g=gg&&focusOf(gg); return (g&&g.part?'<button data-pv="mirmark">'+(M.inPart?'End ':'Mark ')+esc(g.part)+'</button>':'')+'<button data-pv="mirend">End lesson</button>'; })():'')+'<button class="a" data-pv="attention">Attention</button>'+(mir?'':'<button data-pv="point">+1 point</button>')+'<button data-pv="mini" title="Shrink to a tiny Roomie">Mini</button></span>';
+  if(bar.dataset.h!==barH){ bar.innerHTML=barH; bar.dataset.h=barH; }
+  const f=d.getElementById('pfr'), fd=f.contentDocument; if(!fd||!fd.body) return;
+  const cl=st.cloneNode(true); cl.querySelectorAll('[id]').forEach(x=>x.removeAttribute('id'));
+  cl.querySelectorAll('iframe,video,audio,canvas').forEach(x=>{ const ph=document.createElement('div'); ph.style.cssText='display:grid;place-items:center;background:#1B1340;color:#fff;border-radius:12px;min-height:80px;font:800 16px Nunito,sans-serif'; ph.textContent='▶ Playing on the main screen'; x.replaceWith(ph); });
+  const tag=(src,dst,path)=>{ [...src.children].forEach((c,i)=>{ const p=path?path+'.'+i:String(i); const dc=dst.children[i]; if(!dc) return; if(c.matches('button,a,[role="button"],[data-act],[data-tool],[data-run],[data-brain]')) dc.setAttribute('data-pi',p); tag(c,dc,p); }); };
+  tag(st,cl,'');
+  const az=parseFloat((document.getElementById('app')||{style:{}}).style.zoom)||1, r=st.getBoundingClientRect(), w=Math.round(r.width/az), h=Math.round(r.height/az);
+  const html='<div class="stage '+esc(st.className.replace(/\bstage\b/,''))+'" style="width:'+w+'px;height:'+h+'px">'+cl.innerHTML+'</div>';
+  fd.body.className=document.body.className; fd.documentElement.setAttribute('style',document.documentElement.getAttribute('style')||'');
+  if(!fd.head.querySelector('link[data-pf]')) document.querySelectorAll('link[rel="stylesheet"]').forEach(l=>{ const c=fd.createElement('link'); c.rel='stylesheet'; c.href=l.href; c.dataset.pf='1'; fd.head.appendChild(c); });
+  if(f.dataset.h!==html){ fd.body.innerHTML=html; f.dataset.h=html; const lay=()=>{ const c=fd.querySelector('.card.scene'); if(c&&typeof scLayout==='function') try{ scLayout(c,c.querySelector(':scope > .scn-band'),c.querySelector(':scope > .scn-art'),c.querySelector('h1')); }catch(_){ } }; lay(); if(fd.fonts&&fd.fonts.ready) fd.fonts.ready.then(lay); }
+  const W=d.documentElement.clientWidth, H=d.documentElement.clientHeight-40, k=Math.min(W/w,H/h);
+  f.style.width=w+'px'; f.style.height=h+'px'; f.style.transform='scale('+k+')'; f.style.left=Math.max(0,Math.round((W-w*k)/2))+'px'; }
+function pipHideScreen(){ const d=A.pipDoc; if(!d) return; const b=d.getElementById('pscr'), bar=d.getElementById('pbar'), r=d.getElementById('pip'); if(b) b.hidden=true; if(bar) bar.hidden=true; if(r) r.style.display=''; }
+{ const f=pipRender; pipRender=function(force){ if(A.pipDoc&&A.pipView==='screen'&&!A.attnClose){ try{ pipScreen(); }catch(e){ console.warn(e); } return; } pipHideScreen(); return f.apply(this,arguments); }; }
+{ const f=floatOpen; floatOpen=async function(){ const was=!!A.pip; const r=await f.apply(this,arguments); if(!was&&A.pip){ A.pipView='screen'; try{ A.pip.resizeTo(560,380); }catch(_){} A.pip.addEventListener('resize',()=>pipRender(true)); pipRender(true);
+    A.pipDoc.addEventListener('click',e=>{ if(!e.target.closest('[data-pact="expand"]')) return; e.stopPropagation(); A.pipView='screen'; try{ A.pip.resizeTo(560,380); }catch(_){} A.pipSig=''; pipRender(true); },true); } return r; }; }
+/* keep the copy live: re-copy when the screen changes */
+{ let q=0; const mo=new MutationObserver(()=>{ if(!A.pipDoc||A.pipView!=='screen') return; cancelAnimationFrame(q); q=requestAnimationFrame(()=>pipRender(true)); }); const st=document.getElementById('stage'); if(st) mo.observe(st,{subtree:true,childList:true,characterData:true,attributes:true}); }
+
+/* ---- v2.5: Your own pictures. Teachers upload a school crest/logo and pictures for any screen. Stored in this browser only. ---- */
+const PIC_SLOTS=[['crest','School crest or logo','Shows on the welcome screen and, if you like, next to your class name on every screen.'],
+ ['arrival','Welcome screen (Good morning)',''],['brainpick','Brain breaks list',''],['brain','Every brain break',''],['routines','Routines list',''],
+ ['packup','Pack up',''],['endofday','End of day',''],['timer','Timer',''],['checkin','Feelings check-in',''],['ticket','Exit and entry tickets',''],
+ ['lesson','Lessons',''],['brk','Recess and lunch',''],['attention','Attention',''],['door','At the door',''],['reset','Reset','']];
+const PIC_MAX=260000, PIC_TOTAL=1600000;
+function picFor(key){ const P=S.pics||{}; if(!key) return null; if(P[key]) return P[key];
+  if(A.overlay==='brain'&&P.brain) return P.brain; if((key==='tpick'||key==='exit')&&P.ticket) return P.ticket; if(key==='arrival'&&P.crest) return P.crest; return null; }
+function picsTotal(){ return Object.values(S.pics||{}).reduce((a,v)=>a+(v||'').length,0); }
+function picResize(file){ return new Promise((res,rej)=>{ if(!/^image\//.test(file.type)) return rej('That file isn’t a picture.'); const u=URL.createObjectURL(file), im=new Image();
+  im.onload=()=>{ URL.revokeObjectURL(u); let out=null; for(const max of [520,400,300]){ const k=Math.min(1,max/Math.max(im.width,im.height)), c=document.createElement('canvas'); c.width=Math.max(1,Math.round(im.width*k)); c.height=Math.max(1,Math.round(im.height*k)); c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+      for(const q of [0.86,0.72]){ let d=c.toDataURL('image/webp',q); if(!/^data:image\/webp/.test(d)) d=c.toDataURL('image/png'); if(d.length>PIC_MAX) d=c.toDataURL('image/jpeg',q); if(d.length<=PIC_MAX){ out=d; break; } } if(out) break; }
+    out?res(out):rej('That picture is too big. Try a smaller one.'); };
+  im.onerror=()=>{ URL.revokeObjectURL(u); rej('Roomie couldn’t open that picture. Try a PNG or JPG.'); }; im.src=u; }); }
+function picsSetupHTML(){ const P=S.pics||{}, used=Math.round(picsTotal()/PIC_TOTAL*100);
+  const row=([k,label,hint])=>'<div class="picrow"><div class="picthumb">'+(P[k]?'<img src="'+P[k]+'" alt="">':'<span>No picture</span>')+'</div><div class="picinfo"><b>'+esc(label)+'</b>'+(hint?'<small>'+esc(hint)+'</small>':'')+'<div class="row" style="gap:6px;margin-top:4px"><label class="btn alt sm picup">'+(P[k]?'Change':'Upload')+'<input type="file" accept="image/*" data-picup="'+k+'" hidden></label>'+(P[k]?'<button class="btn alt sm" type="button" data-picdel="'+k+'">Remove</button>':'')+'</div></div></div>';
+  return '<h3>Your pictures</h3><p class="hint" style="margin:0">Add your school crest or your own pictures. They replace Roomie’s picture on that screen. Pictures stay in this browser on this computer (they also travel with “Move my Roomie”).</p>'+
+   row(PIC_SLOTS[0])+'<label class="chk"><input type="checkbox" data-crestall '+(S.crestAll?'checked':'')+'><span>Show my crest next to the class name on every screen</span></label>'+
+   '<details class="picmore"'+(Object.keys(P).some(k=>k!=='crest')?' open':'')+'><summary>Pictures for other screens</summary><div class="picgrid">'+PIC_SLOTS.slice(1).map(row).join('')+'</div></details>'+
+   (used>0?'<p class="hint" style="margin:0">Picture space used: '+used+'%</p>':''); }
+document.addEventListener('change',async e=>{ const t=e.target; if(t.matches&&t.matches('[data-crestall]')){ S.crestAll=t.checked; save(); picTop(); return; }
+  if(!t.matches||!t.matches('[data-picup]')||!t.files||!t.files[0]) return; const k=t.dataset.picup;
+  try{ const d=await picResize(t.files[0]); const P=Object.assign({},S.pics||{}); const was=(P[k]||'').length; if(picsTotal()-was+d.length>PIC_TOTAL){ toast('Picture space is full. Remove a picture first.'); return; }
+    P[k]=d; S.pics=P; save(); try{ const back=JSON.parse(localStorage.getItem('bellbird.v2')||'{}'); if(!back.pics||back.pics[k]!==d) throw 0; }catch(_){ delete P[k]; S.pics=P; save(); toast('This browser is out of space for pictures. Try a smaller one.'); renderSetup(); return; }
+    toast('Picture added.'); renderSetup(); scRefresh(); picTop(); }catch(err){ toast(typeof err==='string'?err:'Roomie couldn’t use that picture.'); } });
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-picdel]'); if(!b) return; const P=Object.assign({},S.pics||{}); delete P[b.dataset.picdel]; S.pics=P; save(); renderSetup(); scRefresh(); picTop(); });
+function scRefresh(){ document.querySelectorAll('#stage > .card.scene').forEach(c=>{ c.querySelectorAll(':scope > .scn-band,:scope > .scn-art').forEach(x=>x.remove()); delete c.dataset.sk; }); try{ scenify(); }catch(_){ } }
+function picTop(){ const r=document.getElementById('roomLabel'); let i=document.getElementById('crestTop'); const P=S.pics||{};
+  if(!r||STUDENT||!S.crestAll||!P.crest){ if(i) i.remove(); return; } if(!i){ i=document.createElement('img'); i.id='crestTop'; i.alt=''; r.parentNode.insertBefore(i,r); } if(i.src!==P.crest) i.src=P.crest; }
+function picArtHTML(src){ return '<div class="picframe"><img src="'+src+'" alt=""></div>'; }
+picTop();
+{ const f=render; render=function(){ const r=f.apply(this,arguments); try{ picTop(); }catch(_){ } return r; }; }
+
+/* ---- v2.5: The Reset. Stop → Breathe → Check → Go.
+   Evidence: a consistent attention signal and countdown (Kounin 1970; Simonsen et al. 2008),
+   cyclic "physiological sigh" breathing lowers arousal fast (Balban et al. 2023, Cell Reports Medicine),
+   a clear, positively stated "what to do" (Simonsen et al. 2008), a group goal with a class reward
+   (Good Behavior Game: Embry 2002; Flower et al. 2014) and behaviour-specific praise (Caldarella et al. 2020). ---- */
+const RZ_GOAL=40;
+const RZ={on:false,step:0,t0:0,stepT0:0,h:0,was:false,secs:0,last:-1,auto:0};
+const RZ_STEPS=['STOP','BREATHE','CHECK','GO'];
+const RZ_BREATH=[['Sniff in',1.6,1],['Sniff a bit more',1,1.15],['Looooong breath out',5.4,.5]];
+const RZ_PRAISE=['You froze fast and got calm. That’s a real reset.','Every voice off, every eye up. Brilliant.','Calm bodies, ready minds. Thank you.','That was quick and calm. Let’s keep it going.'];
+function rzExpect(){ const P=A.P||{}, b=P.block; const e=b&&S.expect&&S.expect[b.exp]; return { what:A.overlay?'Back to what we were doing':(b?b.name:'Back to it'), items:e?e.items.slice(0,3).map(x=>x[1]):['Voice level 1','Eyes on your work','Stay in your space'] }; }
+function resetRoom(){ if(RZ.on){ rzEnd(); return; } if(A.attnClose) A.attnClose(); RZ.was=Music.playing&&!Music.paused; if(RZ.was) Music.pause(); Focus.pause();
+  RZ.on=true; RS.on=true; RZ.t0=Date.now(); RZ.step=0; RZ.stepT0=RZ.t0; RZ.last=-1; RZ.secs=0;
+  const yc=$('#ytCard'); if(yc) yc.style.visibility='hidden'; if(typeof mirEvent==='function') mirEvent('att');
+  const pic=(S.pics||{}).reset;
+  $('#overlayHost').innerHTML='<div class="rz" role="alertdialog" aria-label="Reset the room"><div class="rz-top"><div class="rz-steps">'+RZ_STEPS.map((s,i)=>'<span data-i="'+i+'"><b>'+(i+1)+'</b>'+s+'</span>').join('')+'</div><div class="rz-tc"><button type="button" data-rz="skip">Skip ahead</button><button type="button" data-rz="end">Back now</button></div></div><div class="rz-main" id="rzMain"></div>'+(pic?'<div class="rz-pic">'+picArtHTML(pic)+'</div>':'')+'</div>';
+  clearInterval(RZ.h); RZ.h=setInterval(rzDraw,100); rzDraw(); Bird.update(); pipRender(true); }
+function rzGo(step){ RZ.step=step; RZ.stepT0=Date.now(); RZ.last=-1; rzDraw(); }
+function rzDraw(){ if(!RZ.on) return; const m=document.getElementById('rzMain'); if(!m) return; const now=Date.now(), el=(now-RZ.stepT0)/1000;
+  document.querySelectorAll('.rz-steps span').forEach(s=>{ const i=+s.dataset.i; s.className=i<RZ.step?'done':(i===RZ.step?'cur':''); });
+  if(RZ.step===0){ const n=Math.max(1,5-Math.floor(el)); if(el>=5) return rzGo(1);
+    if(RZ.last!==n){ RZ.last=n; if(n===5) chime(1); else if(typeof tick1==='function') tick1();
+      m.className='rz-main rz-stop'; m.innerHTML='<h1 class="rz-t"><span class="pl" style="--pc:#FF6B6B;--pr:-3deg">STOP!</span></h1><div class="rz-count" aria-live="assertive">'+n+'</div><div class="rz-cues"><span>✋ Hands still</span><span>👀 Eyes here</span><span>🤐 Voice off</span></div>'; } return; }
+  if(RZ.step===1){ const cyc=RZ_BREATH.reduce((a,x)=>a+x[1],0), tot=cyc*2; if(el>=tot) return rzGo(2);
+    const c=Math.floor(el/cyc), t=el-c*cyc; let acc=0, ph=0; for(let i=0;i<RZ_BREATH.length;i++){ if(t<acc+RZ_BREATH[i][1]){ ph=i; break; } acc+=RZ_BREATH[i][1]; }
+    const key=c*10+ph; if(RZ.last!==key){ RZ.last=key; const [txt,dur,sc]=RZ_BREATH[ph];
+      if(!m.querySelector('.rz-roo')){ m.className='rz-main rz-breathe'; m.innerHTML='<h1 class="rz-t"><span class="pl" style="--pc:#7EC3FF;--pr:-2deg">Breathe</span> <span class="pl" style="--pc:#fff;--pr:2deg">with</span> <span class="pl" style="--pc:#FF8CC6;--pr:-1deg">Roomie</span></h1><div class="rz-roo"><div class="rz-ball" id="rzBall">'+birdSVG()+'</div></div><div class="rz-say" id="rzSay"></div><div class="rz-sub" id="rzSub"></div>'; }
+      const ball=document.getElementById('rzBall'); if(ball){ ball.style.transitionDuration=dur+'s'; ball.style.transform='scale('+sc+')'; }
+      document.getElementById('rzSay').textContent=txt; document.getElementById('rzSub').textContent='Breath '+(c+1)+' of 2 · in through your nose, out through your mouth'; } return; }
+  if(RZ.step===2){ const left=Math.max(0,Math.round(RZ_GOAL-(now-RZ.t0)/1000));
+    if(RZ.last!==2){ RZ.last=2; chime(1); m.className='rz-main rz-check'; m.innerHTML='<h1 class="rz-t"><span class="pl" style="--pc:#6FD6A0;--pr:-2deg">Show</span> <span class="pl" style="--pc:#FFD84D;--pr:1.5deg">me</span> <span class="pl" style="--pc:#fff;--pr:-1deg">ready!</span></h1><div class="rz-ready"><div style="--c:#FF8CC6"><i>🤐</i><b>Voice 0</b></div><div style="--c:#7EC3FF"><i>👀</i><b>Eyes on the teacher</b></div><div style="--c:#FFD84D"><i>🙌</i><b>Hands and body still</b></div></div><div class="rz-goal" id="rzGoal"></div><div class="row" style="justify-content:center;gap:14px"><button class="rz-btn gold" type="button" data-rz="ready">We’re ready!</button><button class="rz-btn" type="button" data-rz="again">Not yet, again</button></div>'; }
+    const g=document.getElementById('rzGoal'); if(g) g.innerHTML=left>0?'Ready in <b>'+left+'</b> seconds = <b>+1 class point</b>':'Still worth getting ready. Take your time.'; return; }
+  if(RZ.step===3&&RZ.last!==3){ RZ.last=3; const secs=RZ.secs, best=S.resetBest||0, rec=secs<=RZ_GOAL&&(!best||secs<best), earn=secs<=RZ_GOAL, E=rzExpect();
+    if(rec){ S.resetBest=secs; save(); }
+    m.className='rz-main rz-go'; m.innerHTML='<h1 class="rz-t"><span class="pl" style="--pc:#FFD84D;--pr:-2deg">'+(rec?'New':'Nailed')+'</span> <span class="pl" style="--pc:#FF8CC6;--pr:1.5deg">'+(rec?'record!':'it!')+'</span></h1>'+
+     '<p class="rz-praise">'+esc(RZ_PRAISE[Math.floor(Math.random()*RZ_PRAISE.length)])+' Reset in <b>'+secs+' seconds</b>'+(best&&!rec?' (best: '+best+' s)':'')+'.'+(earn?' <b>+1 class point!</b>':'')+'</p>'+
+     '<div class="rz-next"><small>NOW</small><b>'+esc(E.what)+'</b><div>'+E.items.map(t=>'<span>'+esc(t)+'</span>').join('')+'</div></div><button class="rz-btn gold big" type="button" data-rz="end">Back to it</button>';
+    if(earn){ try{ act('point'); }catch(_){ } } else if(typeof ding==='function') ding(); } }
+function rzEnd(){ clearInterval(RZ.h); RZ.on=false; RS.on=false; $('#overlayHost').innerHTML=''; const yc=$('#ytCard'); if(yc) yc.style.visibility=''; if(RZ.was) Music.resume(); Focus.resume(); Bird.update(); pipRender(true); }
+function endReset(){ rzEnd(); }
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-rz]'); if(!b||!RZ.on) return; const a=b.dataset.rz;
+  if(a==='end') rzEnd(); else if(a==='skip'){ if(RZ.step<2) rzGo(RZ.step+1); else if(RZ.step===2){ RZ.secs=Math.round((Date.now()-RZ.t0)/1000); rzGo(3); } else rzEnd(); }
+  else if(a==='ready'){ RZ.secs=Math.round((Date.now()-RZ.t0)/1000); rzGo(3); } else if(a==='again'){ rzGo(0); } });
+
+/* ---- v2.5: My music & videos + make your own routine, right from the Routines screen ---- */
+async function idbDelK(k){ try{ const d=await idb(); await new Promise(res=>{ const t=d.transaction('files','readwrite'); t.objectStore('files').delete(k); t.oncomplete=res; t.onerror=res; }); }catch(_){ } }
+function mediaList(){ return S.media||(S.media=[]); }
+function mediaById(id){ return mediaList().find(m=>m.id===id); }
+function mediaLabel(m){ return m.kind==='yt'?'YouTube':(m.video?'My video':'My song'); }
+function songLabel(r){ const k=r.song||''; if(k.startsWith('m:')){ const m=mediaById(k.slice(2)); return m?m.title:'Missing song'; } if(k==='youtube') return 'YouTube video'; if(k==='own') return 'My own song'; if(k==='none') return 'No music'; return (SONGS[k]||{}).title||''; }
+/* playback for library items */
+{ const orig=Music.play.bind(Music), ostop=Music.stop.bind(Music);
+  Music.play=async function(key,rid){ if(!(key&&String(key).startsWith('m:'))) return orig(key,rid);
+    const m=mediaById(key.slice(2)); this.stop(); if(!m){ return orig('tidy',rid); } const a=audio(); if(!a) return;
+    if(m.kind==='yt'){ this.isYT=true; this.playing=true; this.paused=false; this.title=m.title; YT_.play({id:'m'+m.id,yt:m.yt,ytStart:m.ytStart}); updateNowPlaying(); return; }
+    const blob=await idbGet('media-'+m.id).catch(()=>null); if(!blob){ toast('Roomie couldn’t find “'+m.title+'” in this browser. Add it again in My music.'); return orig('tidy',rid); }
+    const url=URL.createObjectURL(blob); let el;
+    if(m.video){ el=document.createElement('video'); el.src=url; el.playsInline=true; el.controls=true; el.style.cssText='width:100%;border-radius:12px;background:#000;max-height:200px';
+      $('#ytHost').innerHTML=''; $('#ytHost').appendChild(el); $('#ytLink').removeAttribute('href'); $('#ytLink').textContent=''; $('#ytMsg').textContent=m.title; YT_.card(true); this.isVid=true; }
+    else el=new Audio(url);
+    el.loop=true; el.volume=musicVol; this.fileAudio=el; el.play().catch(()=>{}); this.playing=true; this.paused=false; this.title=m.title; updateNowPlaying(); };
+  Music.stop=function(){ const v=this.isVid; ostop(); if(v){ this.isVid=false; $('#ytHost').innerHTML=''; $('#ytLink').textContent='Open on YouTube'; YT_.card(false); } }; }
+/* the builder */
+let RMK={id:null};
+function rmkOpen(id){ RMK={id:id||null}; rmkDraw(); }
+function rmkClose(){ const h=document.getElementById('rmkHost'); if(h) h.remove(); if(A.overlay==='routines') render(true); }
+function rmkDraw(){ const r=RMK.id?routineById(RMK.id):null; let h=document.getElementById('rmkHost'); if(!h){ h=document.createElement('div'); h.id='rmkHost'; document.body.appendChild(h); }
+  const cur=r?r.song:'switch', lib=mediaList();
+  const songOpts=Object.entries(SONGS).map(([k,s])=>'<option value="'+k+'"'+(cur===k?' selected':'')+'>'+esc(s.title)+' (Roomie original)</option>').join('');
+  h.innerHTML='<div class="rmk" role="dialog" aria-label="Make a routine"><div class="rmk-in"><div class="row" style="justify-content:space-between;align-items:center"><h2>'+(r?'Edit routine':'Make your own routine')+'</h2><button class="btn alt sm" type="button" data-rmk="close">Close</button></div>'+
+   '<div class="rmk-grid"><div class="rmk-col"><label>Name<input id="rmkName" type="text" maxlength="40" value="'+esc(r?r.name:'')+'" placeholder="e.g. Library bags, Morning mindfulness"></label>'+
+   '<label>Steps, one per line<textarea id="rmkSteps" rows="6" placeholder="Bags on hooks&#10;Library book in your hands&#10;Line up at the door">'+esc(r?r.steps:'')+'</textarea></label>'+
+   '<label style="max-width:140px">Minutes<input id="rmkMin" type="number" min="1" max="30" value="'+(r?r.minutes:3)+'"></label></div>'+
+   '<div class="rmk-col"><b>Music or video</b><div class="rmk-pick" id="rmkPick">'+
+    lib.map(m=>'<button type="button" class="rmk-opt'+(cur==='m:'+m.id?' on':'')+'" data-rmsong="m:'+m.id+'"><i>'+(m.kind==='yt'?'▶':m.video?'🎬':'♪')+'</i><span>'+esc(m.title)+'<small>'+mediaLabel(m)+'</small></span></button>').join('')+
+    '<button type="button" class="rmk-opt'+(cur==='none'?' on':'')+'" data-rmsong="none"><i>🔇</i><span>No music</span></button>'+
+    '<label class="rmk-opt rmk-roomie'+(SONGS[cur]?' on':'')+'"><i>🎵</i><select id="rmkRoomie">'+songOpts+'</select></label></div>'+
+   '<div class="rmk-add"><b>Add to My music & videos</b><div class="row" style="gap:6px"><input id="rmkYt" type="url" placeholder="Paste a YouTube link" style="flex:1;min-width:180px"><input id="rmkYtStart" type="text" placeholder="Start 0:45" style="width:96px"><button class="btn sm" type="button" data-rmk="addyt">Add</button></div>'+
+   '<div class="row" style="gap:6px;align-items:center"><label class="btn alt sm" style="cursor:pointer">Upload an MP3 or video<input id="rmkFile" type="file" accept="audio/*,video/*" hidden></label><span class="hint" id="rmkMsg">Saved in this browser. Use music you own or have a licence for.</span></div></div></div></div>'+
+   '<div class="row" style="justify-content:flex-end;gap:8px">'+(r?'<button class="btn alt" type="button" data-rmk="del">Delete</button>':'')+'<button class="btn alt" type="button" data-rmk="save">Save</button><button class="btn gold" type="button" data-rmk="run">Save and run it now</button></div></div></div>';
+  h.dataset.song=cur; }
+function rmkSong(){ const h=document.getElementById('rmkHost'); return h?h.dataset.song:'switch'; }
+function rmkSetSong(k){ const h=document.getElementById('rmkHost'); if(!h) return; h.dataset.song=k; h.querySelectorAll('.rmk-opt').forEach(b=>b.classList.toggle('on',b.dataset.rmsong===k||(b.classList.contains('rmk-roomie')&&!!SONGS[k]))); }
+function rmkSave(){ const name=($('#rmkName').value||'').trim(), steps=($('#rmkSteps').value||'').trim(); if(!name){ toast('Give your routine a name.'); $('#rmkName').focus(); return null; } if(!steps){ toast('Add at least one step.'); $('#rmkSteps').focus(); return null; }
+  let r=RMK.id?routineById(RMK.id):null; if(!r){ r={id:uid(),auto:true}; S.routines.push(r); RMK.id=r.id; }
+  r.name=name; r.steps=steps; r.minutes=Math.max(1,Math.min(30,parseInt($('#rmkMin').value,10)||3)); r.song=rmkSong(); save(); return r; }
+async function rmkAddMedia(item,blob){ if(blob){ try{ await idbPut('media-'+item.id,blob); }catch(_){ toast('This browser blocked saving the file. Try Chrome.'); return; } }
+  mediaList().push(item); save(); const keep={name:$('#rmkName').value,steps:$('#rmkSteps').value,min:$('#rmkMin').value}; const rid=RMK.id;
+  rmkDraw(); $('#rmkName').value=keep.name; $('#rmkSteps').value=keep.steps; $('#rmkMin').value=keep.min; RMK.id=rid; rmkSetSong('m:'+item.id); toast('Added “'+item.title+'” to My music.'); }
+document.addEventListener('click',async e=>{ const s=e.target.closest('[data-rmsong]'); if(s){ rmkSetSong(s.dataset.rmsong); return; }
+  const b=e.target.closest('[data-rmk]'); if(!b) return; const a=b.dataset.rmk;
+  if(a==='close'){ rmkClose(); return; }
+  if(a==='save'||a==='run'){ const r=rmkSave(); if(!r) return; rmkClose(); if(a==='run'){ runRoutine(r.id); } else toast('Saved “'+r.name+'”.'); return; }
+  if(a==='del'){ if(b.dataset.sure!=='1'){ b.dataset.sure='1'; b.textContent='Tap again to delete'; return; } S.routines=S.routines.filter(x=>x.id!==RMK.id); save(); rmkClose(); toast('Routine deleted.'); return; }
+  if(a==='addyt'){ const u=$('#rmkYt').value.trim(), v=YT_.parse(u); if(!v){ toast('That doesn’t look like a YouTube link.'); return; }
+    await rmkAddMedia({id:uid(),kind:'yt',yt:u,ytStart:$('#rmkYtStart').value.trim(),title:'YouTube '+(mediaList().filter(m=>m.kind==='yt').length+1)}); return; } });
+document.addEventListener('change',async e=>{ const t=e.target;
+  if(t.id==='rmkRoomie'){ rmkSetSong(t.value); return; }
+  if(t.id==='rmkFile'&&t.files&&t.files[0]){ const f=t.files[0]; if(f.size>60*1024*1024){ $('#rmkMsg').textContent='That file is over 60 MB. Choose a shorter one.'; return; }
+    await rmkAddMedia({id:uid(),kind:'file',video:/^video\//.test(f.type),title:f.name.replace(/\.[a-z0-9]+$/i,'').slice(0,40)},f); } });
+/* rename library items inline, and the library on the Routines screen */
+function myMusicHTML(){ const lib=mediaList(); return '<div class="mymusic"><b>My music & videos</b>'+(lib.length?lib.map(m=>{ const on=Music.playing&&Music.title===m.title; return '<span class="mm"><button type="button" class="mm-play" data-mmplay="'+m.id+'" aria-label="'+(on?'Stop':'Play')+' '+esc(m.title)+'">'+(on?'■':'▶')+'</button><input type="text" value="'+esc(m.title)+'" data-mmname="'+m.id+'" aria-label="Name"><small>'+mediaLabel(m)+'</small><button type="button" class="mm-x" data-mmdel="'+m.id+'" aria-label="Remove '+esc(m.title)+'">×</button></span>'; }).join(''):'<span class="hint">Add a YouTube link or your own MP3 or video once, then use it for any routine.</span>')+'<button type="button" class="btn alt sm" data-rmk="open-new">+ Add music</button></div>'; }
+document.addEventListener('click',e=>{ const p=e.target.closest('[data-mmplay]'); if(p){ audio(); const m=mediaById(p.dataset.mmplay); if(Music.playing&&m&&Music.title===m.title) Music.fadeStop(); else Music.play('m:'+p.dataset.mmplay); setTimeout(()=>{ if(A.overlay==='routines') render(true); },120); return; }
+  const d=e.target.closest('[data-mmdel]'); if(d){ if(d.dataset.sure!=='1'){ d.dataset.sure='1'; d.textContent='Remove?'; return; } const id=d.dataset.mmdel; S.media=mediaList().filter(m=>m.id!==id); S.routines.forEach(r=>{ if(r.song==='m:'+id) r.song='switch'; }); save(); idbDelK('media-'+id); render(true); return; }
+  const o=e.target.closest('[data-rmk="open-new"],[data-rmkopen]'); if(o){ rmkOpen(o.dataset.rmkopen||null); } });
+document.addEventListener('change',e=>{ const t=e.target; if(t.dataset&&t.dataset.mmname){ const m=mediaById(t.dataset.mmname); if(m){ m.title=(t.value.trim()||m.title).slice(0,40); save(); } } });
+/* put the buttons on the Routines screen */
+{ const f=render; render=function(full){ const r=f.apply(this,arguments); try{ if(A.overlay==='routines'){ const st=document.getElementById('stage'), card=st&&st.querySelector(':scope > .card');
+      if(card&&!card.querySelector('.rmk-new')){ const row=card.querySelector('.row'); const nb=document.createElement('button'); nb.type='button'; nb.className='btn gold rmk-new'; nb.dataset.rmkopen=''; nb.textContent='+ Make my own routine'; const bk=row&&row.lastElementChild; if(bk) bk.before(nb);
+        card.querySelectorAll('.rbtn').forEach(rb=>{ const run=rb.querySelector('[data-run]'); if(!run) return; const id=run.dataset.run, R=routineById(id); const ed=document.createElement('button'); ed.type='button'; ed.className='btn alt sm'; ed.dataset.rmkopen=id; ed.textContent='Edit'; run.parentNode.appendChild(ed);
+          if(R){ const m=document.createElement('small'); m.className='rmusic'; m.textContent='♪ '+songLabel(R); rb.insertBefore(m,run.parentNode); } });
+        card.insertAdjacentHTML('beforeend',myMusicHTML()); } } }catch(err){ console.warn(err); } return r; }; }
 
 /* ---- v1.1: welcome tour ---- */
 function tourSteps(){ const tools=S.mode==='tools', ex=S.studentsAreExample;
