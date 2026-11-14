@@ -1158,6 +1158,22 @@ body.ui-calm-look .mascot *,body.ui-calm-look .bigbird *,body.ui-calm-look .stk 
   .dmenu[data-for="more"]{grid-template-columns:1fr}
   .sheet .row>.fld{min-width:0!important;max-width:100%}
 }
+
+/* Searchable classroom tool finder. Keep its header and search visible while browsing. */
+.dmenu[data-for="more"]{display:flex;flex-direction:column;gap:8px;width:min(560px,calc(100vw - 24px));max-height:min(680px,calc(100dvh - 24px));overflow:hidden;padding:18px}
+.finder-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.finder-head h2{font-size:24px;margin:0}
+.finder-label{font-weight:700;font-size:14px}
+#toolSearch{box-sizing:border-box;width:100%;min-height:46px;padding:10px 12px;border:2px solid var(--edge,#aaa);border-radius:10px;background:#fff;color:#16302A;font:inherit;font-size:16px}
+#toolResultCount{margin:0;min-height:20px}
+#toolResults{overflow:auto;overscroll-behavior:contain;min-height:0}
+.tool-group h3{font-size:14px;margin:14px 0 8px}
+.tool-group:first-child h3{margin-top:0}
+.tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.dmenu .finder-tool{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px 12px;min-height:68px;white-space:normal;text-align:left}
+.finder-tool b{font:inherit;font-weight:800}
+.finder-tool span{font-family:var(--body,sans-serif);font-size:13px;font-weight:400;line-height:1.35}
+@media(max-width:599px){.tool-grid{grid-template-columns:1fr}.dmenu[data-for="more"]{padding:12px}}
 </style>
 
 <svg class="land" viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60 C 260 10 520 40 760 70 S 1200 100 1440 50 L1440 150 L0 150 Z" fill="#7CC79A" id="hill1"></path><path d="M0 110 C 300 80 600 105 900 120 S 1260 130 1440 100 L1440 150 L0 150 Z" fill="#2F8F6B"></path></svg>
@@ -1969,7 +1985,9 @@ document.addEventListener('click',e=>{
   const t=e.target.closest('button,[data-wx]'); if(!t) return;
   if(t.closest('#sheetHost')) return;
   const tool=t.dataset.tool;
-  if(tool){ audio();
+  if(tool){
+    if(t.closest('#dmenu[data-for="more"]')){ closeDMenu(); requestAnimationFrame(()=>{ const heading=document.querySelector('#stage h1,#stage h2'); if(heading){ heading.tabIndex=-1; heading.focus({preventScroll:true}); } }); }
+    audio();
     if(tool==='attention') return attention();
     if(tool==='float') return floatOpen();
     if(tool==='point') return act('point',t);
@@ -2359,7 +2377,7 @@ function openDMenu(btn){ const k=btn.dataset.menu, was=document.getElementById('
   const m=document.createElement('div'); m.id='dmenu'; m.className='dmenu'; m.dataset.for=k; m.setAttribute('role','menu');
   m.innerHTML=DMENUS[k].map(([t,l])=>'<button class="tool" type="button" role="menuitem" data-tool="'+t+'">'+esc(l||(A.pip?'Close floating window':'Float over my slides'))+'</button>').join('');
   document.body.appendChild(m); const r=btn.getBoundingClientRect(); m.style.left=Math.max(8,Math.min(r.left,innerWidth-m.offsetWidth-8))+'px'; m.style.bottom=(innerHeight-r.top+10)+'px'; btn.setAttribute('aria-expanded','true'); }
-document.addEventListener('click',e=>{ const mb=e.target.closest('[data-menu]'); if(mb){ openDMenu(mb); return; } if(document.getElementById('dmenu')) setTimeout(closeDMenu,0); });
+document.addEventListener('click',e=>{ const mb=e.target.closest('[data-menu]'); if(mb){ openDMenu(mb); return; } if(document.getElementById('dmenu')&&!e.target.closest('#dmenu')) setTimeout(closeDMenu,0); else if(e.target.closest('#dmenu [data-tool]')) setTimeout(closeDMenu,0); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDMenu(); });
 
 /* ---- v0.8.1: everything fits on screen, no scrollbars ---- */
@@ -4679,7 +4697,7 @@ applyDock=function(){
   const box=document.querySelector('#dock .dtools'); if(!box||STUDENT) return;
   const order=dockOrder(), visible=uiDockKeys(order,S.dockHide||[],S.dockPreset), br=box.querySelector('.dbreak');
   let more=box.querySelector('.more-tools');
-  if(!more){ more=document.createElement('button'); more.type='button'; more.className='tool more-tools'; more.dataset.menu='more'; more.textContent='More tools'; more.setAttribute('aria-haspopup','menu'); more.setAttribute('aria-expanded','false'); more.setAttribute('aria-controls','dmenu'); }
+  if(!more){ more=document.createElement('button'); more.type='button'; more.className='tool more-tools'; more.dataset.menu='more'; more.textContent='More tools'; more.setAttribute('aria-haspopup','dialog'); more.setAttribute('aria-expanded','false'); more.setAttribute('aria-controls','dmenu'); }
   const displayOrder=S.dockPreset==='simple'?[...UI_SIMPLE_DOCK,...order.filter(k=>!UI_SIMPLE_DOCK.includes(k))]:order;
   displayOrder.forEach(k=>{ const button=box.querySelector('.tool[data-tool="'+k+'"]'); if(button){ button.hidden=!visible.includes(k); box.appendChild(button); } });
   if(br){ const after=visible[Math.ceil(visible.length/2)-1], button=after&&box.querySelector('.tool[data-tool="'+after+'"]'); if(button&&visible.length>8) button.after(br); else box.appendChild(br); br.hidden=visible.length<=8; }
@@ -4696,17 +4714,77 @@ closeDMenu=function(){ const menu=document.getElementById('dmenu'), hadFocus=men
 openDMenu=function(button){
   const result=uiOpenDMenuBase.apply(this,arguments), menu=document.getElementById('dmenu'); if(!menu) return result;
   uiDMenuOpener=button;
+  if(button.dataset.menu==='more') uiBuildToolFinder(menu);
   const r=button.getBoundingClientRect(); menu.style.bottom='auto'; menu.style.top=Math.max(12,Math.min(r.top-menu.offsetHeight-10,innerHeight-menu.offsetHeight-12))+'px';
-  uiFocusFirst(menu);
+  uiFocusFirst(menu,button.dataset.menu==='more'?'#toolSearch':null);
   return result;
 };
 document.addEventListener('keydown',e=>{
   const menu=document.getElementById('dmenu'); if(!menu||!menu.contains(e.target)) return;
   if(e.key==='Escape'){ e.preventDefault(); e.stopImmediatePropagation(); closeDMenu(); return; }
+  if(menu.dataset.for==='more'){ uiToolFinderKey(e,menu); return; }
   const items=uiFocusables(menu), i=items.indexOf(document.activeElement);
   if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)&&items.length){ const n=e.key==='Home'?0:e.key==='End'?items.length-1:(i+(e.key==='ArrowDown'?1:-1)+items.length)%items.length; e.preventDefault(); e.stopImmediatePropagation(); items[n].focus(); }
   if(e.key==='Tab'){ closeDMenu(); }
 },true);
+
+/* TOOL_FINDER_START: shared catalogue and pure search are covered by navigation tests. */
+const UI_TOOL_GROUPS=[
+  ['Lesson tools',[
+    ['timer','Timer','Quick countdowns','countdown minutes seconds'],
+    ['exit','Tickets','Entry and exit prompts','entry exit ticket assessment'],
+    ['think','Thinking','Prompts for deeper thinking','thinking routines'],
+    ['reflect','Reflect','Pause and review learning','reflection review'],
+    ['quiz','Quiz games','Practise through play','quiz questions games'],
+    ['poll','Poll','Hear from the whole class','vote voting survey']]],
+  ['Class and groups',[
+    ['seats','Seating plan','Find everyone’s place','seats desk layout'],
+    ['pick','Pick a name','Give everyone a fair turn','random student name picker'],
+    ['groups','Groups','Make pairs or small groups','pairs teams random groups'],
+    ['rotate','Rotations','Run timed stations','stations rotation'],
+    ['jobs','Helpers','Manage classroom jobs','jobs classroom helpers'],
+    ['hero','Mystery Hero','Celebrate a secret star','reward mystery hero']]],
+  ['Routines and wellbeing',[
+    ['routines','Routines','Run or practise a routine','routine transitions'],
+    ['brain','Brain break','Move, play or reset','movement active break'],
+    ['calm','Calm breathing','Take a quiet minute','breathe breathing calm quiet'],
+    ['checkin','Check-in','See how everyone feels','feelings mood wellbeing check in'],
+    ['finish','Finished?','Ideas for early finishers','finished early finishers'],
+    ['packup','Pack up','Get ready to leave','pack up home time'],
+    ['reteach','Practise expectations','Revisit classroom expectations','behaviour behavior expectations']]]
+];
+function uiFindTools(query){
+  const words=String(query||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().split(/\s+/).filter(Boolean);
+  return UI_TOOL_GROUPS.map(([label,tools])=>[label,tools.filter(tool=>{
+    const text=tool.slice(1).join(' ').toLowerCase().replace(/[^a-z0-9]+/g,' ');
+    return words.every(word=>text.includes(word));
+  })]).filter(([,tools])=>tools.length);
+}
+/* TOOL_FINDER_END */
+function uiToolResults(menu,query){
+  const groups=uiFindTools(query), count=groups.reduce((n,[,tools])=>n+tools.length,0);
+  menu.querySelector('#toolResults').innerHTML=groups.map(([label,tools],i)=>'<section class="tool-group" aria-labelledby="toolGroup'+i+'"><h3 id="toolGroup'+i+'">'+esc(label)+'</h3><div class="tool-grid">'+tools.map(([key,label,detail])=>'<button class="tool finder-tool" type="button" data-tool="'+key+'"><b>'+esc(label)+'</b><span>'+esc(detail)+'</span></button>').join('')+'</div></section>').join('');
+  menu.querySelector('#toolResultCount').textContent=count?count+' tool'+(count===1?'':'s'):'No matching tools. Try “timer”, “seating” or “tickets”.';
+}
+function uiBuildToolFinder(menu){
+  closeClassPop();
+  menu.setAttribute('role','dialog'); menu.setAttribute('aria-label','Find a classroom tool');
+  menu.innerHTML='<div class="finder-head"><h2>Find a tool</h2><button type="button" class="btn alt sm" data-finder-close aria-label="Close tool finder">Close</button></div><label class="finder-label" for="toolSearch">Search tools</label><input id="toolSearch" type="search" placeholder="Try timer, seating or exit ticket" autocomplete="off" aria-controls="toolResults"><p id="toolResultCount" class="hint" role="status" aria-live="polite"></p><div id="toolResults"></div>';
+  uiToolResults(menu,'');
+}
+function uiToolFinderKey(e,menu){
+  if(e.key==='Tab') return; // Normal tab order through the non-modal finder.
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+    const items=[...menu.querySelectorAll('#toolResults [data-tool]')], i=items.indexOf(document.activeElement);
+    if(items.length){ e.preventDefault(); items[i<0?(e.key==='ArrowDown'?0:items.length-1):(i+(e.key==='ArrowDown'?1:-1)+items.length)%items.length].focus(); }
+  }else if(e.key==='Enter'&&e.target.id==='toolSearch'){
+    e.preventDefault(); const items=menu.querySelectorAll('#toolResults [data-tool]'); if(items.length===1) items[0].click(); else if(items.length) items[0].focus();
+  }
+  e.stopImmediatePropagation(); // Typing must not invoke classroom hotkeys.
+}
+document.addEventListener('input',e=>{ if(e.target.id==='toolSearch'){ const menu=e.target.closest('#dmenu'); if(menu) uiToolResults(menu,e.target.value); } });
+document.addEventListener('click',e=>{ if(e.target.closest('[data-finder-close]')) closeDMenu(); });
+document.addEventListener('focusin',e=>{ const menu=document.getElementById('dmenu'); if(menu&&menu.dataset.for==='more'&&!menu.contains(e.target)&&e.target!==uiDMenuOpener) closeDMenu(); });
 
 /* ================= Multiple classes: inactive snapshots, one active class ================= */
 /* PROFILE_MODEL_START: pure transitions are exercised by the profile regression tests. */

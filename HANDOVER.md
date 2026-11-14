@@ -70,3 +70,10 @@ Give the next assistant repository access separately.
 Ask it to open roomie-development and read CLAUDE.md, AGENTS.md, HANDOVER.md and ROADMAP.md.
 These tracked files provide continuity; prior chat messages are not required.
 If another assistant has pushed changes, inspect them before continuing and never overwrite them blindly.
+
+## Navigation improvement — 14 November 2026
+More tools now opens a searchable, non-modal finder covering 19 existing tools in three groups. Class tools and calm breathing are available alongside dock tools. Search matches teacher phrases, focuses on opening and supports arrows/Enter/Escape. Selecting a result moves focus to the destination heading. Existing custom dock settings and saved class schema are unchanged.
+
+Changed app/index.html; added tests/navigation.test.cjs and tests/navigation-preview.html (manual responsive QA frame).
+173 automated tests passed. Chrome checks verified search-to-tool, no results, Escape preserving a running timer, focus on destination, and panel bounds at 390px and 768px plus desktop inspection. No hosted migration or production deployment.
+Next: review teacher feedback on the finder, then walk through Setup navigation before choosing another change. The remaining secure-transfer staging/operational limitations above still apply.
