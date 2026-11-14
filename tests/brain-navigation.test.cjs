@@ -36,12 +36,12 @@ test('changing pace for the current background break preserves its prompt while 
  const h=controls();h.A.overlay='brainpick';h.click('[data-bpace]',{dataset:{bpace:'auto'}});assert.equal(h.A.callIdx,1);assert.ok(h.calls.includes('clear'));assert.ok(h.calls.includes('interval'));
  h.click('[data-bvoice]',{});assert.equal(h.S.brainVoice,false);assert.ok(h.calls.includes('cancel speech'));
 });
-test('browsing preserves the existing break, while Finish stops it and returns to the chooser',()=>{
+test('browsing preserves the existing break, while Finish delegates to the original teaching-screen return',()=>{
  const A={bcat:'game',overlay:'brain'},MT={left:75},calls=[];
- const c=vm.createContext({A,MT,openOverlay:key=>{A.overlay=key;calls.push(key);},navStopActivity:()=>{MT.left=0;calls.push('stop');},render(){},document:{querySelector:()=>null}});
+ const c=vm.createContext({A,MT,openOverlay:key=>{A.overlay=key;calls.push(key);},navStopActivity:()=>{MT.left=0;A.overlay='peek';calls.push('stop');},render(){},document:{querySelector:()=>null}});
  vm.runInContext(html.split('/* BRAIN_NAV_START */')[1].split('/* BRAIN_NAV_END */')[0],c);
  c.brainBrowse('calm');assert.equal(A.bcat,'calm');assert.equal(A.overlay,'brainpick');assert.equal(MT.left,75);
- c.brainFinish();assert.equal(MT.left,0);assert.equal(A.overlay,'brainpick');assert.deepEqual(calls,['brainpick','stop','brainpick']);
+ c.brainFinish();assert.equal(MT.left,0);assert.equal(A.overlay,'peek');assert.deepEqual(calls,['brainpick','stop']);
 });
 
 test('automatic freeze playback continues while browsing and cannot resume after its owner stops',()=>{
@@ -50,4 +50,11 @@ test('automatic freeze playback continues while browsing and cannot resume after
  vm.runInContext(cut('function freezeLoop(){','function renderBrain(full){'),c);
  c.freezeLoop();jobs.shift()();assert.deepEqual(events,['pause']);jobs.shift()();assert.deepEqual(events,['pause','resume']);
  NAV.owner=null;jobs.shift()();assert.deepEqual(events,['pause','resume']);
+});
+
+test('the final thinking Finish and reflection step use the teaching-screen return action',()=>{
+ const A={th:{id:'think',i:1},rf:{id:'reflect',i:1}},calls=[];
+ const c=vm.createContext({A,THINK:[],REFLECT:[{id:'reflect',steps:[[],[]]}],thinkR:()=>({steps:[[],[]]}),MT:{stop:()=>calls.push('timer stopped')},navStopActivity:()=>calls.push('return to lesson'),celebrate(){},render(){throw new Error('Finish must return rather than redraw a completion screen');}});
+ vm.runInContext(cut('function thNext(){','function renderThink('),c);c.thNext();assert.equal(A.th.done,true);assert.equal(calls.at(-1),'return to lesson');
+ vm.runInContext(cut('function reflectAct(',"document.addEventListener('click',e=>{ const t=e.target.closest('[data-rfstart]');"),c);c.reflectAct('rfNext');assert.equal(A.rf.done,true);assert.equal(calls.at(-1),'return to lesson');
 });

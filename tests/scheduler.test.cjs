@@ -295,10 +295,10 @@ test('production inline JavaScript remains syntactically valid', () => {
 });
 
 
-test('Back from the name picker returns to the running timer, then board without stopping it',()=>{
+test('Back from the name picker returns to the running timer, then the original scheduled screen without stopping it',()=>{
  const h=harness();h.openOverlay('timer');h.navStartTimer(300);h.openOverlay('pick');h.time(at(9,0,5));h.navBack();
  assert.equal(h.A.overlay,'timer');assert.equal(h.MT.running,true);assert.equal(h.MT.remaining(),290);
- h.navBack();assert.equal(h.A.overlay,null);assert.equal(h.MT.running,true);assert.equal(h.NAV.owner,'timer');
+ h.navBack();assert.equal(h.A.overlay,'peek');assert.equal(h.A.segX.b.id,'arrival-block');assert.equal(h.MT.running,true);assert.equal(h.NAV.owner,'timer');
 });
 test('Home preserves a routine step, timer and music and clears only navigation history',()=>{
  const h=harness();h.runRoutine('lineup');h.A.mr.step=1;h.context.goHome();
@@ -314,7 +314,7 @@ test('cancelled replacement cannot reset a countdown or start routine music',()=
 });
 test('accepted replacement starts the requested activity and clears the old return path',()=>{
  const h=harness(undefined,{confirm:true});h.openOverlay('timer');h.navStartTimer(300);h.openOverlay('routines');h.runRoutine('lineup');
- assert.equal(h.NAV.owner,'manualRoutine');assert.equal(h.A.overlay,'manualRoutine');assert.equal(h.MT.remaining(),120);assert.equal(h.context.Music.playing,true);assert.ok(!h.NAV.trail.includes('timer'));
+ assert.equal(h.NAV.owner,'manualRoutine');assert.equal(h.A.overlay,'manualRoutine');assert.equal(h.MT.remaining(),120);assert.equal(h.context.Music.playing,true);assert.ok(!h.NAV.trail.some(view=>view.key==='timer'));
 });
 test('restarting an existing timer requires confirmation and cancellation preserves its callback',()=>{
  const h=harness();h.openOverlay('timer');h.navStartTimer(300);const callback=h.MT.onDone;assert.equal(h.navStartTimer(60),false);assert.equal(h.MT.remaining(),300);assert.equal(h.MT.onDone,callback);
@@ -326,4 +326,34 @@ test('explicit Stop ends the background activity and removes stale return paths'
 test('stopping an unrelated screen cannot silently stop the background timer',()=>{
  const h=harness();h.openOverlay('timer');h.navStartTimer(300);h.openOverlay('quiz');h.act('stopActivity',{dataset:{stopScreen:'1'}});
  assert.equal(h.A.overlay,'timer');assert.equal(h.MT.remaining(),300);assert.equal(h.MT.running,true);
+});
+
+
+for(const [owner,chooser] of [['brain','brainpick'],['manualRoutine','routines'],['rotate','rotationSetup'],['ticket','tpick'],['think','thpick'],['reflect','rpick']]){
+ test(owner+' completion returns to the teaching lesson, skipping its chooser',()=>{
+  const h=harness(),lesson={st:540,en:600,b:{id:'english',name:'English',kind:'lesson'}};
+  h.A.segX=lesson;h.openOverlay('peek');h.openOverlay(chooser);assert.equal(h.navPrepareStart(owner),true);h.A.overlay=owner;h.MT.start(60);
+  h.A.segSelection={st:600,en:660,b:{id:'maths',name:'Maths'}};h.navStopActivity();
+  assert.equal(h.A.overlay,'peek');assert.equal(h.A.segX,lesson);assert.equal(h.MT.running,false);assert.equal(h.NAV.owner,null);assert.equal(h.NAV.origin,null);
+ });
+}
+test('replacement activities inherit the original teaching screen rather than the replaced activity',()=>{
+ const h=harness(undefined,{confirm:true}),lesson={st:540,en:600,b:{id:'english',name:'English'}};
+ h.A.segX=lesson;h.openOverlay('peek');h.openOverlay('timer');h.navStartTimer(300);h.openOverlay('brainpick');assert.equal(h.navPrepareStart('brain'),true);h.A.overlay='brain';h.MT.start(60);h.navStopActivity();assert.equal(h.A.overlay,'peek');assert.equal(h.A.segX,lesson);
+});
+test('a changed live timetable returns to the previous lesson as a preview without rewinding the clock',()=>{
+ const h=harness(at(9,10));h.openOverlay('timer');h.navStartTimer(300);h.time(at(10,5));h.navStopActivity();
+ assert.equal(h.A.overlay,'peek');assert.equal(h.A.segX.b.id,'literacy');assert.equal(h.A.returnedLesson,true);assert.equal(h.phaseAt(new h.context.Date()).block.id,'fitness');
+});
+test('finishing while the teacher has paused the timetable preserves that paused lesson',()=>{
+ const h=harness(at(9,10));h.pauseTimetable();h.openOverlay('timer');h.navStartTimer(300);h.time(at(10,5));h.navStopActivity();
+ assert.equal(h.SCHED.paused,true);assert.equal(h.A.overlay,null);assert.equal(h.A.P.block.id,'literacy');
+});
+test('Back restores the exact lesson preview even after browsing another lesson',()=>{
+ const h=harness(),english={b:{id:'english'}},maths={b:{id:'maths'}};
+ h.A.segX=english;h.openOverlay('peek');h.context.navRemember('peek');h.A.segX=maths;h.navBack();assert.equal(h.A.overlay,'peek');assert.equal(h.A.segX,english);
+});
+
+test('a teaching card that is not a chooser is a valid activity return point',()=>{
+ const h=harness();h.openOverlay('reteach');h.openOverlay('brainpick');h.navPrepareStart('brain');h.A.overlay='brain';h.MT.start(60);h.navStopActivity();assert.equal(h.A.overlay,'reteach');
 });

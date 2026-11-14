@@ -1748,9 +1748,20 @@ function paintBreath(){ if(bH) return; let i=0; const run=()=>{ const d=document
 /* ================= Overlays (teacher tools) ================= */
 function openOverlay(name,data){ if(A.overlay!==name) navRemember(A.overlay); A.overlay=name; Object.assign(A,data||{}); markTools(); markHero(); render(true); }
 function closeOverlay(){ if(NAV.owner==='brain'&&A.overlay==='brain') brainFinish(); else if(NAV.owner&&NAV.owner===A.overlay) navStopActivity(); else navBack(); }
-const NAV={trail:[],owner:null};
+const NAV={trail:[],owner:null,origin:null};
 const NAV_LABELS={timer:'timer',brain:'brain break',calm:'calm breathing',manualRoutine:'routine',practise:'routine practice',rotate:'rotations',ticket:'ticket',reflect:'reflection',think:'thinking activity',packup:'pack up',reteach:'expectation practice'};
-function navRemember(key){ if(NAV.trail[NAV.trail.length-1]!==key||!NAV.trail.length) NAV.trail.push(key||null); if(NAV.trail.length>20) NAV.trail.shift(); }
+const NAV_CHOOSERS=['brainpick','tpick','rpick','thpick','routines','rotationSetup'];
+function navCapture(key){ return {key:key||null,phase:!key?A.P:null,segX:key==='peek'?A.segX:null,returnedLesson:key==='peek'&&!!A.returnedLesson}; }
+function navRemember(key){
+  const view=navCapture(key), last=NAV.trail[NAV.trail.length-1];
+  if(!last||last.key!==view.key||(view.key==='peek'&&last.segX!==view.segX)) NAV.trail.push(view);
+  if(NAV.trail.length>20) NAV.trail.shift();
+}
+function navActivityOrigin(key){
+  if(NAV.origin) return NAV.origin;
+  const views=[navCapture(A.overlay),...NAV.trail.slice().reverse()];
+  return views.find(view=>view.key!==key&&!NAV_CHOOSERS.includes(view.key))||navCapture(null);
+}
 function navHasActivity(){
   if(!NAV.owner) return MT.total>0&&MT.remaining()>0;
   if(NAV.owner==='practise') return !!A.pr&&!A.pr.done;
@@ -1759,25 +1770,36 @@ function navHasActivity(){
   if(NAV.owner==='rotate') return !!A.rot&&A.rot.mode!=='done';
   return MT.total>0&&MT.remaining()>0;
 }
-function navShow(key){ A.overlay=key||null; markTools(); markHero(); A.phaseKey=''; tick(true); }
+function navShow(destination){
+  const view=destination&&typeof destination==='object'?destination:{key:destination||null};
+  A.returnedLesson=!!view.returnedLesson;
+  if(view.key==='peek'&&view.segX) A.segX=view.segX;
+  let key=view.key;
+  if(!key&&view.phase&&view.phase.block&&phaseSig(view.phase)!==phaseSig(scheduleDisplayPhase(phaseAt(now())))){
+    const previous=(view.phase.day||[]).find(item=>item.b.id===view.phase.block.id);
+    if(previous){ A.segX=previous; A.returnedLesson=true; key='peek'; }
+  }
+  A.overlay=key||null; markTools(); markHero(); A.phaseKey=''; tick(true);
+}
 function navBack(){ const previous=NAV.trail.length?NAV.trail.pop():null; navShow(previous); }
 function navBoard(){ NAV.trail=[]; navShow(null); }
 function navStopActivity(redraw){
-  const was=NAV.owner||A.overlay;
+  const was=NAV.owner||A.overlay, destination=NAV.origin;
   MT.stop(); clearActivity();
   if(was==='brain'&&typeof speechSynthesis!=='undefined') try{ speechSynthesis.cancel(); }catch(_){}
   if(['brain','calm','manualRoutine','practise','party','rotate','packup'].includes(was)) Music.fadeStop();
   if(was==='hero'&&A.heroStage==='shown') A.heroStage='';
-  NAV.owner=null; NAV.trail=[]; A.rot=null; A.overlay=null;
-  if(redraw!==false){ markTools(); markHero(); A.phaseKey=''; tick(true); }
+  NAV.owner=null; NAV.origin=null; NAV.trail=[]; A.rot=null; A.overlay=null;
+  if(redraw!==false) navShow(destination);
 }
 function navPrepareStart(key){
+  const destination=navActivityOrigin(key);
   if(navHasActivity()){
     const old=NAV_LABELS[NAV.owner]||'activity', next=NAV_LABELS[key]||'activity';
     if(typeof confirm!=='function'||!confirm('Stop the current '+old+' and start '+(key===NAV.owner?'a new '+next:next)+'? Choose Cancel to keep it running.')) return false;
     navStopActivity(false);
   }
-  if(A.overlay!==key) navRemember(A.overlay); NAV.owner=key; return true;
+  if(A.overlay!==key) navRemember(A.overlay); NAV.origin=destination; NAV.owner=key; return true;
 }
 function navStartTimer(seconds){ if(!navPrepareStart('timer')) return false; MT.stop(); MT.start(seconds,()=>{ chime(3); say('Time’s up.'); }); A.overlay='timer'; markTools(); render(true); return true; }
 function navControls(){
@@ -1790,7 +1812,7 @@ function navControls(){
 }
 function markTools(){ document.querySelectorAll('.tool[data-tool]').forEach(b=>b.classList.toggle('on', b.dataset.tool===A.overlay || ((A.overlay==='brainpick')&&b.dataset.tool==='brain') || ((A.overlay==='tpick'||A.overlay==='ticket')&&b.dataset.tool==='exit') || ((A.overlay==='rpick'||A.overlay==='reflect')&&b.dataset.tool==='reflect') || ((A.overlay==='thpick'||A.overlay==='think')&&b.dataset.tool==='think') || (A.overlay==='manualRoutine'&&b.dataset.tool==='routines') || (A.overlay==='practise'&&b.dataset.tool==='routines')));  markMenus(); }
 let actH=[]; function clearActivity(){ actH.forEach(h=>{clearTimeout(h);clearInterval(h);}); actH=[]; }
-function backBtn(label){ const stop=!!label&&/^Stop/.test(label); return '<button class="btn alt sm" type="button" data-act="'+(stop?'stopActivity':'back')+'"'+(stop?' data-stop-screen="1"':'')+'>'+esc(label||'Back')+'</button>'; }
+function backBtn(label){ const stop=!!label&&/^(Stop|Finish)/.test(label); return '<button class="btn alt sm" type="button" data-act="'+(stop?'stopActivity':'back')+'"'+(stop?' data-stop-screen="1"':'')+'>'+esc(label||'Back')+'</button>'; }
 function renderOverlay(full){
   const o=A.overlay, P=A.P;
   if(renderFunOverlay(o,full)) return;
@@ -1799,7 +1821,7 @@ function renderOverlay(full){
     if(full||A.mr.drawn!==cur){ A.mr.drawn=cur; setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Routine</div>'+backBtn('Stop')+'</div><h1 class="big">'+esc(R.name)+'</h1>'+stepsHTML(st,cur)+'<div class="row" style="margin-top:auto"><button class="btn" type="button" data-act="mrNext">'+(cur>=st.length-1?'Finish':'Next step')+'</button><button class="btn alt" type="button" data-act="mrBack">Previous step</button></div></section><aside class="side">'+(R.checkin?'<section class="card sm">'+weatherHTML()+'</section>':'')+'<section class="card sm" style="align-items:center">'+(R.checkin?'<div style="width:150px">'+ringHTML('main','left','sm')+'</div>':ringHTML('main','left'))+'</section>'+npHTML()+'</aside>'); updateNowPlaying(); }
     paintRing('main',MT.remaining(),MT.total); return; }
   if(o==='practise'){ const R=routineById(A.pr.id); const el=A.pr.done?A.pr.done:(Date.now()-A.pr.t0)/1000;
-    if(full){ setStage('two','<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Practise · '+esc(R.name)+'</div>'+backBtn('Stop')+'</div><h1 class="big">Can we beat '+(R.best?fmtLeft(R.best):'our first try')+'?</h1>'+stepsHTML(stepsOf(R),-1)+'</section><section class="card" style="align-items:center;justify-content:center;gap:18px"><div class="pick" id="prT" style="padding:0">0:00</div><div id="prMsg" class="lead" style="text-align:center">Go! Tap “We’re done” when everyone is ready.</div><div class="row"><button class="btn gold" type="button" data-act="prDone" id="prDoneBtn">We’re done!</button><button class="btn alt" type="button" data-act="prAgain">Do it again</button></div></section>'); }
+    if(full){ setStage('two','<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Practise · '+esc(R.name)+'</div>'+backBtn(A.pr.done?'Finish practice':'Stop practice')+'</div><h1 class="big">Can we beat '+(R.best?fmtLeft(R.best):'our first try')+'?</h1>'+stepsHTML(stepsOf(R),-1)+'</section><section class="card" style="align-items:center;justify-content:center;gap:18px"><div class="pick" id="prT" style="padding:0">0:00</div><div id="prMsg" class="lead" style="text-align:center">Go! Tap “We’re done” when everyone is ready.</div><div class="row"><button class="btn gold" type="button" data-act="prDone" id="prDoneBtn">We’re done!</button><button class="btn alt" type="button" data-act="prAgain">Do it again</button></div></section>'); }
     const t=document.getElementById('prT'); if(t) t.textContent=fmtLeft(el); return; }
   if(o==='timer'){ if(full){ setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Timer</h1>'+backBtn()+'</div><div class="row">'+[1,2,3,5,10,15].map(m=>'<button class="btn alt" type="button" data-timer="'+m*60+'">'+m+' min</button>').join('')+'<button class="btn alt" type="button" data-timer="30">30 sec</button></div><div class="row"><button class="btn alt sm" type="button" data-add="60">+1 min</button><button class="btn alt sm" type="button" data-add="-60">−1 min</button><button class="btn alt sm" type="button" data-act="mtPause" id="mtPause">Pause</button></div></section><aside class="side"><section class="card sm" style="align-items:center">'+ringHTML('main','left')+'</section></aside>'); }
     paintRing('main',MT.remaining(),MT.total); const pb=document.getElementById('mtPause'); if(pb) pb.textContent=MT.running?'Pause':'Resume'; return; }
@@ -2337,7 +2359,7 @@ function renderRotate(full){ const R=A.rot, st=stationsList(), n=R.n;
   if(full){ const mv=R.mode==='move';
     const cards=st.slice(0,n).map((s,i)=>{ const gi=((i-(mv?R.round+1:R.round))%n+n)%n; const g=A.groups[gi]||[]; return '<div class="station" style="background:'+CREWC[gi%8]+'"><div class="sn">'+esc(s)+'</div><div class="cw"><span class="dot" style="background:'+CREWD[gi%8]+'"></span>'+(mv?'→ ':'')+esc(CREW[gi%8])+'</div><div class="mem">'+esc(g.join(', '))+'</div></div>'; }).join('');
     const head=R.mode==='done'?'<h1 class="big">All done!</h1><p class="lead">Every group visited every station. Back to your seats.</p>':(mv?'<h1 class="big" style="color:var(--coral)">Rotate!</h1><p class="lead">Tidy your station, then move to the one shown with your crew’s name.</p>':'<h1 class="mid" style="color:var(--gum-d)">Round '+(R.round+1)+' of '+n+'</h1>');
-    setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Rotations</div>'+backBtn('Stop rotations')+'</div>'+head+(R.mode==='done'?'':'<div class="stations'+(mv?' moving':'')+'">'+cards+'</div>')+'</section><aside class="side"><section class="card sm" style="align-items:center">'+ringHTML('main',mv?'to move':'at this station','md')+'</section>'+(R.mode==='work'?'<div class="row"><button class="btn coral" type="button" data-act="rotNow">Rotate now</button><button class="btn alt sm" type="button" data-add="120">+2 min</button></div>':'')+(R.mode==='done'?'<button class="btn gold" type="button" data-act="point">+1 class point</button>':'')+'<p class="hint">Crews are made from your class list. To change stations or minutes, stop rotations and reopen Students → Rotations.</p></aside>'); }
+    setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Rotations</div>'+backBtn(R.mode==='done'?'Finish rotations':'Stop rotations')+'</div>'+head+(R.mode==='done'?'':'<div class="stations'+(mv?' moving':'')+'">'+cards+'</div>')+'</section><aside class="side"><section class="card sm" style="align-items:center">'+ringHTML('main',mv?'to move':'at this station','md')+'</section>'+(R.mode==='work'?'<div class="row"><button class="btn coral" type="button" data-act="rotNow">Rotate now</button><button class="btn alt sm" type="button" data-add="120">+2 min</button></div>':'')+(R.mode==='done'?'<button class="btn gold" type="button" data-act="point">+1 class point</button>':'')+'<p class="hint">Crews are made from your class list. To change stations or minutes, stop rotations and reopen Students → Rotations.</p></aside>'); }
   paintRing('main',MT.remaining(),MT.total,R.mode==='move'?'#F2785C':null); }
 
 /* ---- Focus sounds (made live in the browser) ---- */
@@ -2553,7 +2575,7 @@ function ticketHTML(st){ const T=ticketById(st.id)||{t:'',b:''}; return '<div cl
 function machineHTML(st){ return '<div class="tm"><div class="tm-box"><div class="tm-face">'+birdSVG()+'</div><div class="tm-sign"><b>TAKE A<br>TICKET</b><span class="tm-led" id="tmLed">'+String(st.no).padStart(2,'0')+'</span></div><span class="tm-btn" id="tmBtn"></span></div><div class="tm-slot"></div><div class="tm-feed"><div class="tm-paper'+(st.mode==='done'?' out':'')+'" id="tmPaper">'+ticketHTML(st)+'</div></div></div>'; }
 function exitState(P){ if(P&&(P.phase==='exit'||P.phase==='entry')){ const key=P.block.id+'|'+P.phase; if(!A.xp||A.xp.key!==key) A.xp={key,kind:P.phase,id:((P.phase==='exit'?P.block.exitT:P.block.entryT)&&ticketById(P.phase==='exit'?P.block.exitT:P.block.entryT)?(P.phase==='exit'?P.block.exitT:P.block.entryT):pickTicket(P.phase)),no:ticketNo(),mode:'print'}; return A.xp; } return A.xo; }
 function exitScreen(st,full,P){ const live=!!P, K=TK[st.kind];
-  if(full){ setStage('two','<section class="card tmcard">'+machineHTML(st)+'</section><section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">'+esc(K.name)+(live?' · '+esc(P.block.name):'')+'</div>'+(live?'':backBtn())+'</div><h1 class="big">Take a ticket!</h1><p class="lead" style="font-size:clamp(20px,2vw,28px);color:var(--ink)">'+esc(K.hand)+'</p>'+(st.kind==='exit'?'<div class="trays"><span class="hint">Put it in the tray that matches how you went:</span><span style="--tc:#2F8F6B"><i></i>Got it</span><span style="--tc:#F5B700"><i></i>Nearly</span><span style="--tc:#E0524F"><i></i>Need help</span></div>':'')+'<div class="row" style="margin-top:auto;align-items:center"><div style="width:130px;flex:none">'+ringHTML('main','','sm')+'</div><button class="btn gold" type="button" data-act="point">+1 class point</button>'+(live?'<button class="btn" type="button" data-act="exitDone">We’re done</button>':'')+'</div><div class="row"><button class="btn alt" type="button" data-act="tChoose">Choose a ticket</button><button class="btn alt" type="button" data-act="exitAgain">Another ticket</button>'+(st.kind==='exit'?'<button class="btn alt" type="button" data-tool="packup">Pack up &amp; go</button>':'')+'</div></section>');
+  if(full){ setStage('two','<section class="card tmcard">'+machineHTML(st)+'</section><section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">'+esc(K.name)+(live?' · '+esc(P.block.name):'')+'</div>'+(live?'':backBtn('Finish ticket'))+'</div><h1 class="big">Take a ticket!</h1><p class="lead" style="font-size:clamp(20px,2vw,28px);color:var(--ink)">'+esc(K.hand)+'</p>'+(st.kind==='exit'?'<div class="trays"><span class="hint">Put it in the tray that matches how you went:</span><span style="--tc:#2F8F6B"><i></i>Got it</span><span style="--tc:#F5B700"><i></i>Nearly</span><span style="--tc:#E0524F"><i></i>Need help</span></div>':'')+'<div class="row" style="margin-top:auto;align-items:center"><div style="width:130px;flex:none">'+ringHTML('main','','sm')+'</div><button class="btn gold" type="button" data-act="point">+1 class point</button>'+(live?'<button class="btn" type="button" data-act="exitDone">We’re done</button>':'')+'</div><div class="row"><button class="btn alt" type="button" data-act="tChoose">Choose a ticket</button><button class="btn alt" type="button" data-act="exitAgain">Another ticket</button>'+(st.kind==='exit'?'<button class="btn alt" type="button" data-tool="packup">Pack up &amp; go</button>':'')+'</div></section>');
     if(st.mode==='print') runPrint(st); }
   if(live) paintRing('main',(P.to-P.mins)*60,(P.to-P.from)*60); else paintRing('main',MT.remaining(),MT.total); }
 function runPrint(st){ const tok=st.tok=Math.random(); const led=document.getElementById('tmLed'), btn=document.getElementById('tmBtn'); let n=0;
@@ -2635,9 +2657,9 @@ const REFLECT=[
 function startReflect(id){ const off=S.reflectOff||[]; let pool=REFLECT.filter(r=>!off.includes(r.id)); if(!pool.length) pool=REFLECT; const r=(id&&REFLECT.find(x=>x.id===id))||rnd(pool); if(!navPrepareStart('reflect')) return; clearActivity(); A.rf={id:r.id,i:0}; A.overlay='reflect'; markTools(); rfStep(); }
 function rfStep(){ const r=REFLECT.find(x=>x.id===A.rf.id), st=r.steps[A.rf.i]; chime(1); MT.start(st[2],()=>{ if(A.rf.i<r.steps.length-1){ A.rf.i++; rfStep(); } else { A.rf.done=true; MT.stop(); render(true); celebrate('Nice reflecting!','small'); } }); if(A.rf.i===0) Bird.say('Reflection time!'); render(true); }
 function renderReflect(full){ const R=A.rf, r=REFLECT.find(x=>x.id===R.id), st=r.steps[R.i];
-  if(full){ setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Quick reflection · '+esc(r.name)+'</div><div class="row"><button class="btn alt sm" type="button" data-act="rfMenu">All reflections</button>'+backBtn('Stop')+'</div></div>'+(R.done?'<h1 class="big">Nice reflecting!</h1><p class="lead">Thinking about your learning helps it stick.</p>':'<h1 class="big">'+esc(st[0])+'</h1>'+(st[1]?'<p class="lead" style="font-size:clamp(22px,2.2vw,32px);color:var(--ink)">'+esc(st[1])+'</p>':''))+'<div class="rfdots">'+r.steps.map((_,i)=>'<i class="'+(R.done||i<R.i?'done':i===R.i?'cur':'')+'"></i>').join('')+'</div></section><aside class="side"><section class="card sm" style="align-items:center">'+(R.done?'<div class="bigbird" style="width:190px">'+birdSVG()+'</div>':ringHTML('main','this step','md'))+'</section><div class="row">'+(R.done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-act="rfAgain">Another one</button>':'<button class="btn" type="button" data-act="rfNext">Next</button>'+(R.i>0?'<button class="btn alt" type="button" data-act="rfBack">Previous step</button>':''))+'</div></aside>'); }
+  if(full){ setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Quick reflection · '+esc(r.name)+'</div><div class="row"><button class="btn alt sm" type="button" data-act="rfMenu">All reflections</button>'+backBtn(R.done?'Finish reflection':'Stop reflection')+'</div></div>'+(R.done?'<h1 class="big">Nice reflecting!</h1><p class="lead">Thinking about your learning helps it stick.</p>':'<h1 class="big">'+esc(st[0])+'</h1>'+(st[1]?'<p class="lead" style="font-size:clamp(22px,2.2vw,32px);color:var(--ink)">'+esc(st[1])+'</p>':''))+'<div class="rfdots">'+r.steps.map((_,i)=>'<i class="'+(R.done||i<R.i?'done':i===R.i?'cur':'')+'"></i>').join('')+'</div></section><aside class="side"><section class="card sm" style="align-items:center">'+(R.done?'<div class="bigbird" style="width:190px">'+birdSVG()+'</div>':ringHTML('main','this step','md'))+'</section><div class="row">'+(R.done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-act="rfAgain">Another one</button>':'<button class="btn" type="button" data-act="rfNext">'+(R.i<r.steps.length-1?'Next step':'Finish reflection')+'</button>'+(R.i>0?'<button class="btn alt" type="button" data-act="rfBack">Previous step</button>':''))+'</div></aside>'); }
   if(!R.done) paintRing('main',MT.remaining(),MT.total); }
-function reflectAct(a){ if(a==='rfNext'){ const r=REFLECT.find(x=>x.id===A.rf.id); if(A.rf.i<r.steps.length-1){ A.rf.i++; rfStep(); } else { MT.stop(); A.rf.done=true; render(true); celebrate('Nice reflecting!','small'); } return true; }
+function reflectAct(a){ if(a==='rfNext'){ const r=REFLECT.find(x=>x.id===A.rf.id); if(A.rf.i<r.steps.length-1){ A.rf.i++; rfStep(); } else { MT.stop(); A.rf.done=true; navStopActivity(); celebrate('Nice reflecting!','small'); } return true; }
   if(a==='rfBack'){ if(A.rf.i>0){ A.rf.i--; rfStep(); } return true; }
   if(a==='rfAgain'){ startReflect(null); return true; }
   if(a==='rfMenu'){ openOverlay('rpick'); return true; }
@@ -2694,7 +2716,7 @@ const THINK=[
 const thinkR=id=>THINK.find(x=>x.id===id);
 function startThink(id){ const off=S.thinkOff||[]; let pool=THINK.filter(r=>!off.includes(r.id)); if(!pool.length) pool=THINK; const r=(id&&thinkR(id))||rnd(pool); if(!navPrepareStart('think')) return; clearActivity(); A.th={id:r.id,i:0}; A.overlay='think'; markTools(); thStep(); Bird.say('Thinking caps on!'); }
 function thStep(){ const st=thinkR(A.th.id).steps[A.th.i]; A.th.up=false; chime(1); MT.start(st[3],()=>{ A.th.up=true; chime(2); Bird.say('Time! Ready for the next step?'); render(true); }); render(true); }
-function thNext(){ const r=thinkR(A.th.id); if(A.th.i<r.steps.length-1){ A.th.i++; thStep(); } else { MT.stop(); A.th.done=true; render(true); celebrate('Great thinking!','small'); } }
+function thNext(){ const r=thinkR(A.th.id); if(A.th.i<r.steps.length-1){ A.th.i++; thStep(); } else { MT.stop(); A.th.done=true; navStopActivity(); celebrate('Great thinking!','small'); } }
 function renderThink(full){ const R=A.th, r=thinkR(R.id), st=r.steps[R.i], f=(S.thinkFocus||'').trim();
   if(full){ const chart='<div class="thchart">'+r.steps.map((s,i)=>'<div class="thbox '+(R.done||i<R.i?'done':i===R.i?'cur':'')+'"><b>'+esc(s[0])+'</b>'+(s[2]?'<span>'+esc(s[2])+'</span>':'')+'</div>').join('')+'</div>';
     setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Thinking routine · '+esc(r.name)+'</div><div class="row"><button class="btn alt sm" type="button" data-act="thMenu">All routines</button>'+backBtn('Stop')+'</div></div>'+(f?'<div class="thfocus"><small>We’re thinking about</small>'+esc(f)+'</div>':'')+(R.done?'<h1 class="big">Great thinking!</h1><p class="lead">Your thinking is on the wall now. Keep it there and come back to it.</p>':'<h1 class="big">'+esc(st[0])+'</h1><p class="lead" style="font-size:clamp(22px,2.2vw,32px);color:var(--ink)">'+esc(st[1])+'</p>'+(st[2]?'<div class="thstem">'+esc(st[2])+'</div>':''))+chart+'</section><aside class="side"><section class="card sm" style="align-items:center">'+(R.done?'<div class="bigbird" style="width:190px">'+birdSVG()+'</div>':ringHTML('main',R.up?'time’s up':'thinking time','md'))+(R.done?'':'<div class="row" style="justify-content:center"><button class="btn alt sm" type="button" data-act="thPause">'+(MT.running?'Pause':'Resume')+'</button><button class="btn alt sm" type="button" data-act="thMore">+1 min</button></div>')+'</section><div class="row">'+(R.done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-act="thMenu">Another routine</button>':'<button class="btn" type="button" data-act="thNext">'+(R.i<r.steps.length-1?'Next step':'Finish')+'</button>'+(R.i>0?'<button class="btn alt" type="button" data-act="thBack">Previous step</button>':''))+'</div></aside>'); }
@@ -2719,7 +2741,7 @@ const tChip=(i,on)=>'<button class="tchip'+(on?' on':'')+'" type="button" data-g
 /* Pack up & go: first ready, first out */
 function openPackup(){ if(!navPrepareStart('packup')) return; clearActivity(); A.pk={out:[],call:''}; A.overlay='packup'; markTools(); MT.start(60,()=>{ chime(1); Music.fadeStop(); Bird.say('Packed up? Stand behind your chair.'); render(true); }); Music.play('move'); Bird.say('Pack up time!'); render(true); }
 function renderPackup(full){ const n=S.tables||6, P=A.pk;
-  if(full) setStage('two','<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Pack up &amp; go</div>'+backBtn('Done')+'</div><h1 class="mid" style="color:var(--gum-d)">Pack up, then stand behind your chair</h1><ol class="steps pksteps"><li><span class="n">1</span><span>Books and pencils away</span></li><li><span class="n">2</span><span>Rubbish off the floor</span></li><li><span class="n">3</span><span>Chair tucked in, stand behind it</span></li><li><span class="n">4</span><span>Quiet and ready</span></li></ol><div class="row" style="margin-top:auto;align-items:center"><div style="width:130px;flex:none">'+ringHTML('main','pack-up','sm')+'</div><p class="lead" style="margin:0">First ready, first out!</p></div></section><section class="card"><div class="row" style="justify-content:space-between"><h2 class="mid" style="color:var(--gum-d)">Who’s ready?</h2><div class="row"><button class="btn alt sm" type="button" data-g="tables" data-v="-1" aria-label="Fewer tables">−</button><span class="hint">'+n+' tables</span><button class="btn alt sm" type="button" data-g="tables" data-v="1" aria-label="More tables">+</button></div></div><p class="hint" style="margin:0">Tap a table when it’s packed and quiet.</p>'+(P.call?'<div class="call flash" id="pkCall">'+esc(P.call)+'</div>':'')+'<div class="pkgrid">'+Array.from({length:n},(_,i)=>{ const k=P.out.indexOf(i); return '<button class="pkt'+(k>=0?' out':'')+'" type="button" data-g="pkgo" data-v="'+i+'" style="--tc:'+CREWD[i%CREWD.length]+';--tl:'+CREWC[i%CREWC.length]+'"><b>Table '+(i+1)+'</b><span>'+(k>=0?'Out · '+(['1st','2nd','3rd'][k]||(k+1)+'th'):'Waiting')+'</span></button>'; }).join('')+'</div><div class="row" style="margin-top:auto"><button class="btn gold" type="button" data-g="pkall">Everyone else, off you go</button></div></section>');
+  if(full) setStage('two','<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Pack up &amp; go</div>'+backBtn('Finish pack up')+'</div><h1 class="mid" style="color:var(--gum-d)">Pack up, then stand behind your chair</h1><ol class="steps pksteps"><li><span class="n">1</span><span>Books and pencils away</span></li><li><span class="n">2</span><span>Rubbish off the floor</span></li><li><span class="n">3</span><span>Chair tucked in, stand behind it</span></li><li><span class="n">4</span><span>Quiet and ready</span></li></ol><div class="row" style="margin-top:auto;align-items:center"><div style="width:130px;flex:none">'+ringHTML('main','pack-up','sm')+'</div><p class="lead" style="margin:0">First ready, first out!</p></div></section><section class="card"><div class="row" style="justify-content:space-between"><h2 class="mid" style="color:var(--gum-d)">Who’s ready?</h2><div class="row"><button class="btn alt sm" type="button" data-g="tables" data-v="-1" aria-label="Fewer tables">−</button><span class="hint">'+n+' tables</span><button class="btn alt sm" type="button" data-g="tables" data-v="1" aria-label="More tables">+</button></div></div><p class="hint" style="margin:0">Tap a table when it’s packed and quiet.</p>'+(P.call?'<div class="call flash" id="pkCall">'+esc(P.call)+'</div>':'')+'<div class="pkgrid">'+Array.from({length:n},(_,i)=>{ const k=P.out.indexOf(i); return '<button class="pkt'+(k>=0?' out':'')+'" type="button" data-g="pkgo" data-v="'+i+'" style="--tc:'+CREWD[i%CREWD.length]+';--tl:'+CREWC[i%CREWC.length]+'"><b>Table '+(i+1)+'</b><span>'+(k>=0?'Out · '+(['1st','2nd','3rd'][k]||(k+1)+'th'):'Waiting')+'</span></button>'; }).join('')+'</div><div class="row" style="margin-top:auto"><button class="btn gold" type="button" data-g="pkall">Everyone else, off you go</button></div></section>');
   paintRing('main',MT.remaining(),MT.total); }
 
 /* Finished? check first, then choose */
@@ -2826,7 +2848,7 @@ function closeSegPop(){
   const opener=segOpenerIndex!==null&&document.querySelector('[data-seg="'+segOpenerIndex+'"]');
   if(opener){ opener.setAttribute('aria-expanded','false'); if(restore) opener.focus({preventScroll:true}); }
 }
-function openSegPop(el){ closeSegPop(); const P=phaseAt(now()); const day=P.day||computeDay(now()); const x=day[+el.dataset.seg]; if(!x) return; A.segX=x;
+function openSegPop(el){ closeSegPop(); const P=phaseAt(now()); const day=P.day||computeDay(now()); const x=day[+el.dataset.seg]; if(!x) return; A.segSelection=x;
   const L=segInfo(x), m=document.createElement('div'); m.id='segpop'; m.className='segpop'; m.setAttribute('role','dialog'); m.setAttribute('aria-label','Lesson details'); segOpenerIndex=el.dataset.seg; el.setAttribute('aria-expanded','true');
   m.innerHTML='<small>'+fmtClock(x.st)+' – '+fmtClock(x.en)+'</small><b>'+esc(x.b.name)+'</b>'+(L.length?'<ul>'+L.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'<span class="hint">Nothing planned yet.</span>')+'<div class="row">'+(x.b.startR&&routineById(x.b.startR)?'<button class="btn gold sm" type="button" data-run="'+x.b.startR+'" data-sprun="1">Run '+esc(routineById(x.b.startR).name)+' now</button>':'')+'<button class="btn sm" type="button" data-sp="show">Preview on board</button><button class="btn alt sm" type="button" data-sp="edit">Edit lesson</button><button class="btn alt sm" type="button" data-sp="close">Close</button></div>';
   document.body.appendChild(m); const r=el.getBoundingClientRect(); const side=document.body.classList.contains('tl-side');
@@ -2848,11 +2870,11 @@ function editTimetableBlock(block){
 /* TIMETABLE_EDIT_END */
 function renderPeek(full){ if(!full) return; const x=A.segX; if(!x) return; const b=x.b, R0=b.startR&&routineById(b.startR), L=segInfo(x).filter(t=>!t.startsWith('Get out')&&!t.startsWith('Expectations')&&!(R0&&t==='Starts with: '+R0.name));
   const when=x.st>(A.P?A.P.mins:0)?'Coming up at '+fmtClock(x.st):fmtClock(x.st)+' – '+fmtClock(x.en);
-  const main='<section class="card" style="align-items:flex-start"><div class="row" style="justify-content:space-between;width:100%"><div class="eyebrow">'+when+'</div><div class="row">'+(R0?'<button class="btn sm" type="button" data-run="'+R0.id+'">Run '+esc(R0.name)+' now</button>':'')+backBtn('Back')+'</div></div><h1 class="big">'+esc(b.name)+'</h1>'+(b.materials?'<div class="task">'+esc(b.materials)+'</div>':'')+(R0?stepsHTML(stepsOf(R0),-1):'')+expHTML(b.exp)+(L.length?'<ul class="flist" style="font-size:clamp(18px,1.7vw,24px)">'+L.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'')+'</section>';
+  const main='<section class="card" style="align-items:flex-start"><div class="row" style="justify-content:space-between;width:100%"><div class="eyebrow">'+when+'</div><div class="row">'+(R0?'<button class="btn sm" type="button" data-run="'+R0.id+'">Run '+esc(R0.name)+' now</button>':'')+backBtn('Back')+'</div></div><h1 class="big">'+esc(b.name)+'</h1>'+(A.returnedLesson?'<p class="hint">The timetable has moved on. This is the lesson you returned to. Home shows your current board.</p>':'')+(b.materials?'<div class="task">'+esc(b.materials)+'</div>':'')+(R0?stepsHTML(stepsOf(R0),-1):'')+expHTML(b.exp)+(L.length?'<ul class="flist" style="font-size:clamp(18px,1.7vw,24px)">'+L.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'')+'</section>';
   if(R0&&R0.checkin) setStage('', main+'<aside class="side"><section class="card sm">'+weatherHTML()+'</section>'+factHTML()+'</aside>');
   else setStage('one', main); }
-document.addEventListener('click',e=>{ const sp=e.target.closest('[data-sp]'); if(sp){ const a=sp.dataset.sp, x=A.segX; closeSegPop(); audio();
-    if(a==='show'){ openOverlay('peek'); }
+document.addEventListener('click',e=>{ const sp=e.target.closest('[data-sp]'); if(sp){ const a=sp.dataset.sp, x=A.segSelection; closeSegPop(); audio();
+    if(a==='show'&&x){ if(A.overlay==='peek') navRemember('peek'); A.segX=x; A.returnedLesson=false; openOverlay('peek'); }
     if(a==='edit'&&x) editTimetableBlock(x.b);
     return; }
   const sg=e.target.closest('[data-seg]'); if(sg){ audio(); openSegPop(sg); return; }
@@ -4334,7 +4356,7 @@ function visThinkInject(){ if(A.overlay!=='think'||!S.thinkVis) return; const ca
 /* ---- v2.6 Brain breaks you control: tap Next (default) or let Roomie run them, voice on or off ---- */
 /* BRAIN_NAV_START */
 function brainBrowse(category){ A.bcat=category||'all'; openOverlay('brainpick'); }
-function brainFinish(){ navStopActivity(false); openOverlay('brainpick'); }
+function brainFinish(){ navStopActivity(); }
 function brainRefreshSettings(selector){
   render(true); const details=document.querySelector('#stage [data-brain-settings]'); if(details) details.open=true;
   const control=document.querySelector(selector); if(control) control.focus({preventScroll:true});
@@ -4990,7 +5012,7 @@ idbPut=function(key,value){ return profileTrack('write',profileIdbPutBase,this,[
    stopped first: classProfileBlockReason() gives the instruction to the teacher. */
 function clearClassRuntime(){
   PROFILE_EPOCH++;
-  if(typeof NAV!=='undefined'){ NAV.owner=null; NAV.trail=[]; }
+  if(typeof NAV!=='undefined'){ NAV.owner=null; NAV.origin=null; NAV.trail=[]; }
   MT.stop(); clearActivity();
   if(A.attnClose) try{ A.attnClose(); }catch(_){}
   clearInterval(RS.h); RS.on=false; clearInterval(RZ.h); clearTimeout(RZ.auto); RZ.on=false;
