@@ -962,15 +962,25 @@ body.scrap .door .task{background:#FFE88F;color:#1B1340}
 .visrow .visbox{flex:1.9;min-width:0}
 .visrow ol.steps.stepsmini{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;margin:0}
 .visrow ol.steps.stepsmini li{font-size:clamp(16px,1.5vw,24px)}
-.visbox{display:flex;flex-direction:column;gap:8px;min-height:260px}
-.visstage{flex:1;min-height:220px;background:#fff;border:3px solid #1B1340;border-radius:18px;display:grid;place-items:center;overflow:hidden;position:relative}
-.visstage canvas,.visstage img{max-width:100%;max-height:100%;display:block;object-fit:contain}
-.visstage iframe{width:100%;height:100%;min-height:240px;border:0;display:block}
+.visbox{display:flex;flex-direction:column;gap:8px;min-height:0;min-width:0;overflow:hidden}
+.visstage{flex:1 1 0;min-height:0;min-width:0;background:#fff;border:3px solid #1B1340;border-radius:18px;display:grid;place-items:center;overflow:hidden;position:relative}
+.visstage canvas,.visstage img{position:absolute;inset:0;margin:auto;max-width:100%;max-height:100%;display:block;object-fit:contain}.visstage img{width:100%;height:100%}
+.visstage iframe{width:100%;height:100%;min-height:0;border:0;display:block}
 .visstage .visopen{position:absolute;right:10px;bottom:10px}
 .vismsg{padding:20px;text-align:center;color:var(--muted,#6B6258);font-weight:700}
 .vistext{padding:24px 30px;font-family:var(--display);font-weight:800;font-size:clamp(26px,3vw,52px);line-height:1.2;text-align:center;color:#1B1340}
 .visnav{display:flex;gap:8px;align-items:center;justify-content:flex-end}.visnav .vispg{font-weight:800;margin-right:auto}
-.visbox.visfull{position:fixed;inset:12px;z-index:9000;background:var(--panel,#FFFDF3);padding:12px;border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+/* Keep presentation media above the board, outside its zoom and decorative layers. */
+.vispresent{position:fixed;inset:0;width:100vw;max-width:none;height:100dvh;max-height:none;margin:0;border:0;padding:12px;background:var(--panel,#FFFDF3);color:var(--ink);box-sizing:border-box;overflow:hidden}
+.vispresent[open]{display:flex}.vispresent::backdrop{background:#1B1340}.vispresent .visbox{flex:1;width:100%;height:100%;zoom:1!important}.vispresent .visnav{flex-shrink:0;flex-wrap:wrap}.vispresent .visstage{min-height:0}
+.visnav{flex-shrink:0}.visnav .btn{white-space:nowrap}.visnav [data-visbig]{margin-left:auto}
+.card.hasvis>:not(.visrow):not(.scn-band):not(.scn-art){flex-shrink:0}
+.card.hasvis .visrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,.28fr);min-height:120px;flex:1 1 0;zoom:1!important}
+.card.hasvis .visrow ol.steps.stepsmini{overflow-y:auto;overflow-x:hidden;gap:6px;padding:4px;box-sizing:border-box}.card.hasvis .stepsmini li{font-size:clamp(20px,1.9vw,30px);gap:10px;padding:8px 10px}.card.hasvis .stepsmini li .n{width:40px;height:40px;font-size:24px}
+.card.scene.hasvis h1{font-size:clamp(30px,3.2vw,48px)!important;margin-bottom:0}.card.hasvis{gap:10px}
+.stage.routine-media{grid-template-columns:minmax(0,1fr) minmax(150px,210px);gap:14px}
+@media(max-width:900px){.stage.routine-media{grid-template-columns:minmax(0,1fr)}.stage.routine-media>.side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stage.routine-media>.side .ring{max-width:110px}.card.hasvis .visrow{grid-template-columns:minmax(0,1fr);min-height:320px}.card.hasvis .visrow ol.steps.stepsmini{max-height:130px}.card.hasvis .visbox{min-height:220px}.vispresent .visbox{min-height:0}}
+
 .vispick{display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,.6);border:2px dashed rgba(27,19,64,.25);border-radius:14px;padding:10px}
 .vispick .visadd{gap:6px;flex-wrap:wrap;align-items:center}.vispick input[type=text]{flex:1;min-width:160px}
 .vispick .visfile{cursor:pointer}.vispick .visnote{margin:0;font-size:12px}
@@ -1273,7 +1283,7 @@ body.ui-calm-look .mascot *,body.ui-calm-look .bigbird *,body.ui-calm-look .stk 
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.7.2 · 14 Nov 2026';
+const VERSION='Roomie v2.7.3 · 14 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -2464,7 +2474,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDMenu(); });
 function fitApp(){ const a=document.getElementById('app'); if(!a) return;
   if(innerWidth<1200){ a.style.zoom=''; a.style.width=''; a.style.height=''; document.body.classList.remove('fitted'); document.querySelectorAll('#stage .card,#strip').forEach(box=>{ delete box._fitSig; [...box.children].forEach(k=>k.style.zoom=''); }); return; }
   const cs=getComputedStyle(document.body), pw=innerWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight); const z=Math.min(pw/1408,innerHeight/860); a.style.zoom=z; a.style.width=(pw/z)+'px'; a.style.height=(innerHeight/z)+'px'; document.body.classList.add('fitted'); fitCards(); }
-function fitBox(box,lo){ lo=lo||0.55; const sig=box.clientWidth+'x'+box.clientHeight+':'+box.children.length+':'+box.innerHTML.length; if(box._fitSig===sig) return; box._fitSig=sig; const kids=[...box.children].filter(k=>!k.classList.contains('scn-band')&&!k.classList.contains('scn-art')&&!k.classList.contains('scn-hdr')); kids.forEach(k=>k.style.zoom=''); if(box.scrollHeight<=box.clientHeight) return; let f=1;
+function fitBox(box,lo){ if(box.classList.contains('hasvis')) return; lo=lo||0.55; const sig=box.clientWidth+'x'+box.clientHeight+':'+box.children.length+':'+box.innerHTML.length; if(box._fitSig===sig) return; box._fitSig=sig; const kids=[...box.children].filter(k=>!k.classList.contains('scn-band')&&!k.classList.contains('scn-art')&&!k.classList.contains('scn-hdr')); kids.forEach(k=>k.style.zoom=''); if(box.scrollHeight<=box.clientHeight) return; let f=1;
   for(let i=0;i<4&&box.scrollHeight>box.clientHeight&&f>lo;i++){ f=Math.max(lo,f*Math.min(0.97,(box.clientHeight-6)/box.scrollHeight)); kids.forEach(k=>k.style.zoom=f); } }
 function fitCards(){ if(innerWidth<1200) return; document.querySelectorAll('#stage .card').forEach(b=>fitBox(b)); const st=document.getElementById('strip'); if(st) fitBox(st,0.4); }
 let fitQ=0; const fitSoon=()=>{ cancelAnimationFrame(fitQ); fitQ=requestAnimationFrame(()=>requestAnimationFrame(fitCards)); };
@@ -4205,11 +4215,11 @@ function scLayout(card,band,art,h){ const cr0=card.getBoundingClientRect(); if(!
   if(hdr&&!hdr.classList.contains('scn-hdr')){ hdr.classList.add('scn-hdr'); hdr.style.zoom=''; }
   if(!hdr){ band.style.height='0'; if(art) art.style.display='none'; return; }
   const tg=card.querySelector('.tgrid'), dense=['brainpick','tpick','thpick','rpick','routines','quiz'].includes(card.dataset.sk)||(tg&&tg.children.length>8)||(parseFloat(getComputedStyle(hdr).zoom)||1)<0.98;
-  const aw=art?(dense?100:Math.round(Math.max(100,Math.min(180,cr.width*0.2)))):0; card.style.setProperty('--aw',dense?'0px':aw+'px');
+  const media=card.classList.contains('hasvis'); const aw=art?(media?88:dense?100:Math.round(Math.max(100,Math.min(180,cr.width*0.2)))):0; card.style.setProperty('--aw',dense?'0px':aw+'px');
   if(art){ art.style.display=''; art.style.left=''; }
   const hb=R(hdr).bottom-cr.top; let rb=4, bl=cr.width;
   card.querySelectorAll('button,input,select,.eyebrow').forEach(x=>{ const r=R(x); if(!r.width||r.top-cr.top>=hb) return; if(r.right>cr.right-aw-70) rb=Math.max(rb,r.bottom-cr.top); if(r.left>cr.left+cr.width*0.4) bl=Math.min(bl,r.left-cr.left); });
-  const top=dense?8:rb+10, need=art?top+aw*0.875*0.92:0, extra=Math.max(dense?18:26,need-hb+12);
+  const top=media?12:dense?8:rb+10, need=art?top+aw*0.875*0.92:0, extra=Math.max(media?12:dense?18:26,need-hb+12);
   const hz=parseFloat(getComputedStyle(hdr).zoom)||1, mb=Math.round(extra/hz)+'px'; if(hdr.style.marginBottom!==mb) hdr.style.marginBottom=mb; band.style.height=Math.round(hb+extra-12)+'px';
   if(art){ art.style.width=aw+'px'; art.style.top=Math.round(top)+'px'; if(dense) art.style.left=Math.round(bl-aw-34)+'px'; } }
 { const f=render; render=function(){ const r=f.apply(this,arguments); try{ scenify(); }catch(e){ console.warn(e); } return r; }; }
@@ -4262,7 +4272,8 @@ const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
 let pdfReady=null;
 function pdfLib(){ if(pdfReady) return pdfReady; pdfReady=new Promise((res,rej)=>{ if(window.pdfjsLib) return res(window.pdfjsLib); const s=document.createElement('script'); s.src=PDFJS+'pdf.min.js';
   s.onload=()=>{ try{ pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+'pdf.worker.min.js'; }catch(_){} res(window.pdfjsLib); }; s.onerror=()=>{ pdfReady=null; rej(new Error('pdf')); }; document.head.appendChild(s); }); return pdfReady; }
-const VIS={ docs:{}, page:{} };
+const VIS={ docs:{}, page:{}, draw:{}, observer:null, stages:new Set(), presentation:null };
+function visObserve(stage){ if(!window.ResizeObserver) return; if(!VIS.observer) VIS.observer=new ResizeObserver(entries=>{ for(const e of entries){ const box=e.target.closest('.visbox'); if(box&&box.isConnected&&box.dataset.key) visDraw(box.id); } }); for(const old of VIS.stages){ if(!old.isConnected){ VIS.observer.unobserve(old); VIS.stages.delete(old); } } VIS.stages.add(stage); VIS.observer.observe(stage); }
 function visEmbedUrl(u){ u=String(u||'').trim(); let m;
   if((m=u.match(/docs\.google\.com\/presentation\/d\/(?:e\/)?([A-Za-z0-9_-]+)/))) return u.includes('/d/e/')?u.replace(/\/pub\b.*$/,'/embed?start=false&loop=false'):'https://docs.google.com/presentation/d/'+m[1]+'/embed?start=false&loop=false';
   if((m=u.match(/docs\.google\.com\/(document|spreadsheets|drawings)\/d\/([A-Za-z0-9_-]+)/))) return 'https://docs.google.com/'+m[1]+'/d/'+m[2]+'/preview';
@@ -4284,32 +4295,38 @@ function visPickerHTML(v,scope){ const has=!!v;
    '<input type="text" data-vistxt="'+scope+'" placeholder="'+(scope==='think'?'Or type a question, or paste a link':'Or paste a slides link')+'" aria-label="Question or link"><button type="button" class="btn sm" data-visadd="'+scope+'">Add</button></div>'+
    '<p class="hint visnote">PowerPoint: File → Export → PDF, then upload it. Google Slides, PowerPoint online and Canva links also work. Saved on this computer.</p></div>'; }
 /* the viewer */
-function visBoxHTML(v,id){ return '<div class="visbox" id="'+id+'" data-viskind="'+v.kind+'"><div class="visstage"><div class="vismsg">Loading…</div></div><div class="visnav" hidden><button type="button" class="btn alt sm" data-visnav="'+id+':-1" aria-label="Previous slide">◀</button><span class="vispg"></span><button type="button" class="btn sm" data-visnav="'+id+':1" aria-label="Next slide">Next slide ▶</button><button type="button" class="btn alt sm" data-visbig="'+id+'" aria-label="Show big">⛶</button></div></div>'; }
+function visBoxHTML(v,id){ return '<div class="visbox" id="'+id+'" data-viskind="'+v.kind+'"><div class="visstage"><div class="vismsg">Loading…</div></div><div class="visnav"><button type="button" class="btn alt sm" data-visnav="'+id+':-1" hidden aria-label="Previous slide">◀</button><span class="vispg"></span><button type="button" class="btn sm" data-visnav="'+id+':1" hidden aria-label="Next slide">Next slide ▶</button><button type="button" class="btn alt sm" data-visbig="'+id+'" aria-label="Show big">⛶</button></div></div>'; }
 async function visMount(id,v){ const box=document.getElementById(id); if(!box||box.dataset.mounted===(v.key||v.url||v.text)) return; box.dataset.mounted=v.key||v.url||v.text; const stg=box.querySelector('.visstage');
   try{
+    visObserve(stg);
     if(v.kind==='text'){ stg.innerHTML='<div class="vistext">'+esc(v.text)+'</div>'; return; }
     if(v.kind==='link'){ const e=visEmbedUrl(v.url); stg.innerHTML=(e?(/\.(png|jpe?g|gif|webp)/i.test(e)?'<img src="'+esc(e)+'" alt="">':'<iframe src="'+esc(e)+'" title="Slides" allow="autoplay; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>'):'<div class="vismsg">This link opens on '+esc(visSiteName(v.url))+'.</div>')+'<a class="btn alt sm visopen" href="'+esc(v.url)+'" target="_blank" rel="noopener">Open on '+esc(visSiteName(v.url))+' ↗</a>'; return; }
     const blob=await idbGet(v.key); if(!blob){ stg.innerHTML='<div class="vismsg">This file isn’t on this computer. Add it again in the routine.</div>'; return; }
     if(v.kind==='img'){ stg.innerHTML='<img alt="" src="'+URL.createObjectURL(blob)+'">'; return; }
     const lib=await pdfLib(); let doc=VIS.docs[v.key]; if(!doc){ doc=await lib.getDocument({data:new Uint8Array(await blob.arrayBuffer())}).promise; VIS.docs[v.key]=doc; }
-    VIS.page[id]=VIS.page[id]||1; box.dataset.key=v.key; box.querySelector('.visnav').hidden=doc.numPages<2; await visDraw(id);
+    VIS.page[id]=VIS.page[id]||1; box.dataset.key=v.key; box.querySelectorAll('[data-visnav]').forEach(b=>b.hidden=doc.numPages<2); await visDraw(id);
   }catch(e){ stg.innerHTML='<div class="vismsg">Roomie couldn’t open this file here. '+(v.kind==='pdf'?'Check you’re online (PDFs need the internet the first time).':'')+'</div>'; } }
+function visPageFit(width,height,pageWidth,pageHeight,dpr){ const scale=Math.min(Math.max(1,width)/pageWidth,Math.max(1,height)/pageHeight); return {width:pageWidth*scale,height:pageHeight*scale,scale:scale*Math.min(3,Math.max(1,dpr||1))}; }
 async function visDraw(id){ const box=document.getElementById(id); if(!box) return; const doc=VIS.docs[box.dataset.key]; if(!doc) return; const n=Math.min(Math.max(1,VIS.page[id]||1),doc.numPages); VIS.page[id]=n;
-  const pg=await doc.getPage(n), stg=box.querySelector('.visstage'), W=Math.max(320,stg.clientWidth||800), H=Math.max(200,stg.clientHeight||450), vp0=pg.getViewport({scale:1}), sc=Math.min(W/vp0.width,H/vp0.height)*(window.devicePixelRatio||1), vp=pg.getViewport({scale:sc});
-  const c=document.createElement('canvas'); c.width=vp.width; c.height=vp.height; await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise; stg.innerHTML=''; stg.appendChild(c);
-  const s=box.querySelector('.vispg'); if(s) s.textContent=n+' / '+doc.numPages; const nx=box.querySelector('[data-visnav$=":1"]'); if(nx) nx.textContent=n>=doc.numPages?'Last slide':'Next slide ▶'; }
+  const token=VIS.draw[id]=(VIS.draw[id]||0)+1, pg=await doc.getPage(n), stg=box.querySelector('.visstage'); if(!box.isConnected||VIS.draw[id]!==token) return;
+  const vp0=pg.getViewport({scale:1}), fit=visPageFit(stg.clientWidth,stg.clientHeight,vp0.width,vp0.height,window.devicePixelRatio), vp=pg.getViewport({scale:fit.scale});
+  const c=document.createElement('canvas'); c.width=Math.ceil(vp.width); c.height=Math.ceil(vp.height); c.style.width=fit.width+'px'; c.style.height=fit.height+'px'; c.setAttribute('role','img'); c.setAttribute('aria-label','Slide '+n+' of '+doc.numPages);
+  await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise; if(!box.isConnected||VIS.draw[id]!==token) return; stg.replaceChildren(c);
+  const s=box.querySelector('.vispg'); if(s) s.textContent=n+' / '+doc.numPages; const prev=box.querySelector('[data-visnav$=":-1"]'); if(prev) prev.disabled=n===1; const nx=box.querySelector('[data-visnav$=":1"]'); if(nx){ nx.disabled=n===doc.numPages; nx.textContent=n>=doc.numPages?'Last slide':'Next slide ▶'; } }
+function visClosePresentation(){ const p=VIS.presentation; if(!p) return; VIS.presentation=null; if(p.marker.isConnected) p.marker.replaceWith(p.box); else p.box.remove(); p.dialog.close(); p.dialog.remove(); p.button.setAttribute('aria-label','Show big'); p.button.textContent='⛶'; if(p.box.isConnected){ p.button.focus({preventScroll:true}); if(p.box.dataset.key) visDraw(p.box.id); } }
+function visPresent(box,button){ if(VIS.presentation){ visClosePresentation(); return; } const marker=document.createComment('slide viewer'), dialog=document.createElement('dialog'); dialog.className='vispresent'; dialog.setAttribute('aria-label','Slides presentation'); dialog.setAttribute('role','dialog'); box.replaceWith(marker); dialog.appendChild(box); document.body.appendChild(dialog); VIS.presentation={box,button,marker,dialog}; const backLabel=box.id==='rvis'?'Back to routine':'Back to thinking'; button.setAttribute('aria-label',backLabel); button.textContent=backLabel; dialog.addEventListener('cancel',e=>{ e.preventDefault(); visClosePresentation(); }); dialog.showModal(); button.focus(); if(box.dataset.key) visDraw(box.id); }
 function visStep(id,d){ const box=document.getElementById(id); if(!box||!box.dataset.key) return false; const doc=VIS.docs[box.dataset.key]; if(!doc) return false; const n=(VIS.page[id]||1)+d; if(n<1||n>doc.numPages) return false; VIS.page[id]=n; visDraw(id); return true; }
 document.addEventListener('click',e=>{ const n=e.target.closest('[data-visnav]'); if(n){ const [id,d]=n.dataset.visnav.split(':'); audio(); visStep(id,+d); return; }
-  const b=e.target.closest('[data-visbig]'); if(b){ const box=document.getElementById(b.dataset.visbig); if(box){ box.classList.toggle('visfull'); setTimeout(()=>visDraw(box.id),60); } } });
+  const b=e.target.closest('[data-visbig]'); if(b){ const box=document.getElementById(b.dataset.visbig); if(box) visPresent(box,b); } });
 /* ---- routines: slides beside the steps ---- */
 function curRoutineVis(){ let R=null; if(A.overlay==='manualRoutine'&&A.mr) R=routineById(A.mr.id); else if(!A.overlay&&A.P&&A.P.phase==='routine') R=A.P.routine; return R&&R.vis?{R,v:R.vis}:null; }
-function visRoutineInject(){ const cv=curRoutineVis(); if(!cv) return; const card=document.querySelector('#stage > .card'); if(!card||card.querySelector('#rvis')) return;
+function visRoutineInject(){ if(VIS.presentation&&VIS.presentation.box.id==='rvis') return; const cv=curRoutineVis(); if(!cv) return; const card=document.querySelector('#stage > .card'); if(!card||card.querySelector('#rvis')) return;
   const steps=card.querySelector('ol.steps'); const wrap=document.createElement('div'); wrap.className='visrow'; wrap.innerHTML=visBoxHTML(cv.v,'rvis');
   if(steps){ steps.classList.add('stepsmini'); steps.parentNode.insertBefore(wrap,steps); wrap.appendChild(steps); } else card.appendChild(wrap);
-  card.classList.add('hasvis'); delete card.dataset.ssig; if(typeof scRelayout==='function') scRelayout(); visMount('rvis',cv.v); }
-{ const f=render; render=function(){ const r=f.apply(this,arguments); try{ visRoutineInject(); }catch(e){ console.warn(e); } return r; }; }
+  card.classList.add('hasvis'); if(card.parentNode.id==='stage'&&cv) card.parentNode.classList.add('routine-media'); delete card.dataset.ssig; if(typeof scRelayout==='function') scRelayout(); visMount('rvis',cv.v); }
+{ const f=render; render=function(){ const r=f.apply(this,arguments); try{ if(VIS.presentation&&!VIS.presentation.marker.isConnected) visClosePresentation(); visRoutineInject(); }catch(e){ console.warn(e); } return r; }; }
 /* remote and keyboard "next" move the slides first when a routine has slides */
-document.addEventListener('keydown',e=>{ if(!document.getElementById('rvis')) return; if(e.key==='PageDown'||e.key==='ArrowRight'){ if(visStep('rvis',1)) e.preventDefault(); } if(e.key==='PageUp'||e.key==='ArrowLeft'){ if(visStep('rvis',-1)) e.preventDefault(); } });
+document.addEventListener('keydown',e=>{ const p=VIS.presentation, box=p?p.box:document.getElementById('rvis'); if(!box||e.target.closest('input,textarea,select,[contenteditable="true"]')) return; if(p&&e.key==='Escape'){ e.preventDefault(); e.stopImmediatePropagation(); visClosePresentation(); return; } const d=['PageDown','ArrowRight'].includes(e.key)?1:['PageUp','ArrowLeft'].includes(e.key)?-1:0; if(d&&box.dataset.key){ e.preventDefault(); e.stopImmediatePropagation(); visStep(box.id,d); } },true);
 /* builder + thinking: add/remove handlers. scope 'rmk' = routine maker (RMK.vis), 'think' = S.thinkVis */
 function visGet(scope){ return scope==='rmk'?RMK.vis:S.thinkVis; }
 function visSet(scope,v){ const old=visGet(scope); if(old&&old!==v&&scope==='think') visDrop(old); if(scope==='rmk'){ RMK.vis=v; } else { S.thinkVis=v; save(); } visRefresh(scope); }
@@ -4319,7 +4336,7 @@ document.addEventListener('click',e=>{ const a=e.target.closest('[data-visadd]')
 async function visImportFile(scope,file){ try{ const v=await visSaveFile(file); if(!v){ toast('Choose a PDF or a picture.'); return; } visSet(scope,v); toast('Added “'+v.name+'”.'); }catch(_){ toast('This browser could not save the file. Try a smaller file or check available storage.'); } }
 document.addEventListener('change',e=>{ const t=e.target; if(!t.matches||!t.matches('[data-visfile]')||!t.files||!t.files[0]) return; return visImportFile(t.dataset.visfile,t.files[0]); });
 /* ---- thinking routines: the thing students look at, beside every step ---- */
-function visThinkInject(){ if(A.overlay!=='think'||!S.thinkVis) return; const card=document.querySelector('#stage > .card'); if(!card||card.querySelector('#tvis')) return;
+function visThinkInject(){ if(VIS.presentation&&VIS.presentation.box.id==='tvis') return; if(A.overlay!=='think'||!S.thinkVis) return; const card=document.querySelector('#stage > .card'); if(!card||card.querySelector('#tvis')) return;
   const h=card.querySelector('h1.big'); if(!h) return; const row=document.createElement('div'); row.className='visrow throw'; row.innerHTML=visBoxHTML(S.thinkVis,'tvis')+'<div class="thtext"></div>';
   h.parentNode.insertBefore(row,h); const col=row.querySelector('.thtext'); [h,card.querySelector('p.lead'),card.querySelector('.thstem')].forEach(x=>{ if(x) col.appendChild(x); });
   card.classList.add('hasvis'); delete card.dataset.ssig; if(typeof scRelayout==='function') scRelayout(); visMount('tvis',S.thinkVis); }
