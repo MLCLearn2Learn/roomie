@@ -95,7 +95,8 @@ test('the picker previews the chosen rules, and the Fun checkbox saves an explic
   assert.equal(context.S.keepEveryoneInGame,false); assert.equal(controls.saved,1);
   context.renderBrainPicker(true); assert.match(controls.screen,/Stuck\? Sit down/);
   assert.doesNotMatch(context.brainBreakSettingsHTML(),/id="fKeepEveryoneInGame" checked/);
-  assert.match(html,/brainBreakSettingsHTML\(\)\+'<h3>Rotations/,'The option is included in the Fun settings UI');
+  assert.match(controls.screen,/Brain break settings/,'The option is available in the brain-break picker');
+  assert.match(controls.screen,/id="fKeepEveryoneInGame"/);
 });
 
 test('movement and choice games offer seated participation without changing their stored originals',()=>{
