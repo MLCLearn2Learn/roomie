@@ -4730,21 +4730,22 @@ document.addEventListener('keydown',e=>{
 
 /* TOOL_FINDER_START: shared catalogue and pure search are covered by navigation tests. */
 const UI_TOOL_GROUPS=[
-  ['Lesson tools',[
+  ['Teaching',[
     ['timer','Timer','Quick countdowns','countdown minutes seconds'],
     ['exit','Tickets','Entry and exit prompts','entry exit ticket assessment'],
     ['think','Thinking','Prompts for deeper thinking','thinking routines'],
     ['reflect','Reflect','Pause and review learning','reflection review'],
     ['quiz','Quiz games','Practise through play','quiz questions games'],
-    ['poll','Poll','Hear from the whole class','vote voting survey']]],
-  ['Routines and wellbeing',[
+    ['poll','Poll','Hear from the whole class','vote voting survey'],
+    ['finish','Finished?','Ideas for early finishers','finished early finishers']]],
+  ['Routines',[
     ['routines','Routines','Run or practise a routine','routine transitions'],
+    ['packup','Pack up','Get ready to leave','pack up home time'],
+    ['reteach','Practise expectations','Revisit classroom expectations','behaviour behavior expectations']]],
+  ['Wellbeing',[
     ['brain','Brain break','Move, play or reset','movement active break'],
     ['calm','Calm breathing','Take a quiet minute','breathe breathing calm quiet'],
-    ['checkin','Check-in','See how everyone feels','feelings mood wellbeing check in'],
-    ['finish','Finished?','Ideas for early finishers','finished early finishers'],
-    ['packup','Pack up','Get ready to leave','pack up home time'],
-    ['reteach','Practise expectations','Revisit classroom expectations','behaviour behavior expectations']]]
+    ['checkin','Check-in','See how everyone feels','feelings mood wellbeing check in']]]
 ];
 function uiFindTools(query){
   const words=String(query||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().split(/\s+/).filter(Boolean);

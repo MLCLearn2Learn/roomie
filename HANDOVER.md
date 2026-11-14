@@ -81,3 +81,6 @@ Next: review teacher feedback on the finder, then walk through Setup navigation 
 ## Navigation refinement — Students menu ownership
 Antoinette confirmed that class-management tools should live under Students rather than also appearing in More tools. Removed Seating plan, Pick a name, Groups, Rotations, Helpers and Mystery Hero from the finder. More tools now has 13 teaching/routine/wellbeing tools in two groups. Updated search hints and dock-help wording. Existing dock shortcuts remain as configured; Students still contains all six class tools and Class list.
 173 automated tests pass, including checks that these tools are absent from the finder and remain in Students. No production deployment or database changes. This supersedes the earlier 19-tool/three-group catalogue description.
+
+## Tool grouping refinement
+Antoinette approved three separate finder groups: Teaching (Timer, Tickets, Thinking, Reflect, Quiz games, Poll, Finished?), Routines (Routines, Pack up, Practise expectations), Wellbeing (Brain break, Calm breathing, Check-in). Same 13 tools; Students remains separate. All 173 automated tests pass. No production changes.
