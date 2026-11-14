@@ -42,3 +42,15 @@ test('Enter opens a single match, focuses first of several, and tolerates no res
  h.menu.querySelectorAll=()=>[h.items[0]];h.context.uiToolFinderKey(h.event('Enter'),h.menu);assert.equal(h.items[0].clicked,true);
  h.menu.querySelectorAll=()=>[];assert.doesNotThrow(()=>h.context.uiToolFinderKey(h.event('Enter'),h.menu));
 });
+
+const navEvents=html.split('/* NAVIGATION_EVENTS_START */')[1].split('/* NAVIGATION_EVENTS_END */')[0];
+test('Escape dismisses the nearest popup before navigating and ignores editable controls',()=>{
+ const handlers={},calls=[];let popup='classpop',editing=false;
+ const context=vm.createContext({A:{overlay:'pick'},NAV:{owner:'timer'},TOUR:null,navBack:()=>calls.push('back'),navRemember(){},navShow(){},closeDMenu:()=>calls.push('tools'),closeClassPop:()=>calls.push('class'),closeSegPop:()=>calls.push('segment'),document:{addEventListener:(name,fn)=>handlers[name]=fn,getElementById:id=>id==='sheetHost'?{innerHTML:''}:id===popup?{}:null}});
+ vm.runInContext(navEvents,context);
+ const event=()=>({key:'Escape',target:{closest:()=>editing},preventDefault(){this.prevented=true;},stopImmediatePropagation(){this.stopped=true;}});
+ let e=event();handlers.keydown(e);assert.deepEqual(calls,['class']);assert.ok(e.stopped);
+ popup='dmenu';handlers.keydown(event());assert.deepEqual(calls,['class','tools']);
+ popup=null;editing=true;handlers.keydown(event());assert.equal(calls.length,2);
+ editing=false;handlers.keydown(event());assert.equal(calls.at(-1),'back');
+});

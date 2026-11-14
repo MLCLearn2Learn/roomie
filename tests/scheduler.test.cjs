@@ -55,6 +55,7 @@ function harness(initial = at(8, 59, 55), options = {}) {
   const S = { mode: 'day', autoStart: options.autoStart ?? true, room: 'Test class', routines: [routine, lineup], days: Object.fromEntries(['mon', 'tue', 'wed', 'thu', 'fri'].map(d => [d, blocks])), goal: { name: 'Class goal', points: 1, target: 5 } };
   const context = {
     Date: ClockDate, console, S, STUDENT: false, EXIT_MIN: 3,
+    confirm:message=>{events.push('confirm:'+message);return options.confirm===true;},
     pad: n => String(n).padStart(2, '0'),
     routineById: id => S.routines.find(r => r.id === id),
     stepsOf: r => r.steps.split('\n'),
@@ -85,7 +86,7 @@ function harness(initial = at(8, 59, 55), options = {}) {
     startThink() {}, startReflect() {},
   };
   vm.createContext(context);
-  vm.runInContext(production + '\nthis.api={A,MT,SCHED,tick,phaseAt,phaseSig,openOverlay,closeOverlay,runRoutine,pauseTimetable,resumeTimetable,switchToTimetable,resetTimetableSession,checkCues,act,rmState,RM_CMDS};', context);
+  vm.runInContext(production + '\nthis.api={A,MT,SCHED,NAV,navBack,navBoard,navStopActivity,navStartTimer,navPrepareStart,tick,phaseAt,phaseSig,openOverlay,closeOverlay,runRoutine,pauseTimetable,resumeTimetable,switchToTimetable,resetTimetableSession,checkCues,act,rmState,RM_CMDS};', context);
   const api = context.api;
   function time(ms) {
     current = ms;
@@ -291,4 +292,38 @@ test('production inline JavaScript remains syntactically valid', () => {
   const scripts = [...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)];
   assert.ok(scripts.length > 0);
   scripts.forEach(([, source]) => new vm.Script(source));
+});
+
+
+test('Back from the name picker returns to the running timer, then board without stopping it',()=>{
+ const h=harness();h.openOverlay('timer');h.navStartTimer(300);h.openOverlay('pick');h.time(at(9,0,5));h.navBack();
+ assert.equal(h.A.overlay,'timer');assert.equal(h.MT.running,true);assert.equal(h.MT.remaining(),290);
+ h.navBack();assert.equal(h.A.overlay,null);assert.equal(h.MT.running,true);assert.equal(h.NAV.owner,'timer');
+});
+test('Home preserves a routine step, timer and music and clears only navigation history',()=>{
+ const h=harness();h.runRoutine('lineup');h.A.mr.step=1;h.context.goHome();
+ assert.equal(h.A.overlay,null);assert.equal(h.A.mr.step,1);assert.equal(h.MT.running,true);assert.equal(h.context.Music.playing,true);assert.equal(h.NAV.owner,'manualRoutine');assert.equal(h.NAV.trail.length,0);
+});
+test('Back preserves a paused countdown',()=>{
+ const h=harness();h.openOverlay('timer');h.navStartTimer(300);h.MT.pause();h.openOverlay('pick');h.navBack();
+ assert.equal(h.A.overlay,'timer');assert.equal(h.MT.running,false);assert.equal(h.MT.remaining(),300);
+});
+test('cancelled replacement cannot reset a countdown or start routine music',()=>{
+ const h=harness();h.openOverlay('timer');h.navStartTimer(300);h.openOverlay('routines');const before=h.MT.onDone;h.events.length=0;
+ h.runRoutine('lineup');assert.equal(h.NAV.owner,'timer');assert.equal(h.MT.remaining(),300);assert.equal(h.MT.onDone,before);assert.equal(h.A.overlay,'routines');assert.equal(h.A.mr,undefined);assert.ok(h.events.some(e=>e.startsWith('confirm:')));assert.ok(!h.events.includes('music'));
+});
+test('accepted replacement starts the requested activity and clears the old return path',()=>{
+ const h=harness(undefined,{confirm:true});h.openOverlay('timer');h.navStartTimer(300);h.openOverlay('routines');h.runRoutine('lineup');
+ assert.equal(h.NAV.owner,'manualRoutine');assert.equal(h.A.overlay,'manualRoutine');assert.equal(h.MT.remaining(),120);assert.equal(h.context.Music.playing,true);assert.ok(!h.NAV.trail.includes('timer'));
+});
+test('restarting an existing timer requires confirmation and cancellation preserves its callback',()=>{
+ const h=harness();h.openOverlay('timer');h.navStartTimer(300);const callback=h.MT.onDone;assert.equal(h.navStartTimer(60),false);assert.equal(h.MT.remaining(),300);assert.equal(h.MT.onDone,callback);
+});
+test('explicit Stop ends the background activity and removes stale return paths',()=>{
+ const h=harness();h.runRoutine('lineup');h.openOverlay('pick');h.navStopActivity();
+ assert.equal(h.MT.remaining(),0);assert.equal(h.MT.running,false);assert.equal(h.context.Music.playing,false);assert.equal(h.NAV.owner,null);assert.equal(h.A.overlay,null);assert.equal(h.NAV.trail.length,0);
+});
+test('stopping an unrelated screen cannot silently stop the background timer',()=>{
+ const h=harness();h.openOverlay('timer');h.navStartTimer(300);h.openOverlay('quiz');h.act('stopActivity',{dataset:{stopScreen:'1'}});
+ assert.equal(h.A.overlay,'timer');assert.equal(h.MT.remaining(),300);assert.equal(h.MT.running,true);
 });

@@ -16,7 +16,7 @@ function harness() {
   const context=vm.createContext({
     S:{keepEveryoneInGame:true}, A:{}, uid:()=>String(++id),
     esc:escapeHTML, backBtn:()=>'', setStage:(_,markup)=>{controls.screen=markup;},
-    clearActivity(){},markTools(){},render(){},Music:{play(){},stop(){},fadeStop(){}},
+    navPrepareStart:()=>true,clearActivity(){},markTools(){},render(){},Music:{play(){},stop(){},fadeStop(){}},
     speakLine:line=>controls.spoken.push(line), brainVoiceOn:()=>true, brainPaceTap:()=>true,
     MT:{start(){}},actH:[],setInterval:()=>1,setTimeout:()=>1,freezeLoop(){},chime(){},$(){return null;},
     save:()=>{controls.saved++;},editR:null,routineById:()=>null,

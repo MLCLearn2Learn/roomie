@@ -1180,7 +1180,7 @@ body.ui-calm-look .mascot *,body.ui-calm-look .bigbird *,body.ui-calm-look .stk 
 
 <div class="app" id="app">
   <header class="top">
-    <button class="homebtn" id="homeBtn" type="button" title="Back to the home screen (Esc)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/></svg><span>Home</span></button><button class="classbtn" id="classBtn" type="button" aria-haspopup="true" aria-expanded="false" title="My class: seating plan, pick a name, groups"><span class="room" id="roomLabel">Room 7</span><span class="cbsub"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.2 3-5 6-5s5.4 1.8 6 5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.2c2.6.1 4.4 1.7 5 4.8"/></svg>Students <span id="classCount"></span> ▾</span></button>
+    <button class="homebtn" id="homeBtn" type="button" title="Show the board; your activity keeps running"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/></svg><span>Home</span></button><button class="classbtn" id="classBtn" type="button" aria-haspopup="true" aria-expanded="false" title="My class: seating plan, pick a name, groups"><span class="room" id="roomLabel">Room 7</span><span class="cbsub"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.2 3-5 6-5s5.4 1.8 6 5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.2c2.6.1 4.4 1.7 5 4.8"/></svg>Students <span id="classCount"></span> ▾</span></button>
     <span class="date" id="dateLabel"></span>
     <button class="demo" id="demoTag" type="button" hidden title="Exit the demo and restore your class">Demo · Exit demo</button>
     <div class="top-r">
@@ -1199,6 +1199,7 @@ body.ui-calm-look .mascot *,body.ui-calm-look .bigbird *,body.ui-calm-look .stk 
       <span id="scheduleStatus" role="status" aria-live="polite"></span>
       <button type="button" id="scheduleSwitch" data-schedule="switch" hidden>End activity and switch</button>
     </div>
+    <div class="schedule-controls" id="activityNav" hidden><span id="activityNavStatus"></span><button type="button" class="btn alt sm" id="activityReturn" data-nav-return>Return to activity</button><button type="button" class="btn alt sm" id="activityStop" data-act="stopActivity">Stop activity</button></div>
   </header>
   <nav class="strip" id="strip" aria-label="Today's timetable"></nav>
   <main class="stage" id="stage" aria-live="polite"></main>
@@ -1622,7 +1623,7 @@ function stepIndexFor(P){ const st=stepsOf(P.routine); if(!st.length) return 0; 
 
 /* ================= Manual timer (tools) ================= */
 const MT={ total:0,left:0,endAt:0,running:false,onDone:null,h:null,
-  start(sec,onDone){ this.total=sec; this.left=sec; this.onDone=onDone||null; this.resume(); },
+  start(sec,onDone){ if(!NAV.owner) NAV.owner=A.overlay||'timer'; this.total=sec; this.left=sec; this.onDone=onDone||null; this.resume(); },
   resume(){ if(this.left<=0) return; this.running=true; this.endAt=Date.now()+this.left*1000; clearInterval(this.h); this.h=setInterval(()=>this.tick(),250); },
   pause(){ if(!this.running) return; this.left=Math.max(0,(this.endAt-Date.now())/1000); this.running=false; clearInterval(this.h); },
   stop(){ this.running=false; clearInterval(this.h); this.left=0; this.total=0; this.onDone=null; },
@@ -1657,6 +1658,7 @@ function renderStrip(P){
   if(document.body.classList.contains('tl-side')) $('#strip').insertAdjacentHTML('afterbegin','<h2 class="tlh">Today</h2>');
 }
 function render(full){
+  navControls();
   const d=now(), current=phaseAt(d), P=scheduleDisplayPhase(current); A.P=P;
   renderStrip(current); scheduleControls(current);
   document.body.classList.toggle('calm', !!((!A.overlay&&P.phase==='routine'&&P.routine&&P.routine.breathe)||A.overlay==='calm'));
@@ -1735,17 +1737,56 @@ let bH=null; const BR=[['Breathe in',4],['Slowly out',6]];
 function paintBreath(){ if(bH) return; let i=0; const run=()=>{ const d=document.getElementById('bdot'), t=document.getElementById('btxt'); if(!d||!t){ clearTimeout(bH); bH=null; return; } const [l,s]=BR[i%2]; t.textContent=l; d.style.transitionDuration=s+'s'; d.style.transform=i%2?'scale(.55)':'scale(1)'; i++; bH=setTimeout(run,s*1000); }; bH=setTimeout(run,50); }
 
 /* ================= Overlays (teacher tools) ================= */
-function openOverlay(name,data){ A.overlay=name; Object.assign(A,data||{}); markTools(); markHero(); render(true); }
-function closeOverlay(){ const was=A.overlay; A.overlay=null; MT.stop(); clearActivity(); if(was==='brain'||was==='calm'||was==='manualRoutine'||was==='practise'||was==='party'||was==='rotate') Music.fadeStop(); if(was==='hero'&&A.heroStage==='shown') A.heroStage=''; A.rot=null; markTools(); markHero(); A.phaseKey=''; tick(true); }
+function openOverlay(name,data){ if(A.overlay!==name) navRemember(A.overlay); A.overlay=name; Object.assign(A,data||{}); markTools(); markHero(); render(true); }
+function closeOverlay(){ if(NAV.owner&&NAV.owner===A.overlay) navStopActivity(); else navBack(); }
+const NAV={trail:[],owner:null};
+const NAV_LABELS={timer:'timer',brain:'brain break',calm:'calm breathing',manualRoutine:'routine',practise:'routine practice',rotate:'rotations',ticket:'ticket',reflect:'reflection',think:'thinking activity',packup:'pack up',reteach:'expectation practice'};
+function navRemember(key){ if(NAV.trail[NAV.trail.length-1]!==key||!NAV.trail.length) NAV.trail.push(key||null); if(NAV.trail.length>20) NAV.trail.shift(); }
+function navHasActivity(){
+  if(!NAV.owner) return MT.total>0&&MT.remaining()>0;
+  if(NAV.owner==='practise') return !!A.pr&&!A.pr.done;
+  if(NAV.owner==='brain') return !!A.brain; // Tap-paced breaks remain active until Finish.
+  if(NAV.owner==='think') return !!A.th&&!A.th.done;
+  if(NAV.owner==='rotate') return !!A.rot&&A.rot.mode!=='done';
+  return MT.total>0&&MT.remaining()>0;
+}
+function navShow(key){ A.overlay=key||null; markTools(); markHero(); A.phaseKey=''; tick(true); }
+function navBack(){ const previous=NAV.trail.length?NAV.trail.pop():null; navShow(previous); }
+function navBoard(){ NAV.trail=[]; navShow(null); }
+function navStopActivity(redraw){
+  const was=NAV.owner||A.overlay;
+  MT.stop(); clearActivity();
+  if(['brain','calm','manualRoutine','practise','party','rotate','packup'].includes(was)) Music.fadeStop();
+  if(was==='hero'&&A.heroStage==='shown') A.heroStage='';
+  NAV.owner=null; NAV.trail=[]; A.rot=null; A.overlay=null;
+  if(redraw!==false){ markTools(); markHero(); A.phaseKey=''; tick(true); }
+}
+function navPrepareStart(key){
+  if(navHasActivity()){
+    const old=NAV_LABELS[NAV.owner]||'activity', next=NAV_LABELS[key]||'activity';
+    if(typeof confirm!=='function'||!confirm('Stop the current '+old+' and start '+(key===NAV.owner?'a new '+next:next)+'? Choose Cancel to keep it running.')) return false;
+    navStopActivity(false);
+  }
+  if(A.overlay!==key) navRemember(A.overlay); NAV.owner=key; return true;
+}
+function navStartTimer(seconds){ if(!navPrepareStart('timer')) return false; MT.stop(); MT.start(seconds,()=>{ chime(3); say('Time’s up.'); }); A.overlay='timer'; markTools(); render(true); return true; }
+function navControls(){
+  const row=document.getElementById('activityNav'); if(!row) return;
+  row.hidden=STUDENT||!NAV.owner||!navHasActivity(); if(row.hidden) return;
+  const label=NAV_LABELS[NAV.owner]||'activity', state=MT.running?'running':MT.remaining()>0?'paused':'in progress';
+  document.getElementById('activityNavStatus').textContent=label.charAt(0).toUpperCase()+label.slice(1)+' '+state+(MT.total>0?' · '+fmtLeft(MT.remaining()):'');
+  const back=document.getElementById('activityReturn'); back.hidden=A.overlay===NAV.owner; back.textContent='Return to '+label;
+  document.getElementById('activityStop').textContent='Stop '+label;
+}
 function markTools(){ document.querySelectorAll('.tool[data-tool]').forEach(b=>b.classList.toggle('on', b.dataset.tool===A.overlay || ((A.overlay==='brainpick')&&b.dataset.tool==='brain') || ((A.overlay==='tpick'||A.overlay==='ticket')&&b.dataset.tool==='exit') || ((A.overlay==='rpick'||A.overlay==='reflect')&&b.dataset.tool==='reflect') || ((A.overlay==='thpick'||A.overlay==='think')&&b.dataset.tool==='think') || (A.overlay==='manualRoutine'&&b.dataset.tool==='routines') || (A.overlay==='practise'&&b.dataset.tool==='routines')));  markMenus(); }
 let actH=[]; function clearActivity(){ actH.forEach(h=>{clearTimeout(h);clearInterval(h);}); actH=[]; }
-function backBtn(label){ return '<button class="btn alt sm" type="button" data-act="close">'+esc(label||'Back to the plan')+'</button>'; }
+function backBtn(label){ const stop=!!label&&/^Stop/.test(label); return '<button class="btn alt sm" type="button" data-act="'+(stop?'stopActivity':'back')+'"'+(stop?' data-stop-screen="1"':'')+'>'+esc(label||'Back')+'</button>'; }
 function renderOverlay(full){
   const o=A.overlay, P=A.P;
   if(renderFunOverlay(o,full)) return;
   if(o==='routines'){ if(!full) return; setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Routines</h1>'+backBtn()+'</div><p class="lead">Run one now, or practise it: the class times itself and tries to beat its best.</p><div class="rlist">'+S.routines.map(r=>'<div class="rbtn"><b>'+esc(r.name)+'</b><span>'+stepsOf(r).length+' steps · '+r.minutes+' min'+(r.best?' · best '+fmtLeft(r.best):'')+'</span><div class="row" style="margin-top:6px"><button class="btn sm" type="button" data-run="'+esc(r.id)+'">Run</button><button class="btn alt sm" type="button" data-practise="'+esc(r.id)+'">Practise</button></div></div>').join('')+'</div></section>'); return; }
   if(o==='manualRoutine'){ const R=routineById(A.mr.id); const st=stepsOf(R); const cur=A.mr.step;
-    if(full||A.mr.drawn!==cur){ A.mr.drawn=cur; setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Routine</div>'+backBtn('Stop')+'</div><h1 class="big">'+esc(R.name)+'</h1>'+stepsHTML(st,cur)+'<div class="row" style="margin-top:auto"><button class="btn" type="button" data-act="mrNext">'+(cur>=st.length-1?'Finish':'Next step')+'</button><button class="btn alt" type="button" data-act="mrBack">Back</button></div></section><aside class="side">'+(R.checkin?'<section class="card sm">'+weatherHTML()+'</section>':'')+'<section class="card sm" style="align-items:center">'+(R.checkin?'<div style="width:150px">'+ringHTML('main','left','sm')+'</div>':ringHTML('main','left'))+'</section>'+npHTML()+'</aside>'); updateNowPlaying(); }
+    if(full||A.mr.drawn!==cur){ A.mr.drawn=cur; setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Routine</div>'+backBtn('Stop')+'</div><h1 class="big">'+esc(R.name)+'</h1>'+stepsHTML(st,cur)+'<div class="row" style="margin-top:auto"><button class="btn" type="button" data-act="mrNext">'+(cur>=st.length-1?'Finish':'Next step')+'</button><button class="btn alt" type="button" data-act="mrBack">Previous step</button></div></section><aside class="side">'+(R.checkin?'<section class="card sm">'+weatherHTML()+'</section>':'')+'<section class="card sm" style="align-items:center">'+(R.checkin?'<div style="width:150px">'+ringHTML('main','left','sm')+'</div>':ringHTML('main','left'))+'</section>'+npHTML()+'</aside>'); updateNowPlaying(); }
     paintRing('main',MT.remaining(),MT.total); return; }
   if(o==='practise'){ const R=routineById(A.pr.id); const el=A.pr.done?A.pr.done:(Date.now()-A.pr.t0)/1000;
     if(full){ setStage('two','<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Practise · '+esc(R.name)+'</div>'+backBtn('Stop')+'</div><h1 class="big">Can we beat '+(R.best?fmtLeft(R.best):'our first try')+'?</h1>'+stepsHTML(stepsOf(R),-1)+'</section><section class="card" style="align-items:center;justify-content:center;gap:18px"><div class="pick" id="prT" style="padding:0">0:00</div><div id="prMsg" class="lead" style="text-align:center">Go! Tap “We’re done” when everyone is ready.</div><div class="row"><button class="btn gold" type="button" data-act="prDone" id="prDoneBtn">We’re done!</button><button class="btn alt" type="button" data-act="prAgain">Do it again</button></div></section>'); }
@@ -1766,7 +1807,7 @@ function renderOverlay(full){
 function lateCard(b,solo){ return '<section class="card"><div class="row" style="justify-content:space-between"><h2 class="mid" style="color:var(--gum-d)">Just arrived? Welcome!</h2>'+(solo?backBtn('Done'):'')+'</div><ol class="steps"><li><span class="n">'+icon('bag',22,'currentColor')+'</span><span>Bag on your hook, note in the tray</span></li><li><span class="n">'+icon('pencil',22,'currentColor')+'</span><span>'+esc(b&&b.materials?b.materials:'Get out what you need for '+(b?b.name:'this lesson'))+'</span></li><li><span class="n">'+icon('people',22,'currentColor')+'</span><span>Ask your partner where we’re up to</span></li></ol></section>'; }
 
 /* brain breaks */
-function startBrain(type,id){ const off=S.breakOff||[]; let pool=BREAKS.filter(b=>!b.breath&&!off.includes(b.id)&&(!type||b.type===type)&&(!A.brain||b.id!==A.brain.id)); if(!pool.length) pool=BREAKS.filter(b=>!b.breath); const b=brainBreakVariant((id&&BREAKS.find(x=>x.id===id))||pool[Math.floor(Math.random()*pool.length)]||BREAKS[0]);
+function startBrain(type,id){ if(!navPrepareStart('brain')) return; const off=S.breakOff||[]; let pool=BREAKS.filter(b=>!b.breath&&!off.includes(b.id)&&(!type||b.type===type)&&(!A.brain||b.id!==A.brain.id)); if(!pool.length) pool=BREAKS.filter(b=>!b.breath); const b=brainBreakVariant((id&&BREAKS.find(x=>x.id===id))||pool[Math.floor(Math.random()*pool.length)]||BREAKS[0]);
   clearActivity(); if(b.gen) b.calls=b.gen(); A.brain=b; A.callIdx=0; A.overlay='brain'; markTools(); if(b.song) Music.play(b.song); else Music.stop(); say(b.name+'. '+b.how);
   MT.start(b.secs,()=>{ chime(2); Music.fadeStop(); clearActivity(); const c=$('#call'); if(c){ c.className='call'; c.textContent='Brain break done. Back to your spot.'; } setTimeout(()=>{ if(A.overlay==='brain') closeOverlay(); },4000); });
   if(b.calls) actH.push(setInterval(()=>{ A.callIdx=(A.callIdx+1)%b.calls.length; const c=$('#call'); if(c) c.textContent=b.calls[A.callIdx]; },(b.every||8)*1000));
@@ -1819,7 +1860,7 @@ function pipRender(force){ if(!A.pipDoc) return; const P=A.P||phaseAt(now()); le
     html='<div class="r"><div><div class="k">NOW</div><div class="t">'+esc(title)+'</div></div><div class="big">'+left+'</div></div>'+(P.phase==='lesson'&&b&&S.expect[b.exp]?'<div class="chips">'+S.expect[b.exp].items.slice(0,3).map(x=>'<span>'+esc(x[1])+'</span>').join('')+'</div>':'')+'<div style="font-size:14px;opacity:.9">'+esc(sub)+'</div><div class="meter" id="pmeter"></div>'+(A.pipPicked?'<div class="r"><span class="k">QUIET PICK · ONLY YOU SEE THIS IF THE BOARD SHOWS YOUR SLIDES</span></div><div class="t">Ask '+esc(A.pipPicked)+'</div>':'')+'<div class="btns"><button class="a" data-pact="attention">Attention</button><button data-pact="pick">Pick</button><button data-pact="door">Door</button><button data-pact="point">+1 point</button><button data-pact="reset">Reset</button></div>'; }
   if(!A.pipBig){ const b=P.block; const title=A.attnClose?'Eyes this way':P.phase==='warning'?'2 minutes to finish':P.phase==='routine'?P.routine.name:P.phase==='exit'?'Exit ticket':P.phase==='entry'?'Entry ticket':(b?b.name:'Roomie'); const left=A.attnClose?'':(P.to?fmtLeft((P.to-P.mins)*60):''); html='<button class="roo" data-pact="'+(A.attnClose?'attention':'expand')+'" title="Tap for Roomie’s controls">'+birdSVG()+'</button>'+(left?'<div class="mt">'+left+'</div>':'')+'<div class="ms">'+esc(title)+'</div>'+(left?'':'<div class="hint2">Tap Roomie for controls</div>'); cls=(cls?cls+' ':'')+'mini'; }
   else html=html+'<button class="shr" data-pact="shrink">Shrink back to Roomie</button>';
-  if(typeof M!=='undefined'&&M.on){ const gg=M.goal&&(((S.coach||{}).goals||[]).find(x=>x.id===M.goal)), g=gg&&focusOf(gg); 
+  if(typeof M!=='undefined'&&M.on){ const gg=M.goal&&(((S.coach||{}).goals||[]).find(x=>x.id===M.goal)), g=gg&&focusOf(gg);
     html='<div class="mir'+(M.inPart?' on':'')+'"><span><i></i>Mirror <em id="pmt"></em>'+(A.pipBig?' · <em id="pml"></em> heard'+(SL.on?' · slides linked':''):'')+'</span>'+(A.pipBig?'<span class="mb">'+(g&&g.part?'<button data-pact="mirmark">'+(M.inPart?'End '+esc(g.part):'Mark '+esc(g.part))+'</button>':'')+((S.coach||{}).slides&&!SL.on?'<button data-pact="mirslides">Link slides</button>':'')+'<button data-pact="mirstop">End lesson</button></span>':(M.inPart?'<b>marking</b>':''))+'</div>'+html; }
   const sig=cls+html; if(!force&&sig===A.pipSig){ pipMirUpd(); return; } A.pipSig=sig; const root=A.pipDoc.getElementById('pip'); if(root){ root.className=cls; root.innerHTML=html; } paintMeter(); pipMirUpd(); }
 function pipMirUpd(){ if(!A.pipDoc||typeof M==='undefined'||!M.on) return; const t=A.pipDoc.getElementById('pmt'), l=A.pipDoc.getElementById('pml'); if(t) t.textContent=mirFmt((Date.now()-M.t0)/1000); if(l){ const n=(M.words||[]).length; l.textContent=n+' line'+(n===1?'':'s'); } }
@@ -1834,7 +1875,7 @@ function resetTimetableSession(){
   if(typeof hideNudge==='function') hideNudge();
 }
 function scheduleProtected(){
-  return !!(A.overlay || (MT.total>0&&(MT.running||MT.remaining()>0)) || A.attnClose ||
+  return !!(navHasActivity() || A.overlay || (MT.total>0&&(MT.running||MT.remaining()>0)) || A.attnClose ||
     (typeof RZ!=='undefined'&&RZ.on) || (typeof RS!=='undefined'&&RS.on) ||
     ['sheetHost','wzHost','rmkHost','rmHost','tour'].some(id=>{ const el=document.getElementById(id); return el&&!!el.innerHTML; }));
 }
@@ -1883,7 +1924,7 @@ function switchToTimetable(){
   SCHED.paused=false; SCHED.pinned=null; SCHED.pending=null;
   scheduleSkipDue(current); A.phaseKey=phaseSig(current);
   /* This is the explicit, labelled action that ends the current activity. */
-  goHome(); MT.stop(); clearActivity(); Music.fadeStop();
+  navStopActivity(false); goHome(); MT.stop(); clearActivity(); Music.fadeStop();
   A.overlay=null; A.rot=null; markTools();
   A.phaseKey=phaseSig(phaseAt(now())); lastStep=-1; tick(true);
 }
@@ -1926,6 +1967,8 @@ function onPhaseChange(P,prev){
 
 /* ================= Actions ================= */
 function act(a,el){
+  if(a==='back'){ navBack(); return; }
+  if(a==='stopActivity'){ if(el&&el.dataset.stopScreen&&NAV.owner&&A.overlay!==NAV.owner) navBack(); else navStopActivity(); return; }
   if(a==='rotStart') return startRotations();
   const P=(a==='plus5'||a==='startNow')?phaseAt(now()):(A.P||phaseAt(now()));
   if(a==='plus5'&&P.block){ A.ext[P.block.id]=(A.ext[P.block.id]||0)+5; toast('5 more minutes'); tick(true); return; }
@@ -1957,8 +2000,8 @@ function act(a,el){
   if(a==='prDone'){ const R=routineById(A.pr.id); if(A.pr.done) return; A.pr.done=(Date.now()-A.pr.t0)/1000; clearActivity(); Music.fadeStop(); const t=A.pr.done; const beat=!R.best||t<R.best; const m=$('#prMsg'); if(beat){ R.best=Math.round(t); save(); chime(3); if(m) m.innerHTML='<b style="color:var(--gum-d);font-size:28px">New best! '+fmtLeft(t)+'</b><br><button class="btn gold sm" type="button" data-act="point" style="margin-top:10px">+1 class point</button>'; } else { chime(1); if(m) m.textContent='Our best is still '+fmtLeft(R.best)+'. Do it again?'; } return; }
   if(a==='prAgain'){ startPractise(A.pr.id); return; }
 }
-function runRoutine(id){ const R=routineById(id); if(!R) return; clearActivity(); A.mr={id,step:0}; MT.start(R.minutes*60,()=>{ chime(2); Music.fadeStop(); toast('Time’s up for '+R.name); }); if(R.song&&R.song!=='none') Music.play(R.song,R.id); say(R.name+'. Step 1. '+(stepsOf(R)[0]||'')); openOverlay('manualRoutine'); }
-function startPractise(id){ const R=routineById(id); clearActivity(); A.pr={id,t0:Date.now(),done:0}; if(R.song&&R.song!=='none') Music.play(R.song,R.id); chime(1); openOverlay('practise'); }
+function runRoutine(id){ const R=routineById(id); if(!R) return; if(!navPrepareStart('manualRoutine')) return; clearActivity(); A.mr={id,step:0}; MT.start(R.minutes*60,()=>{ chime(2); Music.fadeStop(); toast('Time’s up for '+R.name); }); if(R.song&&R.song!=='none') Music.play(R.song,R.id); say(R.name+'. Step 1. '+(stepsOf(R)[0]||'')); openOverlay('manualRoutine'); }
+function startPractise(id){ const R=routineById(id); if(!R||!navPrepareStart('practise')) return; clearActivity(); A.pr={id,t0:Date.now(),done:0}; if(R.song&&R.song!=='none') Music.play(R.song,R.id); chime(1); openOverlay('practise'); }
 function beginDemo(){
   if(DEMO.active) return true;
   const blocked=typeof classProfileBlockReason==='function'?classProfileBlockReason():((S.liveOn||S.remote||(typeof M!=='undefined'&&M.on))?'Turn off student devices, remote control and lesson coaching before starting a demo.':''); if(blocked){ toast(blocked.replace('changing classes','starting a demo')); return false; }
@@ -1992,8 +2035,10 @@ document.addEventListener('click',e=>{
     if(tool==='float') return floatOpen();
     if(tool==='point') return act('point',t);
     if(tool==='reset') return resetRoom();
-    if(tool==='hero') return A.overlay==='hero'?closeOverlay():openHero();
-    if((A.overlay===tool&&tool!=='brain')||(tool==='brain'&&A.overlay==='brainpick')||(tool==='exit'&&(A.overlay==='tpick'||A.overlay==='ticket'))||(tool==='reflect'&&(A.overlay==='rpick'||A.overlay==='reflect'))||(tool==='think'&&(A.overlay==='thpick'||A.overlay==='think'))){ closeOverlay(); return; }
+    const owned={routines:['manualRoutine','practise'],brain:['brain'],exit:['ticket'],reflect:['reflect'],think:['think'],rotate:['rotate'],packup:['packup'],reteach:['reteach'],timer:['timer'],calm:['calm']};
+    if(navHasActivity()&&(owned[tool]||[]).includes(NAV.owner)){ if(A.overlay!==NAV.owner) navRemember(A.overlay); navShow(NAV.owner); return; }
+    if(tool==='hero') return A.overlay==='hero'?navBack():openHero();
+    if((A.overlay===tool&&tool!=='brain')||(tool==='brain'&&A.overlay==='brainpick')||(tool==='exit'&&(A.overlay==='tpick'||A.overlay==='ticket'))||(tool==='reflect'&&(A.overlay==='rpick'||A.overlay==='reflect'))||(tool==='think'&&(A.overlay==='thpick'||A.overlay==='think'))){ navBack(); return; }
     if(tool==='routines') return openOverlay('routines');
     if(tool==='rotate') return openOverlay('rotationSetup');
     if(tool==='exit') return openTicketPicker('exit',false);
@@ -2010,7 +2055,7 @@ document.addEventListener('click',e=>{
     if(tool==='reteach'){ A.rt=null; return openOverlay('reteach'); }
     if(tool==='timer'){ return openOverlay('timer'); }
     if(tool==='brain') return openOverlay('brainpick');
-    if(tool==='calm'){ clearActivity(); MT.start(60,()=>{ chime(1); Music.fadeStop(); }); Music.play('still'); return openOverlay('calm'); }
+    if(tool==='calm'){ if(!navPrepareStart('calm')) return; clearActivity(); MT.start(60,()=>{ chime(1); Music.fadeStop(); }); Music.play('still'); return openOverlay('calm'); }
     if(tool==='pick') return openOverlay('pick');
     if(tool==='groups') return A.groups.length?openOverlay('groups'):makeGroups({size:4});
     if(tool==='door'||tool==='late') return openOverlay(tool);
@@ -2018,11 +2063,11 @@ document.addEventListener('click',e=>{
   if(t.dataset.wx){ A.feel=feelBucket(); A.feel[t.dataset.wx]++; if(A.overlay==='checkin'){ blip(); render(true); const nb=document.querySelector('.feel.big [data-wx="'+t.dataset.wx+'"]'); if(nb) nb.classList.add('tapped'); return; } t.classList.remove('tapped'); void t.offsetWidth; t.classList.add('tapped'); blip(); const box=t.closest('.card'); if(box){ const h=box.querySelector('.feel'); box.innerHTML=weatherHTML(); } return; }
   if(t.dataset.feelview){ A.feelView=!A.feelView; const box=t.closest('.card'); if(box) box.innerHTML=weatherHTML(); return; }
   if(t.dataset.focus!==undefined){ const k=t.dataset.focus; if(k) Focus.start(k); else Focus.stop(); document.querySelectorAll('[data-focus]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.focus===k))); if(k) Bird.say(k==='rain'?'Ahh, rain.':k==='birds'?'Tink, tink!':'Nice and calm.'); return; }
-  if(t.dataset.rt!==undefined){ A.rt=t.dataset.rt?{id:t.dataset.rt,mode:'learn'}:null; MT.stop(); render(true); return; }
+  if(t.dataset.rt!==undefined){ if(NAV.owner==='reteach'&&navHasActivity()){ if(!confirm('Stop the current expectation practice and choose another card?')) return; navStopActivity(false); A.overlay='reteach'; } A.rt=t.dataset.rt?{id:t.dataset.rt,mode:'learn'}:null; render(true); return; }
   if(t.dataset.rtgo) return rtGo(t.dataset.rtgo);
   if(t.dataset.run) return runRoutine(t.dataset.run);
   if(t.dataset.practise) return startPractise(t.dataset.practise);
-  if(t.dataset.timer){ MT.stop(); MT.start(+t.dataset.timer,()=>{ chime(3); say('Time’s up.'); }); render(true); return; }
+  if(t.dataset.timer){ navStartTimer(+t.dataset.timer); return; }
   if(t.dataset.add){ MT.add(+t.dataset.add); render(false); return; }
   if(t.dataset.brain!==undefined) return startBrain(t.dataset.brain||null);
   if(t.dataset.gsize) return makeGroups({size:+t.dataset.gsize});
@@ -2030,7 +2075,7 @@ document.addEventListener('click',e=>{
   if(t.dataset.act) return act(t.dataset.act,t);
 });
 document.addEventListener('keydown',e=>{ if(e.target.closest('input,textarea,select,[role="menu"],[role="dialog"][aria-modal="true"]')||$('#sheetHost').innerHTML) return; const k=e.key.toLowerCase();
-  if(k==='a') attention(); else if(k==='r') resetRoom(); else if(k==='d') openOverlay('door'); else if(k==='l') openOverlay('late'); else if(k==='escape'){ goHome(); }
+  if(k==='a') attention(); else if(k==='r') resetRoom(); else if(k==='d') openOverlay('door'); else if(k==='l') openOverlay('late');
   else if(k==='arrowright'){ const P=A.P; if(A.overlay==='manualRoutine') act('mrNext'); else if(P&&P.phase==='routine'){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)+1; render(false); } }
   else if(k==='arrowleft'){ const P=A.P; if(A.overlay==='manualRoutine') act('mrBack'); else if(P&&P.phase==='routine'){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)-1; render(false); } } });
 document.addEventListener('dblclick',e=>{ const li=e.target.closest('.steps li'); if(!li) return; const P=A.P; if(P&&P.phase==='routine'&&!A.overlay){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)+1; render(false); } });
@@ -2273,6 +2318,7 @@ function renderRotationSetup(){
   setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Rotations</h1>'+backBtn()+'</div><p class="lead">Review your stations, then start when your class is ready.</p><p class="hint" data-rotation-summary>'+stationsList().length+' stations · '+esc(S.rotMin||12)+' minutes at each</p><div class="row"><button class="btn gold" type="button" data-act="rotStart">Start rotations</button></div><details><summary class="btn alt sm">Edit stations & timing</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">'+'<div class="row" style="align-items:flex-start"><div class="fld" style="flex:1;min-width:240px"><label for="fStations">Stations, one per line (2 to 8)</label><textarea id="fStations" style="min-height:180px">'+esc(S.stations||'')+'</textarea></div><div class="fld" style="width:160px"><label for="fRotMin">Minutes at each</label><input id="fRotMin" type="number" min="2" max="40" value="'+(S.rotMin||12)+'"></div></div><p class="hint" style="margin:0">Roomie makes one crew per station from your class list. Crews move one station each round, with a 45-second move song.</p>'+'</div></details></section>');
 }
 function startRotations(){ const st=stationsList(); if(st.length<2){ toast('Add at least 2 stations in Edit stations & timing before starting.'); return; } if(!names().length){ toast('Add your class in Setup first.'); return; }
+  if(!navPrepareStart('rotate')) return;
   if(A.groups.length!==st.length) makeGroups({count:st.length,quiet:true}); clearActivity(); A.rot={round:0,mode:'work',n:st.length}; A.overlay='rotate'; markTools(); rotWork(); }
 function rotWork(){ A.rot.mode='work'; MT.start((S.rotMin||12)*60,rotMove); chime(1); Bird.say(A.rot.round?'New station. Go!':'Off you go!'); render(true); }
 function rotMove(){ if(A.rot.round>=A.rot.n-1){ A.rot.mode='done'; MT.stop(); render(true); celebrate('Every group did every station!','big'); return; }
@@ -2321,7 +2367,7 @@ function renderReteach(full){ const r=A.rt&&RETEACH.find(x=>x.id===A.rt.id);
   if(full){ const show=A.rt.mode==='show', done=A.rt.mode==='done';
     setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Quick reteach</div><div class="row"><button class="btn alt sm" type="button" data-rt="">All cards</button>'+backBtn()+'</div></div><h1 class="big">'+esc(r.name)+'</h1><p class="lead">Why? '+esc(r.why)+'</p>'+stepsHTML(r.steps,-1,'',true)+(show||done?'<div class="rt-show">Show me! '+esc(r.show)+'</div>':'')+'<div class="row" style="margin-top:auto">'+(done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-rtgo="show">Practise again</button>':(show?'<button class="btn gold" type="button" data-rtgo="done">Nailed it!</button>':'<button class="btn" type="button" data-rtgo="show">Practise: show me!</button>'))+'</div></section><aside class="side"><section class="card sm" style="align-items:center">'+(show?ringHTML('main','to show me','md'):'<div class="bigbird" style="width:180px">'+birdSVG()+'</div>')+'</section></aside>'); }
   if(A.rt.mode==='show') paintRing('main',MT.remaining(),MT.total); }
-function rtGo(mode){ if(mode==='show'){ A.rt.mode='show'; chime(1); MT.start(20,()=>{ chime(1); }); render(true); Bird.say('Show me!'); } else if(mode==='done'){ A.rt.mode='done'; MT.stop(); render(true); celebrate('Nailed it!','big',null,rnd(['NAILED IT!','BOOM!','YES!'])); } }
+function rtGo(mode){ if(mode==='show'){ if(!navPrepareStart('reteach')) return; A.rt.mode='show'; chime(1); MT.start(20,()=>{ chime(1); }); render(true); Bird.say('Show me!'); } else if(mode==='done'){ A.rt.mode='done'; MT.stop(); render(true); celebrate('Nailed it!','big',null,rnd(['NAILED IT!','BOOM!','YES!'])); } }
 
 /* ---- Bush fact of the day ---- */
 const FACTS=['Octopuses have three hearts and blue blood.', 'Honey never goes off. Archaeologists found 3,000-year-old honey that was still good to eat.', 'A group of flamingos is called a flamboyance.', 'Bananas are berries, but strawberries are not.', 'Sharks were around before trees existed.', 'A day on Venus is longer than a year on Venus.', 'Your brain uses about 20% of your body’s energy.', 'Sloths can hold their breath for up to 40 minutes.', 'There are more stars in the universe than grains of sand on all of Earth’s beaches.', 'Butterflies taste with their feet.', 'A snail can sleep for up to three years.', 'The Eiffel Tower grows about 15 cm taller in summer as the metal heats up.', 'Cows have best friends and get stressed when they’re apart.', 'Hot water can freeze faster than cold water. It’s called the Mpemba effect.', 'Some turtles can breathe through their bottoms.', 'The heart of a blue whale is about the size of a small car.', 'Penguins propose with a pebble.', 'Lightning is about five times hotter than the surface of the Sun.', 'Sea otters hold hands when they sleep so they don’t drift apart.', 'A cloud can weigh more than a million kilograms.', 'Humans share about 60% of their DNA with bananas.', 'Dolphins give each other names: a special whistle for each one.', 'The shortest war in history lasted about 38 minutes.', 'An ostrich’s eye is bigger than its brain.', 'Saturn would float in a bath big enough to hold it.', 'Hummingbirds are the only birds that can fly backwards.', 'Your nose can remember about 50,000 different smells.', 'Starfish have no brain and no blood.', 'There’s enough water in Lake Superior to cover North and South America 30 cm deep.', 'Wombats do cube-shaped poo.'];
@@ -2411,10 +2457,10 @@ document.addEventListener('change',e=>{ if(e.target.id==='cpName'){ A.phaseKey='
 function goHome(){ try{ if(typeof TOUR!=='undefined'&&TOUR) endTour(); }catch(_){} try{ if(A.attnClose) A.attnClose(); }catch(_){} try{ if(typeof RZ!=='undefined'&&RZ.on) rzEnd(); }catch(_){} try{ if(typeof rmkClose==='function'&&document.getElementById('rmkHost')) rmkClose(); }catch(_){}
   ['classpop','segpop','dmenu'].forEach(id=>{ const el=document.getElementById(id); if(el) el.remove(); });
   const sh=document.getElementById('sheetHost'); if(sh&&sh.innerHTML) closeSetup();
-  A.seatEdit=false; A.jobEdit=false; A.seatSel=null; A.qz=null; A.th=null;
-  if(A.overlay) closeOverlay(); else render(true); }
+  A.seatEdit=false; A.jobEdit=false; A.seatSel=null;
+  navBoard(); }
 document.addEventListener('click',e=>{ if(e.target.closest('#homeBtn')){ audio(); goHome(); } });
-document.addEventListener('keydown',e=>{ if(e.key!=='Escape') return; const tag=(e.target.tagName||'').toLowerCase(); if(tag==='input'||tag==='textarea'||tag==='select') return; if(typeof TOUR!=='undefined'&&TOUR) return; if(document.getElementById('classpop')||document.getElementById('segpop')) return; goHome(); });
+
 setInterval(()=>{ document.body.classList.toggle('at-home',!A.overlay&&!(document.getElementById('sheetHost')||{}).innerHTML); },500);
 
 /* ================= Ticket machine: entry and exit tickets (v0.4.1) ================= */
@@ -2515,7 +2561,7 @@ function renderTicketPicker(full){ if(!full) return; const tp=A.tp; if(tp.kind==
   setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Choose a ticket</h1><div class="row"><button class="btn gold" type="button" data-tuse="">Surprise me</button>'+backBtn()+'</div></div><div class="row"><button class="tab" type="button" data-tkind="entry" aria-selected="'+(tp.kind==='entry')+'">Entry tickets</button><button class="tab" type="button" data-tkind="exit" aria-selected="'+(tp.kind==='exit')+'">Exit tickets</button><span class="hint" style="margin-left:auto">Untick any you don’t want in the surprise mix.</span></div><div class="tgrid">'+L.map(x=>'<div class="tcard'+(off.includes(x.id)?' off':'')+'"><b>'+esc(x.t)+'</b><span>'+esc(x.b)+(x.l?' '+esc(x.l.join(' · ')):'')+'</span><div class="row" style="margin-top:auto;justify-content:space-between"><label class="chk" style="font-size:14px"><input type="checkbox" data-toff="'+x.id+'" '+(off.includes(x.id)?'':'checked')+'> In the mix</label><span class="row" style="gap:6px">'+(x.mine?'<button class="btn alt sm" type="button" data-tdel="'+x.id+'" aria-label="Delete">✕</button>':'')+'<button class="btn sm" type="button" data-tuse="'+x.id+'">Use</button></span></div></div>').join('')+'<div class="tcard add">'+(tp.form?'<input type="text" id="tNewT" placeholder="Title, e.g. Summary in a tweet" maxlength="40"><textarea id="tNewB" placeholder="What students do" style="min-height:80px" maxlength="200"></textarea><div class="row"><button class="btn sm" type="button" data-act="tAddSave">Add ticket</button><button class="btn alt sm" type="button" data-act="tAddCancel">Cancel</button></div>':'<button class="btn alt" type="button" data-act="tAdd" style="margin:auto">+ Write your own</button>')+'</div></div></section>'); }
 function useTicket(id){ const tp=A.tp; const kind=tp.kind; const pick=id||pickTicket(kind);
   if(tp.live&&A.P&&(A.P.phase===kind)){ const st=exitState(A.P); st.id=pick; st.no=ticketNo(); st.mode='print'; A.overlay=null; markTools(); A.phaseKey=phaseSig(A.P); render(true); return; }
-  MT.stop(); A.xo={kind,id:pick,no:ticketNo(),mode:'print'}; A.overlay='ticket'; markTools(); MT.start(EXIT_MIN*60,()=>chime(1)); render(true); }
+  if(!navPrepareStart('ticket')) return; MT.stop(); A.xo={kind,id:pick,no:ticketNo(),mode:'print'}; A.overlay='ticket'; markTools(); MT.start(EXIT_MIN*60,()=>chime(1)); render(true); }
 document.addEventListener('click',e=>{ const t=e.target.closest('[data-tuse],[data-tkind],[data-tdel],[data-bpick],[data-bkind]'); if(!t||t.closest('#sheetHost')) return;
   if(t.dataset.tuse!==undefined) return useTicket(t.dataset.tuse);
   if(t.dataset.tkind){ A.tp.kind=t.dataset.tkind; A.tp.form=false; render(true); return; }
@@ -2576,15 +2622,15 @@ const REFLECT=[
    ['Send the wave!','Say your word, then the next person goes. Keep it moving!',60],
    ['Which words did we hear most?','Hands up if you heard the same word more than once.',10]]}
 ];
-function startReflect(id){ const off=S.reflectOff||[]; let pool=REFLECT.filter(r=>!off.includes(r.id)); if(!pool.length) pool=REFLECT; const r=(id&&REFLECT.find(x=>x.id===id))||rnd(pool); clearActivity(); A.rf={id:r.id,i:0}; A.overlay='reflect'; markTools(); rfStep(); }
+function startReflect(id){ const off=S.reflectOff||[]; let pool=REFLECT.filter(r=>!off.includes(r.id)); if(!pool.length) pool=REFLECT; const r=(id&&REFLECT.find(x=>x.id===id))||rnd(pool); if(!navPrepareStart('reflect')) return; clearActivity(); A.rf={id:r.id,i:0}; A.overlay='reflect'; markTools(); rfStep(); }
 function rfStep(){ const r=REFLECT.find(x=>x.id===A.rf.id), st=r.steps[A.rf.i]; chime(1); MT.start(st[2],()=>{ if(A.rf.i<r.steps.length-1){ A.rf.i++; rfStep(); } else { A.rf.done=true; MT.stop(); render(true); celebrate('Nice reflecting!','small'); } }); if(A.rf.i===0) Bird.say('Reflection time!'); render(true); }
 function renderReflect(full){ const R=A.rf, r=REFLECT.find(x=>x.id===R.id), st=r.steps[R.i];
-  if(full){ setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Quick reflection · '+esc(r.name)+'</div><div class="row"><button class="btn alt sm" type="button" data-act="rfMenu">All reflections</button>'+backBtn('Stop')+'</div></div>'+(R.done?'<h1 class="big">Nice reflecting!</h1><p class="lead">Thinking about your learning helps it stick.</p>':'<h1 class="big">'+esc(st[0])+'</h1>'+(st[1]?'<p class="lead" style="font-size:clamp(22px,2.2vw,32px);color:var(--ink)">'+esc(st[1])+'</p>':''))+'<div class="rfdots">'+r.steps.map((_,i)=>'<i class="'+(R.done||i<R.i?'done':i===R.i?'cur':'')+'"></i>').join('')+'</div></section><aside class="side"><section class="card sm" style="align-items:center">'+(R.done?'<div class="bigbird" style="width:190px">'+birdSVG()+'</div>':ringHTML('main','this step','md'))+'</section><div class="row">'+(R.done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-act="rfAgain">Another one</button>':'<button class="btn" type="button" data-act="rfNext">Next</button>'+(R.i>0?'<button class="btn alt" type="button" data-act="rfBack">Back</button>':''))+'</div></aside>'); }
+  if(full){ setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Quick reflection · '+esc(r.name)+'</div><div class="row"><button class="btn alt sm" type="button" data-act="rfMenu">All reflections</button>'+backBtn('Stop')+'</div></div>'+(R.done?'<h1 class="big">Nice reflecting!</h1><p class="lead">Thinking about your learning helps it stick.</p>':'<h1 class="big">'+esc(st[0])+'</h1>'+(st[1]?'<p class="lead" style="font-size:clamp(22px,2.2vw,32px);color:var(--ink)">'+esc(st[1])+'</p>':''))+'<div class="rfdots">'+r.steps.map((_,i)=>'<i class="'+(R.done||i<R.i?'done':i===R.i?'cur':'')+'"></i>').join('')+'</div></section><aside class="side"><section class="card sm" style="align-items:center">'+(R.done?'<div class="bigbird" style="width:190px">'+birdSVG()+'</div>':ringHTML('main','this step','md'))+'</section><div class="row">'+(R.done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-act="rfAgain">Another one</button>':'<button class="btn" type="button" data-act="rfNext">Next</button>'+(R.i>0?'<button class="btn alt" type="button" data-act="rfBack">Previous step</button>':''))+'</div></aside>'); }
   if(!R.done) paintRing('main',MT.remaining(),MT.total); }
 function reflectAct(a){ if(a==='rfNext'){ const r=REFLECT.find(x=>x.id===A.rf.id); if(A.rf.i<r.steps.length-1){ A.rf.i++; rfStep(); } else { MT.stop(); A.rf.done=true; render(true); celebrate('Nice reflecting!','small'); } return true; }
   if(a==='rfBack'){ if(A.rf.i>0){ A.rf.i--; rfStep(); } return true; }
   if(a==='rfAgain'){ startReflect(null); return true; }
-  if(a==='rfMenu'){ MT.stop(); A.rf=null; openOverlay('rpick'); return true; }
+  if(a==='rfMenu'){ openOverlay('rpick'); return true; }
   return false; }
 document.addEventListener('click',e=>{ const t=e.target.closest('[data-rfstart]'); if(t&&!t.closest('#sheetHost')) startReflect(t.dataset.rfstart||null); });
 document.addEventListener('change',e=>{ const el=e.target; if(el.dataset&&el.dataset.rfoff){ const off=new Set(S.reflectOff||[]); el.checked?off.delete(el.dataset.rfoff):off.add(el.dataset.rfoff); S.reflectOff=[...off]; save(); const c=el.closest('.tcard'); if(c) c.classList.toggle('off',!el.checked); } });
@@ -2636,19 +2682,19 @@ const THINK=[
    ['What changed it?','What made your thinking change?','My thinking changed because…',60]]}
 ];
 const thinkR=id=>THINK.find(x=>x.id===id);
-function startThink(id){ const off=S.thinkOff||[]; let pool=THINK.filter(r=>!off.includes(r.id)); if(!pool.length) pool=THINK; const r=(id&&thinkR(id))||rnd(pool); clearActivity(); A.th={id:r.id,i:0}; A.overlay='think'; markTools(); thStep(); Bird.say('Thinking caps on!'); }
+function startThink(id){ const off=S.thinkOff||[]; let pool=THINK.filter(r=>!off.includes(r.id)); if(!pool.length) pool=THINK; const r=(id&&thinkR(id))||rnd(pool); if(!navPrepareStart('think')) return; clearActivity(); A.th={id:r.id,i:0}; A.overlay='think'; markTools(); thStep(); Bird.say('Thinking caps on!'); }
 function thStep(){ const st=thinkR(A.th.id).steps[A.th.i]; A.th.up=false; chime(1); MT.start(st[3],()=>{ A.th.up=true; chime(2); Bird.say('Time! Ready for the next step?'); render(true); }); render(true); }
 function thNext(){ const r=thinkR(A.th.id); if(A.th.i<r.steps.length-1){ A.th.i++; thStep(); } else { MT.stop(); A.th.done=true; render(true); celebrate('Great thinking!','small'); } }
 function renderThink(full){ const R=A.th, r=thinkR(R.id), st=r.steps[R.i], f=(S.thinkFocus||'').trim();
   if(full){ const chart='<div class="thchart">'+r.steps.map((s,i)=>'<div class="thbox '+(R.done||i<R.i?'done':i===R.i?'cur':'')+'"><b>'+esc(s[0])+'</b>'+(s[2]?'<span>'+esc(s[2])+'</span>':'')+'</div>').join('')+'</div>';
-    setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Thinking routine · '+esc(r.name)+'</div><div class="row"><button class="btn alt sm" type="button" data-act="thMenu">All routines</button>'+backBtn('Stop')+'</div></div>'+(f?'<div class="thfocus"><small>We’re thinking about</small>'+esc(f)+'</div>':'')+(R.done?'<h1 class="big">Great thinking!</h1><p class="lead">Your thinking is on the wall now. Keep it there and come back to it.</p>':'<h1 class="big">'+esc(st[0])+'</h1><p class="lead" style="font-size:clamp(22px,2.2vw,32px);color:var(--ink)">'+esc(st[1])+'</p>'+(st[2]?'<div class="thstem">'+esc(st[2])+'</div>':''))+chart+'</section><aside class="side"><section class="card sm" style="align-items:center">'+(R.done?'<div class="bigbird" style="width:190px">'+birdSVG()+'</div>':ringHTML('main',R.up?'time’s up':'thinking time','md'))+(R.done?'':'<div class="row" style="justify-content:center"><button class="btn alt sm" type="button" data-act="thPause">'+(MT.running?'Pause':'Resume')+'</button><button class="btn alt sm" type="button" data-act="thMore">+1 min</button></div>')+'</section><div class="row">'+(R.done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-act="thMenu">Another routine</button>':'<button class="btn" type="button" data-act="thNext">'+(R.i<r.steps.length-1?'Next step':'Finish')+'</button>'+(R.i>0?'<button class="btn alt" type="button" data-act="thBack">Back</button>':''))+'</div></aside>'); }
+    setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Thinking routine · '+esc(r.name)+'</div><div class="row"><button class="btn alt sm" type="button" data-act="thMenu">All routines</button>'+backBtn('Stop')+'</div></div>'+(f?'<div class="thfocus"><small>We’re thinking about</small>'+esc(f)+'</div>':'')+(R.done?'<h1 class="big">Great thinking!</h1><p class="lead">Your thinking is on the wall now. Keep it there and come back to it.</p>':'<h1 class="big">'+esc(st[0])+'</h1><p class="lead" style="font-size:clamp(22px,2.2vw,32px);color:var(--ink)">'+esc(st[1])+'</p>'+(st[2]?'<div class="thstem">'+esc(st[2])+'</div>':''))+chart+'</section><aside class="side"><section class="card sm" style="align-items:center">'+(R.done?'<div class="bigbird" style="width:190px">'+birdSVG()+'</div>':ringHTML('main',R.up?'time’s up':'thinking time','md'))+(R.done?'':'<div class="row" style="justify-content:center"><button class="btn alt sm" type="button" data-act="thPause">'+(MT.running?'Pause':'Resume')+'</button><button class="btn alt sm" type="button" data-act="thMore">+1 min</button></div>')+'</section><div class="row">'+(R.done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-act="thMenu">Another routine</button>':'<button class="btn" type="button" data-act="thNext">'+(R.i<r.steps.length-1?'Next step':'Finish')+'</button>'+(R.i>0?'<button class="btn alt" type="button" data-act="thBack">Previous step</button>':''))+'</div></aside>'); }
   if(!R.done) paintRing('main',MT.remaining(),MT.total); }
 function thinkAct(a){ if(!A.th&&a!=='thMenu') return false;
   if(a==='thNext'){ thNext(); return true; }
   if(a==='thBack'){ if(A.th.i>0){ A.th.i--; thStep(); } return true; }
   if(a==='thPause'){ MT.running?MT.pause():MT.resume(); render(true); return true; }
   if(a==='thMore'){ MT.add(60); if(A.th.up){ A.th.up=false; MT.onDone=()=>{ A.th.up=true; chime(2); render(true); }; MT.resume(); } render(true); return true; }
-  if(a==='thMenu'){ MT.stop(); A.th=null; openOverlay('thpick'); return true; }
+  if(a==='thMenu'){ openOverlay('thpick'); return true; }
   return false; }
 document.addEventListener('click',e=>{ const t=e.target.closest('[data-thstart]'); if(t&&!t.closest('#sheetHost')) startThink(t.dataset.thstart||null); });
 document.addEventListener('change',e=>{ const el=e.target; if(el.dataset&&el.dataset.thoff){ const off=new Set(S.thinkOff||[]); el.checked?off.delete(el.dataset.thoff):off.add(el.dataset.thoff); S.thinkOff=[...off]; save(); const c=el.closest('.tcard'); if(c) c.classList.toggle('off',!el.checked); } });
@@ -2661,7 +2707,7 @@ const TEAMC=[['Rockets','#F5B700'],['Comets','#2F8F6B'],['Dragons','#2F7FB0'],['
 const tChip=(i,on)=>'<button class="tchip'+(on?' on':'')+'" type="button" data-g="team" data-v="'+i+'" style="--tc:'+TEAMC[i][1]+'"><i></i>'+esc(TEAMC[i][0])+'</button>';
 
 /* Pack up & go: first ready, first out */
-function openPackup(){ clearActivity(); A.pk={out:[],call:''}; A.overlay='packup'; markTools(); MT.start(60,()=>{ chime(1); Music.fadeStop(); Bird.say('Packed up? Stand behind your chair.'); render(true); }); Music.play('move'); Bird.say('Pack up time!'); render(true); }
+function openPackup(){ if(!navPrepareStart('packup')) return; clearActivity(); A.pk={out:[],call:''}; A.overlay='packup'; markTools(); MT.start(60,()=>{ chime(1); Music.fadeStop(); Bird.say('Packed up? Stand behind your chair.'); render(true); }); Music.play('move'); Bird.say('Pack up time!'); render(true); }
 function renderPackup(full){ const n=S.tables||6, P=A.pk;
   if(full) setStage('two','<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Pack up &amp; go</div>'+backBtn('Done')+'</div><h1 class="mid" style="color:var(--gum-d)">Pack up, then stand behind your chair</h1><ol class="steps pksteps"><li><span class="n">1</span><span>Books and pencils away</span></li><li><span class="n">2</span><span>Rubbish off the floor</span></li><li><span class="n">3</span><span>Chair tucked in, stand behind it</span></li><li><span class="n">4</span><span>Quiet and ready</span></li></ol><div class="row" style="margin-top:auto;align-items:center"><div style="width:130px;flex:none">'+ringHTML('main','pack-up','sm')+'</div><p class="lead" style="margin:0">First ready, first out!</p></div></section><section class="card"><div class="row" style="justify-content:space-between"><h2 class="mid" style="color:var(--gum-d)">Who’s ready?</h2><div class="row"><button class="btn alt sm" type="button" data-g="tables" data-v="-1" aria-label="Fewer tables">−</button><span class="hint">'+n+' tables</span><button class="btn alt sm" type="button" data-g="tables" data-v="1" aria-label="More tables">+</button></div></div><p class="hint" style="margin:0">Tap a table when it’s packed and quiet.</p>'+(P.call?'<div class="call flash" id="pkCall">'+esc(P.call)+'</div>':'')+'<div class="pkgrid">'+Array.from({length:n},(_,i)=>{ const k=P.out.indexOf(i); return '<button class="pkt'+(k>=0?' out':'')+'" type="button" data-g="pkgo" data-v="'+i+'" style="--tc:'+CREWD[i%CREWD.length]+';--tl:'+CREWC[i%CREWC.length]+'"><b>Table '+(i+1)+'</b><span>'+(k>=0?'Out · '+(['1st','2nd','3rd'][k]||(k+1)+'th'):'Waiting')+'</span></button>'; }).join('')+'</div><div class="row" style="margin-top:auto"><button class="btn gold" type="button" data-g="pkall">Everyone else, off you go</button></div></section>');
   paintRing('main',MT.remaining(),MT.total); }
@@ -3087,7 +3133,7 @@ const INTENTS=[
  {id:'brain',names:()=>BREAKS.filter(x=>!x.breath).map(x=>x.name),k:[[/ (get up|up and move|get moving|move our bodies|on our feet|stand up and) /,2.2],[/ (a |some )?(breath|breaths|deep breath) /,1.6],[/ something (calm|quiet|calming|active|fun|different|relaxing|to move) /,2.2],[/ (calm|quiet) (down|time|moment|one) /,1.3],[/ brain ?breaks? /,3],[/ (break|breaks) /,1.4],[/ (wiggle|wiggles|stretch|stretching|energi[sz]er|shake (it )?out|get (them|us|everyone|the kids) moving|movement break|move around|dance|dancing) /,1.8],[/ (restless|fidgety|tired|sleepy|flat|zoned out|need (a )?(reset|break|breather)) /,1.4],[/ breathing|breathe|mindful(ness)? /,1.4],[/ (play|do) (a |some )?game /,1.2]],
   run(s){ const b=nFind(s,BREAKS.filter(x=>!x.breath),'name'); goHome(); if(b){ startBrain(null,b.id); return b.name+'!'; } const t=BTYPE(s); startBrain(t); return t==='calm'?'A calm one.':t==='movement'?'Let’s move!':'Brain break time!'; }},
  {id:'timer',k:[[/ timer /,3],[/ \d+ (minutes?|seconds?|hours?) /,2],[/ count ?down /,2.5],[/ (set|start) (a |the )?(clock|time) /,2]],
-  run(s){ if(/ (stop|cancel|clear|turn off|end) (the )?timer /.test(s)){ MT.stop(); render(true); return 'Timer stopped.'; }
+  run(s){ if(/ (stop|cancel|clear|turn off|end) (the )?timer /.test(s)){ navStopActivity(); return 'Timer stopped.'; }
    if(/ (add|more|extra|another|give (them|us) (an )?(extra|more)) /.test(s)&&MT.add){ const d=nDur(s)||60; MT.add(d); render(true); return 'Added '+(d%60?d+' seconds':mm(d/60))+'.'; }
    if(/ (take off|take away|less|minus|remove|knock off) /.test(s)&&MT.add){ const d=nDur(s)||60; MT.add(-d); render(true); return 'Took off '+(d%60?d+' seconds':mm(d/60))+'.'; }
    const d=nDur(s)||300; goHome(); tool('timer'); setTimeout(()=>vclick({'data-timer':d}),60); return (d%60?d+' seconds':mm(d/60))+'. Go!'; }},
@@ -3890,7 +3936,7 @@ document.addEventListener('click',e=>{ if(e.target.closest('[data-wzopen]')){ au
 if(!STUDENT&&/[?&]demo\b/.test(location.search)) setTimeout(()=>{ try{ S.wizDone=true; startDemo(); }catch(_){ } },400);
 
 /* ---- v2.2: teacher phone remote. The board pairs with a phone via QR; commands travel through Roomie's server with a secret key that stays in the link. ---- */
-const RM_CMDS={attention:()=>attention(),reset:()=>resetRoom(),point:()=>act('point'),pick:()=>{ goHome(); act('pick'); },quiet:()=>pickQuiet(),brain:()=>nluRun(' brain break '),checkin:()=>nluRun(' how is everyone feeling '),exit:()=>nluRun(' lets do an exit ticket '),packup:()=>nluRun(' time to pack up '),plus5:()=>act('plus5'),startnow:()=>SCHED.paused||SCHED.pending?switchToTimetable():act('startNow'),home:()=>goHome(),mark:()=>{ if(typeof mirMarkPart==='function') mirMarkPart('toggle'); },timerstop:()=>{ MT.stop(); render(true); },
+const RM_CMDS={attention:()=>attention(),reset:()=>resetRoom(),point:()=>act('point'),pick:()=>{ goHome(); act('pick'); },quiet:()=>pickQuiet(),brain:()=>nluRun(' brain break '),checkin:()=>nluRun(' how is everyone feeling '),exit:()=>nluRun(' lets do an exit ticket '),packup:()=>nluRun(' time to pack up '),plus5:()=>act('plus5'),startnow:()=>SCHED.paused||SCHED.pending?switchToTimetable():act('startNow'),home:()=>goHome(),mark:()=>{ if(typeof mirMarkPart==='function') mirMarkPart('toggle'); },timerstop:()=>navStopActivity(),
   timer:n=>nluRun(' set a timer for '+n+' minutes ')};
 if(REMOTE){ /* ================= PHONE SIDE ================= */
   document.body.classList.add('student','remote');
@@ -4261,7 +4307,7 @@ function speakLine(t){ if(!window.speechSynthesis||!t) return; try{ speechSynthe
 function brainSay(t){ if(brainVoiceOn()) { if(typeof ownVoicePlay==='function'&&ownVoicePlay(t)) return; speakLine(t); } }
 function brainShow(i){ const b=A.brain; if(!b||!b.calls) return; A.callIdx=(i+b.calls.length)%b.calls.length; const c=$('#call'); if(c){ c.className='call'; c.textContent=b.calls[A.callIdx]; c.classList.remove('callpop'); void c.offsetWidth; c.classList.add('callpop'); }
   const n=$('#bstepn'); if(n) n.textContent=(A.callIdx+1)+' / '+b.calls.length; const nx=$('[data-bstep="1"]'); if(nx) nx.textContent=A.callIdx>=b.calls.length-1?'Start again ↻':'Next ▶'; brainSay(b.calls[A.callIdx]); }
-startBrain=function(type,id){ const off=S.breakOff||[]; let pool=BREAKS.filter(b=>!b.breath&&!off.includes(b.id)&&(!type||b.type===type)&&(!A.brain||b.id!==A.brain.id)); if(!pool.length) pool=BREAKS.filter(b=>!b.breath);
+startBrain=function(type,id){ if(!navPrepareStart('brain')) return; const off=S.breakOff||[]; let pool=BREAKS.filter(b=>!b.breath&&!off.includes(b.id)&&(!type||b.type===type)&&(!A.brain||b.id!==A.brain.id)); if(!pool.length) pool=BREAKS.filter(b=>!b.breath);
   const b=brainBreakVariant((id&&BREAKS.find(x=>x.id===id))||pool[Math.floor(Math.random()*pool.length)]||BREAKS[0]);
   clearActivity(); if(b.gen) b.calls=b.gen(); A.brain=b; A.callIdx=0; A.overlay='brain'; markTools(); if(b.song) Music.play(b.song); else Music.stop();
   if(brainVoiceOn()) speakLine(b.name+'. '+b.how+(b.calls?' '+b.calls[0]:''));
@@ -4870,6 +4916,7 @@ rmkAddMedia=function(){ return profileTrack('write',profileRmkAddMediaBase,this,
 picImportFile=function(){ return profileTrack('write',profilePicImportBase,this,arguments); };
 visImportFile=function(){ return profileTrack('write',profileVisImportBase,this,arguments); };
 function classProfileBlockReason(){
+  if(typeof navHasActivity==='function'&&navHasActivity()) return 'Stop the current activity before changing classes.';
   return profileGuardMessage({student:STUDENT,demo:DEMO.active,live:!!(S.liveOn||A.live.busy||A.live.syncing),remote:!!(S.remote||RM.busy||PROFILE_PENDING.remote),coach:!!(M.on||SL.on||PROFILE_PENDING.coach||Object.values(AIX).some(state=>state.busy)),voice:!!(V.on||PROFILE_PENDING.voice),write:PROFILE_PENDING.write>0,media:PROFILE_PENDING.media>0});
 }
 /* PROFILE_SAVE_START: S changes only if the complete, non-recursive backup saves. */
@@ -4893,6 +4940,7 @@ idbPut=function(key,value){ return profileTrack('write',profileIdbPutBase,this,[
    stopped first: classProfileBlockReason() gives the instruction to the teacher. */
 function clearClassRuntime(){
   PROFILE_EPOCH++;
+  if(typeof NAV!=='undefined'){ NAV.owner=null; NAV.trail=[]; }
   MT.stop(); clearActivity();
   if(A.attnClose) try{ A.attnClose(); }catch(_){}
   clearInterval(RS.h); RS.on=false; clearInterval(RZ.h); clearTimeout(RZ.auto); RZ.on=false;
@@ -4997,6 +5045,20 @@ $('#ver').textContent=VERSION;
 if(!firstRun) $('#bandPick').hidden=true;
 else { const b=document.querySelector('[data-band="'+S.band+'"]'); if(b) b.className='btn'; }
 markMode();
+
+/* NAVIGATION_EVENTS_START */
+document.addEventListener('click',e=>{ if(e.target.closest('[data-nav-return]')&&NAV.owner){ navRemember(A.overlay); navShow(NAV.owner); } });
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape') return;
+  if(document.getElementById('dmenu')){ e.preventDefault(); e.stopImmediatePropagation(); closeDMenu(); return; }
+  if(document.getElementById('classpop')){ e.preventDefault(); e.stopImmediatePropagation(); closeClassPop(); return; }
+  if(document.getElementById('segpop')){ e.preventDefault(); e.stopImmediatePropagation(); closeSegPop(); return; }
+  if(typeof TOUR!=='undefined'&&TOUR) return;
+  if(e.target.closest('input,textarea,select,[contenteditable="true"],[role="dialog"]')||document.getElementById('sheetHost').innerHTML) return;
+  if(A.overlay){ e.preventDefault(); e.stopImmediatePropagation(); navBack(); }
+},true);
+/* NAVIGATION_EVENTS_END */
+
 Bird.init(); skyInit();
 refreshLabels(); tick(true);
 setInterval(()=>tick(false),250);
