@@ -1654,12 +1654,17 @@ function setStage(cls,html){ stage.className='stage '+(cls||''); stage.innerHTML
 function renderStrip(P){
   const d=now(); const day=P.day||computeDay(d); const mins=P.mins;
   const total=day.reduce((a,x)=>a+(x.en-x.st),0)||1;
-  $('#strip').innerHTML=day.map((x,i)=>{ let c=''; if(x.en<=mins) c='past'; else if(x.st<=mins) c='now'; else if(P.next&&x===P.next&&(P.phase==='warning'||P.phase==='held')) c='next'; else if(x.b.kind==='break') c='brk';
+  let markup=day.map((x,i)=>{ let c=''; if(x.en<=mins) c='past'; else if(x.st<=mins) c='now'; else if(P.next&&x===P.next&&(P.phase==='warning'||P.phase==='held')) c='next'; else if(x.b.kind==='break') c='brk';
     const label=(c==='now'?(x.en-x.st>=40?x.b.name+' · until '+fmtClock(x.en):x.b.name):(c===''||c==='brk'||c==='next'?(x.b.kind==='break'?'':fmtClock(x.st)+' ')+x.b.name:x.b.name));
     if(document.body.classList.contains('tl-side')){ const xb=x.b, ex=xb.kind==='lesson'&&c!=='past'?[xb.entry?'Entry ticket':'',xb.bbAt?'Brain break':'',xb.acAt?((xb.acW||'think').startsWith('reflect')?'Reflection':(xb.acW||'').startsWith('quiz')?'Quiz':(xb.acW||'')==='checkin'?'Check-in':'Thinking'):'',xb.exit?'Exit ticket':''].filter(Boolean):[];
-      return '<div class="seg '+c+'" data-seg="'+i+'" role="button" tabindex="0"><small>'+fmtClock(x.st)+(c==='now'?' – '+fmtClock(x.en):'')+'</small><b>'+esc(x.b.name)+'</b>'+(ex.length&&c!=='past'?'<em>'+esc(ex.join(' · '))+'</em>':'')+'</div>'; }
-    return '<div class="seg '+c+'" data-seg="'+i+'" role="button" tabindex="0" style="flex:'+Math.max(8,(x.en-x.st))+'" title="'+esc(fmtClock(x.st)+' '+x.b.name)+'">'+esc(label)+'</div>'; }).join('');
-  if(document.body.classList.contains('tl-side')) $('#strip').insertAdjacentHTML('afterbegin','<h2 class="tlh">Today</h2>');
+      return '<div class="seg '+c+'" data-seg="'+i+'" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false"><small>'+fmtClock(x.st)+(c==='now'?' – '+fmtClock(x.en):'')+'</small><b>'+esc(x.b.name)+'</b>'+(ex.length&&c!=='past'?'<em>'+esc(ex.join(' · '))+'</em>':'')+'</div>'; }
+    return '<div class="seg '+c+'" data-seg="'+i+'" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false" style="flex:'+Math.max(8,(x.en-x.st))+'" title="'+esc(fmtClock(x.st)+' '+x.b.name)+'">'+esc(label)+'</div>'; }).join('');
+  if(document.body.classList.contains('tl-side')) markup='<h2 class="tlh">Today</h2>'+markup;
+  const strip=$('#strip'); if(strip._navMarkup===markup) return;
+  const focused=document.activeElement&&document.activeElement.closest('[data-seg]'), index=focused&&strip.contains(focused)?focused.dataset.seg:null;
+  strip._navMarkup=markup; strip.innerHTML=markup;
+  if(index!==null){ const replacement=strip.querySelector('[data-seg="'+index+'"]'); if(replacement) replacement.focus({preventScroll:true}); }
+
 }
 function render(full){
   navControls();
@@ -2814,20 +2819,41 @@ function planExtrasHTML(b){ if(b.kind!=='lesson') return '';
 /* ---- v0.8.2: tap a subject in the day list ---- */
 function segInfo(x){ const b=x.b, L=[]; if(b.materials) L.push('Get out: '+b.materials); if(S.expect[b.exp]) L.push('Expectations: '+S.expect[b.exp].name);
   const R0=b.startR&&routineById(b.startR), R1=b.endR&&routineById(b.endR); if(R0) L.push('Starts with: '+R0.name); if(b.kind==='lesson'){ if(b.entry) L.push('Entry ticket'+(b.entryT&&ticketById(b.entryT)?': '+ticketById(b.entryT).t:'')); const at=v=>v==='start'?'at the start':v==='end'?'at the end':'after '+v+' min'; if(b.bbAt) L.push(cueLabel('brain:'+(b.bbId||'any'))+' '+at(b.bbAt)); if(b.acAt) L.push(cueLabel(b.acW||'think:any')+' '+at(b.acAt)); if(b.exit) L.push('Exit ticket'+(b.exitT&&ticketById(b.exitT)?': '+ticketById(b.exitT).t:'')); } if(R1) L.push('Ends with: '+R1.name); return L; }
-function closeSegPop(){ const p=document.getElementById('segpop'); if(p) p.remove(); }
-function openSegPop(el){ closeSegPop(); const P=A.P||phaseAt(now()); const day=P.day||computeDay(now()); const x=day[+el.dataset.seg]; if(!x) return; A.segX=x;
-  const L=segInfo(x), m=document.createElement('div'); m.id='segpop'; m.className='segpop'; m.setAttribute('role','dialog');
-  m.innerHTML='<small>'+fmtClock(x.st)+' – '+fmtClock(x.en)+'</small><b>'+esc(x.b.name)+'</b>'+(L.length?'<ul>'+L.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'<span class="hint">Nothing planned yet.</span>')+'<div class="row">'+(x.b.startR&&routineById(x.b.startR)?'<button class="btn gold sm" type="button" data-run="'+x.b.startR+'" data-sprun="1">Run '+esc(routineById(x.b.startR).name)+' now</button>':'')+'<button class="btn sm" type="button" data-sp="show">Show on the board</button><button class="btn alt sm" type="button" data-sp="edit">Edit</button></div>';
+let segOpenerIndex=null;
+function closeSegPop(){
+  const popup=document.getElementById('segpop'), restore=popup&&popup.contains(document.activeElement);
+  if(popup) popup.remove();
+  const opener=segOpenerIndex!==null&&document.querySelector('[data-seg="'+segOpenerIndex+'"]');
+  if(opener){ opener.setAttribute('aria-expanded','false'); if(restore) opener.focus({preventScroll:true}); }
+}
+function openSegPop(el){ closeSegPop(); const P=phaseAt(now()); const day=P.day||computeDay(now()); const x=day[+el.dataset.seg]; if(!x) return; A.segX=x;
+  const L=segInfo(x), m=document.createElement('div'); m.id='segpop'; m.className='segpop'; m.setAttribute('role','dialog'); m.setAttribute('aria-label','Lesson details'); segOpenerIndex=el.dataset.seg; el.setAttribute('aria-expanded','true');
+  m.innerHTML='<small>'+fmtClock(x.st)+' – '+fmtClock(x.en)+'</small><b>'+esc(x.b.name)+'</b>'+(L.length?'<ul>'+L.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'<span class="hint">Nothing planned yet.</span>')+'<div class="row">'+(x.b.startR&&routineById(x.b.startR)?'<button class="btn gold sm" type="button" data-run="'+x.b.startR+'" data-sprun="1">Run '+esc(routineById(x.b.startR).name)+' now</button>':'')+'<button class="btn sm" type="button" data-sp="show">Preview on board</button><button class="btn alt sm" type="button" data-sp="edit">Edit lesson</button><button class="btn alt sm" type="button" data-sp="close">Close</button></div>';
   document.body.appendChild(m); const r=el.getBoundingClientRect(); const side=document.body.classList.contains('tl-side');
-  if(side){ m.style.left=(r.right+12)+'px'; m.style.top=Math.max(8,Math.min(r.top,innerHeight-m.offsetHeight-8))+'px'; } else { m.style.left=Math.max(8,Math.min(r.left,innerWidth-m.offsetWidth-8))+'px'; m.style.top=(r.bottom+8)+'px'; } }
+  m.style.left=Math.max(8,Math.min(side?r.right+12:r.left,innerWidth-m.offsetWidth-8))+'px';
+  m.style.top=Math.max(8,Math.min(side?r.top:r.bottom+8,innerHeight-m.offsetHeight-8))+'px';
+  const first=m.querySelector('button'); if(first) first.focus({preventScroll:true}); }
+/* TIMETABLE_EDIT_START */
+function timetableEditTarget(days,regularDay,oneOffDay,block){
+  const day=oneOffDay&&Array.isArray(days[oneOffDay])?oneOffDay:regularDay;
+  const index=(days[day]||[]).findIndex(item=>item===block||item.id===block.id);
+  return {day,index};
+}
+function editTimetableBlock(block){
+  const target=timetableEditTarget(S.days,isWeekend(now())?'mon':dayKey(now()),typeof onceKey==='function'?onceKey(now()):null,block);
+  if(target.index<0){ toast('This lesson is no longer in the current day plan. Open Setup to review it.'); return; }
+  editDay=target.day; planOpen=target.index; tab='plan'; openSetup();
+  requestAnimationFrame(()=>{ const row=document.querySelector('.prow[data-i="'+planOpen+'"]'); if(row){ row.scrollIntoView({block:'center'}); const field=row.querySelector('[data-f="name"]'); if(field) field.focus({preventScroll:true}); } });
+}
+/* TIMETABLE_EDIT_END */
 function renderPeek(full){ if(!full) return; const x=A.segX; if(!x) return; const b=x.b, R0=b.startR&&routineById(b.startR), L=segInfo(x).filter(t=>!t.startsWith('Get out')&&!t.startsWith('Expectations')&&!(R0&&t==='Starts with: '+R0.name));
   const when=x.st>(A.P?A.P.mins:0)?'Coming up at '+fmtClock(x.st):fmtClock(x.st)+' – '+fmtClock(x.en);
   const main='<section class="card" style="align-items:flex-start"><div class="row" style="justify-content:space-between;width:100%"><div class="eyebrow">'+when+'</div><div class="row">'+(R0?'<button class="btn sm" type="button" data-run="'+R0.id+'">Run '+esc(R0.name)+' now</button>':'')+backBtn('Back')+'</div></div><h1 class="big">'+esc(b.name)+'</h1>'+(b.materials?'<div class="task">'+esc(b.materials)+'</div>':'')+(R0?stepsHTML(stepsOf(R0),-1):'')+expHTML(b.exp)+(L.length?'<ul class="flist" style="font-size:clamp(18px,1.7vw,24px)">'+L.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'')+'</section>';
   if(R0&&R0.checkin) setStage('', main+'<aside class="side"><section class="card sm">'+weatherHTML()+'</section>'+factHTML()+'</aside>');
   else setStage('one', main); }
 document.addEventListener('click',e=>{ const sp=e.target.closest('[data-sp]'); if(sp){ const a=sp.dataset.sp, x=A.segX; closeSegPop(); audio();
-    if(a==='show'){ clearActivity(); A.overlay='peek'; markTools(); render(true); }
-    if(a==='edit'&&x){ editDay=isWeekend(now())?'mon':dayKey(now()); tab='plan'; openSetup(); setTimeout(()=>{ const i=(S.days[editDay]||[]).indexOf(x.b); const row=document.querySelector('.prow[data-i="'+i+'"]'); if(row){ row.scrollIntoView({block:'center'}); row.classList.add('flashrow'); } },120); }
+    if(a==='show'){ openOverlay('peek'); }
+    if(a==='edit'&&x) editTimetableBlock(x.b);
     return; }
   const sg=e.target.closest('[data-seg]'); if(sg){ audio(); openSegPop(sg); return; }
   if(!e.target.closest('#segpop')||e.target.closest('[data-sprun]')) setTimeout(closeSegPop,0); });
@@ -5018,14 +5044,14 @@ function profileSwitch(targetId){
   }catch(error){ profileStatus(committed?'The class change was saved, but the screen could not refresh. Reload Roomie to continue.':error.message||'The class could not be changed. Your current class is unchanged.',true); return committed; }
 }
 function profileHasActivity(){ return !!(A.overlay||A.attnClose||RZ.on||RS.on||(MT.total>0&&(MT.running||MT.remaining()>0))); }
-function profileSwitchLabel(room){ return (profileHasActivity()?'End activity and switch':'Switch class')+(room?' · '+room:''); }
+function profileSwitchLabel(room){ return (!classProfileBlockReason()&&profileHasActivity()?'End activity and switch':'Switch class')+(room?' · '+room:''); }
 function profileManagerHTML(){
   const records=profileRecords(S), blocked=classProfileBlockReason();
   return '<section class="profile-manager" aria-labelledby="profilesTitle"><h2 id="profilesTitle" tabindex="-1">Your classes</h2><p class="hint" style="margin:0">Each class keeps its own list, timetable, routines, settings and history. Your backup includes every class. Use <b>Class name</b> below to rename the class you are using.</p><div class="profile-list"><div class="profile-row"><div><b data-profile-current-name>'+esc(S.room)+'</b><small data-profile-current-count>'+names().length+' students'+(S.studentsAreExample?' · example class':'')+'</small></div><span aria-current="true">Current class</span></div>'+records.map(record=>'<div class="profile-row"><div><b>'+esc(record.data.room||'Class')+'</b><small>'+((record.data.students||[]).length)+' students'+(record.data.studentsAreExample?' · example class':'')+'</small></div><button type="button" class="btn alt sm" data-profile-switch="'+esc(record.id)+'">'+esc(profileSwitchLabel())+'</button></div>').join('')+'</div><p class="profile-status'+(blocked?' warnbox':'')+'" data-profile-status role="status">'+esc(blocked)+'</p><details><summary>Add another class</summary><p class="hint">Start with an empty class list, zero points and a blank timetable. You can use the toolkit straight away. Creating the class ends the current local activity after saving.</p><form class="profile-new" id="profileNewForm"><label>Class name<input id="profileNewRoom" name="room" maxlength="40" required placeholder="e.g. Year 7 Blue"></label><label>Teacher name (optional)<input id="profileNewTeacher" name="teacher" maxlength="40" value="'+esc(S.teacher||'')+'"></label><label>Age band<select id="profileNewBand" name="band">'+[['early','Pre-primary to Year 2'],['primary','Years 3 to 6'],['middle','Years 7 and 8']].map(([value,label])=>opt(value,label,S.band||'primary')).join('')+'</select></label><div class="row wide"><button class="btn" type="submit">Create and switch to class</button></div></form></details></section>';
 }
 function profileQuickHTML(){
-  const records=profileRecords(S), current=S.classProfileId||'';
-  return '<div class="profile-quick"><label for="profileQuickSelect">Switch class</label><div class="row"><select id="profileQuickSelect"><option value="'+esc(current)+'">'+esc(S.room)+' (current)</option>'+records.map(record=>'<option value="'+esc(record.id)+'">'+esc(record.data.room||'Class')+'</option>').join('')+'</select><button class="btn sm" type="button" data-profile-quick disabled>'+esc(profileSwitchLabel())+'</button><button class="btn alt sm" type="button" data-profile-manage>Manage classes</button></div><p class="profile-status" data-profile-status role="status"></p></div>';
+  const records=profileRecords(S), current=S.classProfileId||'', blocked=classProfileBlockReason();
+  return '<div class="profile-quick"><label for="profileQuickSelect">Switch class</label><div class="row"><select id="profileQuickSelect"><option value="'+esc(current)+'">'+esc(S.room)+' (current)</option>'+records.map(record=>'<option value="'+esc(record.id)+'">'+esc(record.data.room||'Class')+'</option>').join('')+'</select><button class="btn sm" type="button" data-profile-quick disabled>'+esc(profileSwitchLabel())+'</button><button class="btn alt sm" type="button" data-profile-manage>Manage classes</button></div><p class="profile-status" data-profile-status role="status">'+esc(blocked)+'</p></div>';
 }
 const profileRenderSetupBase=renderSetup;
 renderSetup=function(){
@@ -5046,7 +5072,7 @@ openClassPop=function(){
 };
 closeClassPop=function(){ const popup=document.getElementById('classpop'), focused=popup&&popup.contains(document.activeElement), result=profileCloseClassPopBase.apply(this,arguments); if(focused){ const button=document.getElementById('classBtn'); if(button&&!button.closest('[inert]')) button.focus({preventScroll:true}); } return result; };
 document.getElementById('classBtn').setAttribute('aria-haspopup','dialog');
-document.addEventListener('change',e=>{ if(e.target.id!=='profileQuickSelect') return; const button=document.querySelector('[data-profile-quick]'); if(button){ button.disabled=!e.target.value||e.target.value===S.classProfileId; button.textContent=profileSwitchLabel(); } });
+document.addEventListener('change',e=>{ if(e.target.id!=='profileQuickSelect') return; const button=document.querySelector('[data-profile-quick]'); if(button){ button.disabled=!e.target.value||e.target.value===S.classProfileId||!!classProfileBlockReason(); button.textContent=profileSwitchLabel(); } });
 document.addEventListener('click',e=>{
   const button=e.target.closest('[data-profile-manage],[data-profile-quick],[data-profile-switch]'); if(!button) return;
   if(button.hasAttribute('data-profile-manage')){ closeClassPop(); tab='class'; openSetup(); const title=document.getElementById('profilesTitle'); if(title) title.focus(); return; }
