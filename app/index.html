@@ -1257,7 +1257,7 @@ body.ui-calm-look .mascot *,body.ui-calm-look .bigbird *,body.ui-calm-look .stk 
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.7.0 · 14 Nov 2026';
+const VERSION='Roomie v2.7.1 · 14 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -2018,7 +2018,7 @@ document.addEventListener('dblclick',e=>{ const li=e.target.closest('.steps li')
 $('#setupBtn').addEventListener('click',()=>openSetup());
 $('#lookBtn').addEventListener('click',()=>{ tab='look'; openSetup(); });
 $('#fsBtn').addEventListener('click',()=>{ try{ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(()=>toast('Full screen isn’t available here.')); }catch(e){ toast('Full screen isn’t available here.'); } });
-function markMode(){ document.querySelectorAll('[data-mode]').forEach(x=>x.className='btn'+(x.dataset.mode===(S.mode||'day')?'':' alt')); document.body.classList.toggle('mode-tools',S.mode==='tools'); }
+function markMode(){ document.querySelectorAll('[data-mode]').forEach(x=>x.className='btn'+(x.dataset.mode===(S.mode||'day')?'':' alt')); document.body.classList.toggle('mode-tools',S.mode==='tools'); const start=document.getElementById('startBtn'); if(start) start.textContent=S.mode==='tools'?'Open my toolkit':'Start my day'; }
 document.addEventListener('click',e=>{ const m=e.target.closest('[data-mode]'); if(!m) return; S.mode=m.dataset.mode; save(); markMode(); A.phaseKey=null; if(document.getElementById('app').offsetParent!==null||true) tick(true); if(document.getElementById('sheetHost')&&typeof renderSetup==='function'&&m.closest('#sheetHost')) renderSetup(); });
 document.querySelectorAll('[data-band]').forEach(b=>b.addEventListener('click',()=>{ const band=b.dataset.band; const keep={students:S.students,studentsAreExample:S.studentsAreExample,room:S.room,mode:S.mode,toured:S.toured,keepEveryoneInGame:S.keepEveryoneInGame}; S=Object.assign(defaults(band),keep); save(); document.querySelectorAll('[data-band]').forEach(x=>x.className='btn alt'); b.className='btn'; toast('Set up for '+b.textContent+'. You can change everything in Setup.'); }));
 $('#startBtn').addEventListener('click',()=>{ audio(); $('#splash').hidden=true; save(); wake(); tick(true); });
@@ -2053,7 +2053,7 @@ function renderSetup(){
   if(tab==='fun'){ body='<div class="row" style="align-items:flex-end"><div class="fld" style="width:220px"><label for="fFun">Fun level</label><select id="fFun">'+opt('calm','Calm: just the essentials',S.fun)+opt('lively','Lively (recommended)',S.fun)+opt('party','Party: everything on',S.fun)+'</select></div><button class="btn gold" type="button" data-sact="testFun">Test a celebration</button></div><label class="chk"><input type="checkbox" id="fMascot" '+(S.mascot!==false?'checked':'')+'><span>Show Roomie the mascot<span class="hint" style="display:block">Sings with the music, cheers for points, says hello at each change</span></span></label><label class="chk"><input type="checkbox" id="fSfx" '+(S.sfx!==false?'checked':'')+'><span>Celebration sounds<span class="hint" style="display:block">Fanfares, drumrolls and pops. The attention chime always plays.</span></span></label><p class="hint" style="margin:0">Fun comes in bursts: celebrations, races and reveals. During learning the board stays calm. If a computer is set to reduce motion, Roomie turns the animations off.</p>'+brainBreakSettingsHTML()+'<h3>Rotations</h3><div class="row" style="align-items:flex-start"><div class="fld" style="flex:1;min-width:240px"><label for="fStations">Stations, one per line (2 to 8)</label><textarea id="fStations" style="min-height:180px">'+esc(S.stations||'')+'</textarea></div><div class="fld" style="width:160px"><label for="fRotMin">Minutes at each</label><input id="fRotMin" type="number" min="2" max="40" value="'+(S.rotMin||12)+'"></div></div><p class="hint" style="margin:0">Roomie makes one crew per station from your class list. Crews move one station each round, with a 45-second move song.</p>'; }
   if(tab==='demo'){ const P=phaseAt(now()); body='<div class="okbox" style="font-size:16px">Try your timetable with a demo clock. Demo edits, points and history stay in this open page. Exit demo to restore your saved class.</div><div class="row"><button class="btn gold" type="button" data-sact="demoStart">Start the day at 8:40</button><button class="btn" type="button" data-sact="demoNext">Jump to 10 seconds before the next change</button><button class="btn alt" type="button" data-sact="demoReal">Back to the real time</button></div><p class="lead">Board time now: '+fmtClock(P.mins)+' · '+esc(P.phase)+(P.block?' · '+esc(P.block.name):'')+'</p>'; }
   if(tab==='coach'){ body=coachTab(); setTimeout(coachFillMics,0); }
-  if(tab==='privacy'){ body=moveHTML()+'<div class="okbox" style="font-size:16px;line-height:1.6"><b>Saved in this browser:</b> your class display names, plan, routines, settings, seating, points and up to 30 daily summaries. Summaries include activity counts and anonymous check-in totals. Uploaded audio and pictures stay in this browser. If you use coaching, lesson estimates and recognised text are saved here too.<br><b>Optional online features:</b> student-device answers and remote-control messages use Roomie’s server. Student answers include a display name only when requested; feelings do not include a name. A move code uploads an encrypted copy of your settings. Server retention needs to be checked with the service operator.<br><b>Microphone and AI:</b> the noise meter processes sound levels without saving an audio recording. Voice commands use on-device recognition by default. If you enable cloud listening, your browser sends audio to its speech service. Coaching can capture other speakers and transcription errors; review the text before copying or sending it to an AI service.<br><b>Backups:</b> contain your saved class data and connection keys. Keep them private. Browser storage is not a substitute for a backup.</div><div class="fld"><label for="fBackup">Backup: copy this somewhere safe, or paste a backup here to restore</label><textarea id="fBackup" style="font-size:12px;font-family:ui-monospace,monospace">'+esc(JSON.stringify(S))+'</textarea></div><div class="row"><button class="btn alt sm" type="button" data-sact="copyBackup">Copy backup</button><button class="btn alt sm" type="button" data-sact="restore">Restore from the box</button><button class="btn alt sm" type="button" data-sact="erase">Erase everything on this computer</button></div><div id="privMsg"></div>'; }
+  if(tab==='privacy'){ body=moveHTML()+'<div class="okbox" style="font-size:16px;line-height:1.6"><b>Saved in this browser:</b> your class display names, plan, routines, settings, seating, points and up to 30 daily summaries. Summaries include activity counts and anonymous check-in totals. Uploaded audio and pictures stay in this browser. If you use coaching, lesson estimates and recognised text are saved here too.<br><b>Optional online features:</b> student-device answers and remote-control messages use Roomie’s server. Student answers include a display name only when requested; feelings do not include a name. A move code uploads an encrypted copy of your settings. Server retention needs to be checked with the service operator.<br><b>Microphone and AI:</b> the noise meter processes sound levels without saving an audio recording. Voice commands use on-device recognition by default. If you enable cloud listening, your browser sends audio to its speech service. Coaching can capture other speakers and transcription errors; review the text before copying or sending it to an AI service.<br><b>Backups:</b> contain all your saved classes, settings, connection keys, school crest and pictures added under “Your pictures”. Uploaded audio, videos, PDFs and routine image attachments are not included; keep their original files. Keep the backup private. Restoring it replaces all classes saved in this browser.</div><div class="fld"><label for="fBackup">Backup: copy this somewhere safe. Restoring from this box replaces all saved classes.</label><textarea id="fBackup" style="font-size:12px;font-family:ui-monospace,monospace">'+esc(JSON.stringify(S))+'</textarea></div><div class="row"><button class="btn alt sm" type="button" data-sact="copyBackup">Copy backup</button><button class="btn alt sm" type="button" data-sact="restore">Restore from the box</button><button class="btn alt sm" type="button" data-sact="erase">Erase everything on this computer</button></div><div id="privMsg"></div>'; }
   $('#sheetHost').innerHTML='<div class="sheet" role="dialog" aria-label="Setup"><div class="sheet-in"><div class="row" style="justify-content:space-between"><h1 style="font-size:34px;color:var(--gum-d)">Setup</h1><button class="btn" type="button" data-sact="done"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px"><path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/></svg>Done, back to Home</button></div><div class="tabs" role="tablist">'+tabs.map(([k,l])=>'<button class="tab" role="tab" type="button" data-tab="'+k+'" aria-selected="'+(tab===k)+'">'+l+'</button>').join('')+'</div>'+body+'<p class="hint"><span data-save-caption>'+esc(storageCaption())+'</span> '+esc(VERSION)+'</p></div></div>';
 }
 function reliefHTML(){ const k=isWeekend(now())?'mon':dayKey(now()); const day=(typeof blocksToday==='function'?blocksToday(now()):(S.days[k]||[])).slice().sort((a,b)=>toMin(a.start)-toMin(b.start));
@@ -3110,7 +3110,7 @@ function nluRun(raw){ const s=nNorm(raw); if(!s.trim()) return {ok:false,empty:t
 
 /* ---- v1.4: "Hey Roomie" voice commands ---- */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-const V={on:false,rec:null,awake:0,last:''};
+const V={on:false,starting:false,listening:false,rec:null,local:null,epoch:0,restart:0,awake:0,last:''};
 const WNAME='roomie|roomy|roomies|roomie\'s|rumi|rumie|ruumi|roomee|room e|roomi|rumy|rhumie|roomly|rooming|rooney|ruby|rummy|romy|roomba|rome|ruminy|bruny|groomie|loomie';
 const WAKE=new RegExp('(^|\\b)(hey|hi|hay|hello|ok|okay|oi|yo|a|hey there)?[ ,]*('+WNAME+')(\\b|$)','i');
 const WAKE_STRICT=/\b(roomie|roomy|roomies|rumi|rumie|roomee|roomi)\b/i;
@@ -3162,33 +3162,62 @@ function vSuggest(cmd,list){ let el=document.getElementById('vsug'); if(!el){ el
   el.innerHTML='<small>I heard “'+esc(cmd)+'”. Did you mean…</small><div class="row">'+list.map(([g,n])=>'<button class="btn sm" type="button" data-vsug="'+g+'">'+esc(n)+'</button>').join('')+'<button class="btn alt sm" type="button" data-vsug="">No thanks</button></div>'; el.hidden=false; clearTimeout(V.sh); V.sh=setTimeout(()=>{ el.hidden=true; },9000); }
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-vsug]'); if(!b) return; const g=b.dataset.vsug, el=document.getElementById('vsug'); if(el) el.hidden=true; if(!g) return; const it=INTENTS.find(x=>x.id===g); if(it){ const r=it.run(nNorm(V.last)); if(r&&r!=='skip') Bird.say(r); } });
 function vShow(t){ let el=document.getElementById('vheard'); if(!el){ el=document.createElement('div'); el.id='vheard'; el.className='vheard'; document.body.appendChild(el); } el.textContent=t; el.classList.add('on'); clearTimeout(V.ht); V.ht=setTimeout(()=>el.classList.remove('on'),t.startsWith('🎙')?2500:4500); }
-function vMark(){ const b=document.getElementById('micBtn'); if(!b) return; b.classList.toggle('on',V.on); b.classList.toggle('awake',V.on&&Date.now()<V.awake); b.title=V.on?'Roomie is listening for “Hey Roomie”. Tap to stop.':'Turn on “Hey Roomie” voice commands'; }
-async function vLocalReady(){ if(!SR||!SR.available) return 'unsupported';
+function vMark(){ const b=document.getElementById('micBtn'); if(!b) return; b.classList.toggle('on',V.on||V.starting); b.classList.toggle('awake',V.listening&&Date.now()<V.awake); b.title=V.starting?'Voice commands are starting. Tap to cancel.':V.listening?'Roomie is listening for “Hey Roomie”. Tap to stop.':'Turn on “Hey Roomie” voice commands'; }
+function speechPrivacyRefresh(){ if(A.overlay==='voicehelp') render(true); }
+function speechRecognizer(local){ if(!SR) return null; const r=new SR();
+  // Setting an unknown property on an older browser does not request local processing.
+  if(local){ if(!('processLocally' in r)) return null; r.processLocally=true; if(r.processLocally!==true) return null; }
+  else if('processLocally' in r) r.processLocally=false;
+  r.lang=local?'en-US':'en-AU'; r.continuous=true; return r; }
+function speechAbort(r){ if(!r) return; r.onstart=r.onresult=r.onerror=r.onend=null; try{ typeof r.abort==='function'?r.abort():r.stop(); }catch(_){} }
+function vResetSession(){ V.epoch++; V.on=false; V.starting=false; V.listening=false; V.local=null; V.awake=0; clearTimeout(V.restart); V.restart=0; const r=V.rec; V.rec=null; speechAbort(r); }
+async function vLocalReady(current){ if(!SR||!SR.available) return 'unsupported';
   try{ let a=await SR.available({langs:['en-US'],processLocally:true});
-    if(a==='downloadable'||a==='downloading'){ vShow('Downloading Roomie’s listening pack… (one time only)'); const ok=await SR.install({langs:['en-US'],processLocally:true}); a=ok?'available':'unavailable'; }
-    return a; }catch(_){ return 'unsupported'; } }
-async function vStart(){ if(!SR){ toast('Voice commands need Chrome or Edge.'); return; }
-  const local=S.voiceCloud!==true; let lang='en-AU';
-  if(local){ const a=await vLocalReady(); if(a!=='available'){ V.blocked=true; openOverlay('voicehelp'); return; } lang='en-US'; }
-  V.blocked=false; V.local=local;
-  const r=new SR(); r.lang=lang; if(local) r.processLocally=true; r.continuous=true; r.interimResults=true; r.maxAlternatives=3; V.rec=r; V.on=true; S.voice=true; save(); vMark();
-  r.onresult=e=>{ for(let i=e.resultIndex;i<e.results.length;i++){ const res=e.results[i], alts=[...res].map(a=>a.transcript);
-      if(!res.isFinal){ const t=alts[0]||''; if(wakeIn(t)!==null||Date.now()<V.awake) vShow('🎙 '+t+'…'); continue; }
-      if(typeof M!=='undefined'&&M.on) mirFeed(alts[0]);
-      let cmd=null; for(const t of alts){ const c=wakeIn(t); if(c!==null){ cmd=c; break; } }
-      if(cmd!==null) vHandle(cmd); else if(Date.now()<V.awake) vHandle(alts[0]); } };
-  r.onerror=e=>{ if(e.error==='not-allowed'||e.error==='service-not-allowed'){ V.on=false; S.voice=false; save(); vMark(); toast('Roomie needs permission to use the microphone. Allow it in the address bar and try again.'); } };
-  r.onend=()=>{ if(V.on) setTimeout(()=>{ try{ r.start(); }catch(_){ } },300); };
-  try{ r.start(); }catch(_){ }
-  if(!S.voiceHelped){ S.voiceHelped=true; save(); openOverlay('voicehelp'); } }
-function vStop(){ V.on=false; S.voice=false; save(); try{ V.rec&&V.rec.stop(); }catch(_){ } V.rec=null; vMark(); }
-document.addEventListener('click',e=>{ if(e.target.closest('#micBtn')){ audio(); V.on?vStop():vStart(); } if(e.target.closest('[data-vhelp]')){ openOverlay('voicehelp'); } });
+    if(current&&!current()) return 'cancelled';
+    if(a==='downloadable'||a==='downloading'){ if(!SR.install) return 'unsupported'; vShow('Downloading Roomie’s listening pack… (one time only)'); const ok=await SR.install({langs:['en-US'],processLocally:true}); a=ok?'available':'unavailable'; }
+    return current&&!current()?'cancelled':a; }catch(_){ return 'unsupported'; } }
+async function vStart(){ if(V.on||V.starting) return; if(!SR){ toast('Voice commands need a browser with speech recognition.'); return; }
+  const epoch=++V.epoch, local=S.voiceCloud!==true, current=()=>V.epoch===epoch&&local===(S.voiceCloud!==true); V.starting=true; V.blocked=false; vMark(); speechPrivacyRefresh();
+  try{
+    if(local){ const a=await vLocalReady(current); if(!current()) return; if(a!=='available'){ V.blocked=true; openOverlay('voicehelp'); return; } }
+    if(!current()) return;
+    const r=speechRecognizer(local); if(!r){ V.blocked=true; openOverlay('voicehelp'); return; }
+    const active=()=>current()&&V.on&&V.rec===r;
+    V.local=local; V.rec=r; V.on=true; V.listening=false; S.voice=true; save(); vMark();
+    r.interimResults=true; r.maxAlternatives=3;
+    r.onstart=()=>{ if(!active()){ speechAbort(r); return; } V.starting=false; V.listening=true; vMark(); speechPrivacyRefresh(); };
+    r.onresult=e=>{ if(!active()) return; for(let i=e.resultIndex;i<e.results.length&&active();i++){ const res=e.results[i], alts=[...res].map(a=>a.transcript);
+        if(!res.isFinal){ const t=alts[0]||''; if(wakeIn(t)!==null||Date.now()<V.awake) vShow('🎙 '+t+'…'); continue; }
+        if(typeof M!=='undefined'&&M.on) mirFeed(alts[0]);
+        let cmd=null; for(const t of alts){ const c=wakeIn(t); if(c!==null){ cmd=c; break; } }
+        if(cmd!==null) vHandle(cmd); else if(Date.now()<V.awake) vHandle(alts[0]); } };
+    r.onerror=e=>{ if(!active()||e.error==='no-speech') return; vStop(); V.blocked=local; toast(e.error==='not-allowed'||e.error==='service-not-allowed'?'Microphone permission was not granted. Voice commands are off.':'Speech recognition stopped. Tap the microphone to try again.'); speechPrivacyRefresh(); };
+    r.onend=()=>{ if(!active()) return; V.listening=false; V.starting=true; vMark(); speechPrivacyRefresh(); clearTimeout(V.restart); V.restart=setTimeout(()=>{ V.restart=0; if(!active()) return; try{ r.start(); }catch(_){ vStop(); toast('Voice commands could not restart. Tap the microphone to try again.'); } },300); };
+    try{ r.start(); }catch(_){ vStop(); toast('Voice commands could not start. Tap the microphone to try again.'); return; }
+    if(!S.voiceHelped){ S.voiceHelped=true; save(); openOverlay('voicehelp'); }
+  }finally{ if(current()&&!V.rec){ V.starting=false; vMark(); speechPrivacyRefresh(); } }
+}
+function vStop(){ vResetSession(); S.voice=false; save(); vMark(); speechPrivacyRefresh(); }
+document.addEventListener('click',e=>{ if(e.target.closest('#micBtn')){ audio(); V.on||V.starting?vStop():vStart(); } if(e.target.closest('[data-vhelp]')){ openOverlay('voicehelp'); } });
 function renderVoiceHelp(full){ if(!full) return; const L=[['Brain break','“Hey Roomie, they’re getting restless, let’s have a brain break” · “…something calm” · “…play Heads or Hips”'],['Questions','“Hey Roomie, what’s next?” · “…when is lunch?” · “…how long until recess?” · “…who’s line leader?” · “…how many points do we have?”'],['Changing your mind','“Hey Roomie, another one” · “…something else” · “…go back a step” · “…give them 2 more minutes”'],['Timer','“Hey Roomie, timer 5 minutes” · “…30 seconds” · “…one more minute” · “…pause”'],['Students','“Hey Roomie, pick a name” · “…groups of 3” · “…seating plan” · “…helpers”'],['Tickets','“Hey Roomie, exit ticket” · “…entry ticket”'],['Thinking','“Hey Roomie, thinking routine” · “…see think wonder” · “…next step” · “…reflection”'],['Class','“Hey Roomie, check-in” · “…poll” · “…quiz” · “…pack up”'],['Calm','“Hey Roomie, attention” · “…reset the room” · “…give us a point”'],['Anywhere','“Hey Roomie, home”']];
   setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><div><div class="eyebrow">Voice commands</div><h1 class="mid" style="color:var(--gum-d)">Just say “Hey Roomie…”</h1><p class="lead" style="margin:4px 0 0">Talk to Roomie the way you’d talk to a teacher aide. These are just examples.</p></div>'+backBtn('Got it')+'</div><div class="vgrid">'+L.map(([a,b])=>'<div class="vrow"><b>'+esc(a)+'</b><span>'+esc(b)+'</span></div>').join('')+'</div><p class="hint" style="margin:0">You can also say “Hey Roomie”, wait for the beep, then say what you need. The microphone button at the top turns pink while Roomie listens.</p>'+vPrivacyHTML()+'</section>'); }
-function vPrivacyHTML(){ const cloud=S.voiceCloud===true;
-  return '<div class="vpriv'+(V.blocked?' warn':'')+'"><b>'+(V.blocked?'This browser can’t listen on this computer yet':cloud?'Cloud speech recognition is enabled':'Listening stays on this computer')+'</b><span>'+(V.blocked?'On-device listening is not available in this browser yet. You can try a supported browser or explicitly enable cloud listening below.':cloud?'Your browser sends audio to its speech-recognition service to turn it into words. Roomie does not save an audio recording. If coaching is active, recognised text may be saved in the lesson report.':'Your browser turns speech into words on this computer. Roomie does not save an audio recording. If coaching is active, recognised text may be saved in the lesson report.')+'</span><label class="chk"><input type="checkbox" id="vCloud" '+(cloud?'checked':'')+'><span>Use cloud speech recognition (sends audio to the browser’s speech service)</span></label></div>'; }
-document.addEventListener('change',e=>{ if(e.target.id==='vCloud'){ S.voiceCloud=e.target.checked; save(); V.blocked=false; render(true); } });
-setTimeout(()=>{ vMark(); if(S.voice&&SR&&!STUDENT){ /* browsers need a tap before the mic can start again */ const once=()=>{ document.removeEventListener('click',once,true); if(S.voice&&!V.on) vStart(); }; document.addEventListener('click',once,true); } },400);
+function speechModeStatus(){ const m=typeof M!=='undefined'?M:{}, cloud=S.voiceCloud===true;
+  const active=V.on&&V.rec?{local:V.local,listening:V.listening}:m.on&&m.sr?{local:m.speechLocal,listening:m.speechListening}:null;
+  if(active&&active.listening) return {title:active.local?'Listening on this computer':'Cloud speech recognition is listening',detail:active.local?'Your browser is using on-device speech recognition.':'Your browser sends audio to its speech-recognition service.'};
+  if(V.starting||m.speechStarting) return {title:'Speech recognition is starting',detail:cloud?'Cloud speech was selected. Audio may be sent to the browser’s speech service when it starts.':'Roomie is checking or starting on-device speech. It will not fall back to cloud recognition.'};
+  if(!cloud&&(V.blocked||m.speechBlocked)) return {title:'On-device speech recognition is unavailable',detail:'Speech recognition is off. Try a supported browser, or stop voice commands and lesson coaching before choosing cloud speech.'};
+  return {title:cloud?'Cloud speech selected · not listening':'On-device speech selected · not listening',detail:cloud?'The next speech session may send audio to the browser’s speech service.':'The next speech session will check for on-device support. It will not fall back to cloud recognition.'}; }
+function vPrivacyHTML(){ const cloud=S.voiceCloud===true, status=speechModeStatus();
+  return '<div class="vpriv'+(V.blocked?' warn':'')+'"><b>'+status.title+'</b><span>'+status.detail+' Roomie does not save an audio recording. If coaching is active, recognised text may be saved in the lesson report.</span><label class="chk"><input type="checkbox" id="vCloud" '+(cloud?'checked':'')+'><span>Use cloud speech recognition (sends audio to the browser’s speech service)</span></label><span>Stop voice commands and lesson coaching before changing this setting. Start listening again when you are ready.</span></div>'; }
+function setSpeechCloudPreference(cloud){ cloud=!!cloud; if(cloud===(S.voiceCloud===true)) return true;
+  const m=typeof M!=='undefined'?M:{}, busy=[];
+  if(V.on||V.starting||V.rec) busy.push('voice commands');
+  if(m.on||m.starting||m.sr||m.speechStarting) busy.push('lesson coaching');
+  if(busy.length){ toast('Stop '+busy.join(' and ')+' before changing where speech is processed.'); render(true); return false; }
+  S.voiceCloud=cloud; S.voice=false; V.blocked=false; if(typeof M!=='undefined') M.speechBlocked=false; save(); render(true); return true; }
+document.addEventListener('change',e=>{ if(e.target.id==='vCloud'&&!setSpeechCloudPreference(e.target.checked)) e.target.checked=S.voiceCloud===true; });
+// A saved preference never starts a microphone from an unrelated click after reload.
+setTimeout(vMark,400);
 
 /* ---- v1.8: Coaching. Any focus the teacher asks for; honest, research-linked feedback; progress across lessons ---- */
 const REF={
@@ -3495,20 +3524,23 @@ document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.id==='aiQ'
 const MIR_CODE='coach';
 const OPEN_RE=/^(why|how (do|does|did|would|could|might|can|come)|what (do|does|did) you (think|notice|wonder|reckon)|what (would|might|could|if)|what makes you|explain|tell me|describe|in what ways|how might|what else|what's your|what is your|how are .* (alike|different|connected)|compare)/;
 const Q_RE=/^(what|why|how|who|when|where|which|whose|can|could|would|will|do|does|did|is|are|was|were|should|have|has|had|any|anyone|does anyone|tell me|explain|describe)\b/;
-const M={on:false};
+const M={on:false,starting:false,epoch:0,sr:null,speechEpoch:0,speechStarting:false,speechListening:false,speechLocal:null,speechRestart:0};
 function mirFmt(s){ s=Math.max(0,Math.round(s)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
 async function mirDevices(){ try{ const d=await navigator.mediaDevices.enumerateDevices(); return d.filter(x=>x.kind==='audioinput'); }catch(_){ return []; } }
 async function mirOpen(id){ const st=await navigator.mediaDevices.getUserMedia({audio:{deviceId:id?{exact:id}:undefined,echoCancellation:false,noiseSuppression:false,autoGainControl:false}}); const ac=M.ac||(M.ac=new (window.AudioContext||window.webkitAudioContext)()); const src=ac.createMediaStreamSource(st), an=ac.createAnalyser(); an.fftSize=1024; src.connect(an); return {st,an,buf:new Float32Array(an.fftSize),floor:0.004,hist:[]}; }
 function mirLevel(ch){ ch.an.getFloatTimeDomainData(ch.buf); let s=0; for(const v of ch.buf) s+=v*v; const r=Math.sqrt(s/ch.buf.length); ch.hist.push(r); if(ch.hist.length>600) ch.hist.shift(); if(ch.hist.length%20===0){ const so=[...ch.hist].sort((a,b)=>a-b); ch.floor=Math.max(0.002,so[Math.floor(so.length*0.15)]); } return r; }
 async function mirCalibrate(){ const C=S.coach||{}; const ch=await mirOpen(C.worn||C.room||''); let peak=[]; const t0=Date.now(); await new Promise(ok=>{ const h=setInterval(()=>{ peak.push(mirLevel(ch)); if(Date.now()-t0>4500){ clearInterval(h); ok(); } },100); }); ch.st.getTracks().forEach(t=>t.stop()); peak.sort((a,b)=>b-a); const lvl=peak.slice(0,Math.max(3,Math.floor(peak.length*0.3))).reduce((a,b)=>a+b,0)/Math.max(3,Math.floor(peak.length*0.3)); S.coach=Object.assign(S.coach||{},{tLevel:lvl}); save(); return lvl; }
-async function mirStart(){ if(DEMO.active){ toast('Exit demo before starting lesson coaching.'); return; } if(M.on) return; const C=S.coach||{};
-  try{ M.room=await mirOpen(C.room||''); M.worn=C.worn?await mirOpen(C.worn):null; }catch(e){ toast('Roomie needs the microphone. Allow it in the address bar.'); return; }
-  Object.assign(M,{slides:[],words:[],ev:[],loudRun:0,lastLoud:0,marks:[],inPart:false,trace:'',goal:(mGoal()||{}).id||null,on:true,t0:Date.now(),tick:0,teacher:0,students:0,quiet:0,buckets:[],cur:{t:0,s:0,q:0},lastVoice:Date.now(),lastTeacher:0,run:0,longest:0,qs:[],pendQ:null,state:'q'});
+async function mirStart(){ if(DEMO.active){ toast('Exit demo before starting lesson coaching.'); return; } if(M.on||M.starting) return; const C=S.coach||{}, epoch=++M.epoch, owner=S, current=()=>M.epoch===epoch&&S===owner;
+  M.starting=true; let room=null, worn=null; const release=()=>[room,worn].forEach(c=>c&&c.st.getTracks().forEach(t=>t.stop()));
+  try{ room=await mirOpen(C.room||''); if(!current()){ release(); return; } worn=C.worn?await mirOpen(C.worn):null; if(!current()){ release(); return; } }
+  catch(e){ release(); if(current()) toast('Roomie needs the microphone. Allow it in the address bar.'); return; }
+  finally{ if(current()) M.starting=false; }
+  Object.assign(M,{room,worn,slides:[],words:[],ev:[],loudRun:0,lastLoud:0,marks:[],inPart:false,trace:'',goal:(mGoal()||{}).id||null,on:true,t0:Date.now(),tick:0,teacher:0,students:0,quiet:0,buckets:[],cur:{t:0,s:0,q:0},lastVoice:Date.now(),lastTeacher:0,run:0,longest:0,qs:[],pendQ:null,state:'q'});
   Object.assign(M,{lastTick:Date.now(),traceT:Date.now(),bucketT:Date.now(),lastPip:0});
   /* Sampling is driven by the audio clock as well as a timer, so it keeps going when Roomie is floating or in a background tab. */
   try{ const ac=M.ac, cs=ac.createConstantSource?ac.createConstantSource():null, sp=ac.createScriptProcessor(2048,1,1), z=ac.createGain(); z.gain.value=0; if(cs){ cs.connect(sp); cs.start(); } sp.connect(z); z.connect(ac.destination); sp.onaudioprocess=()=>mirTick(); M.sp=sp; M.cs=cs; M.z=z; if(ac.state==='suspended') ac.resume(); }catch(_){ }
   M.h=setInterval(mirTick,100);
-  if(!(typeof V!=='undefined'&&V.on)) mirSR();
+  if(!(typeof V!=='undefined'&&(V.on||V.starting))) mirSR();
   if((S.coach||{}).slides) slidesLink();
   Bird.say('I’m listening to this lesson.'); mirMark(); }
 function mirTick(){ if(!M.on) return; const now=Date.now(), dms=now-M.lastTick; if(dms<90) return; M.lastTick=now; const dt=Math.min(dms,2000)/1000; const C=S.coach||{}, tl=C.tLevel||0.05;
@@ -3526,10 +3558,24 @@ function mirTick(){ if(!M.on) return; const now=Date.now(), dms=now-M.lastTick; 
   while(now-M.traceT>=500){ M.trace+=st; M.traceT+=500; }
   while(now-M.bucketT>=10000){ M.buckets.push(M.cur); M.cur={t:0,s:0,q:0}; M.bucketT+=10000; }
   mirMark(); if(A.pip&&now-M.lastPip>1000){ M.lastPip=now; try{ pipRender(); }catch(_){ } } }
-function mirSR(){ if(!SR) return; const local=S.voiceCloud!==true; const r=new SR(); r.lang=local?'en-US':'en-AU'; if(local) r.processLocally=true; r.continuous=true; r.interimResults=false; M.sr=r;
-  r.onresult=e=>{ for(let i=e.resultIndex;i<e.results.length;i++) if(e.results[i].isFinal) mirFeed(e.results[i][0].transcript); };
-  r.onend=()=>{ if(M.on&&M.sr===r) setTimeout(()=>{ try{ r.start(); }catch(_){ } },300); };
-  try{ (M.worn&&r.start.length>=0)?r.start(M.worn.st.getAudioTracks()[0]):r.start(); }catch(_){ try{ r.start(); }catch(__){ } } }
+function mirSpeechStop(){ M.speechEpoch++; M.speechStarting=false; M.speechListening=false; M.speechLocal=null; clearTimeout(M.speechRestart); M.speechRestart=0; const r=M.sr; M.sr=null; speechAbort(r); speechPrivacyRefresh(); }
+async function mirSR(){ if(!M.on||M.sr||M.speechStarting) return; const epoch=++M.speechEpoch, lesson=M.epoch, local=S.voiceCloud!==true, current=()=>M.on&&M.epoch===lesson&&M.speechEpoch===epoch&&local===(S.voiceCloud!==true);
+  M.speechStarting=true; M.speechBlocked=false; speechPrivacyRefresh();
+  try{
+    if(local){ const a=await vLocalReady(current); if(!current()) return; if(a!=='available'){ M.speechBlocked=true; toast('On-device speech is unavailable. The lesson mirror will keep measuring sound levels without a transcript.'); return; } }
+    if(!current()) return;
+    const r=speechRecognizer(local); if(!r){ M.speechBlocked=local; toast('Speech recognition is unavailable. The lesson mirror will keep measuring sound levels without a transcript.'); return; }
+    M.sr=r; M.speechLocal=local; r.interimResults=false;
+    const active=()=>current()&&M.sr===r;
+    const start=()=>{ if(!active()) return; try{ const track=M.worn&&M.worn.st.getAudioTracks()[0]; if(track){ try{ r.start(track); return; }catch(_){} } r.start(); }
+      catch(_){ mirSpeechStop(); toast('Speech recognition stopped. Sound-level measurements continue; end the lesson and start again to retry speech.'); } };
+    r.onstart=()=>{ if(!active()){ speechAbort(r); return; } M.speechStarting=false; M.speechListening=true; speechPrivacyRefresh(); };
+    r.onresult=e=>{ if(!active()) return; for(let i=e.resultIndex;i<e.results.length&&active();i++) if(e.results[i].isFinal) mirFeed(e.results[i][0].transcript); };
+    r.onerror=e=>{ if(!active()||e.error==='no-speech') return; mirSpeechStop(); M.speechBlocked=local; toast('Speech recognition stopped. Sound-level measurements continue; end the lesson and start again to retry speech.'); speechPrivacyRefresh(); };
+    r.onend=()=>{ if(!active()) return; M.speechListening=false; M.speechStarting=true; speechPrivacyRefresh(); clearTimeout(M.speechRestart); M.speechRestart=setTimeout(()=>{ M.speechRestart=0; if(active()) start(); },300); };
+    start();
+  }finally{ if(current()&&!M.sr){ M.speechStarting=false; speechPrivacyRefresh(); } }
+}
 function mirFeed(text){ if(!M.on) return; const now=Date.now(); if(now-M.lastTeacher>1500) return; /* Approximate teacher-volume gate; this is not reliable speaker identification. */
   text=String(text).trim(); if(!text) return; if(!/^(hey )?(roomie|roomy|rumi)\b/i.test(text)&&M.words.length<2500) M.words.push({at:Math.round((now-M.t0)/1000),t:mirMask(text,400,true)}); const parts=text.split(/(?<=[?.!])\s+/).map(x=>x&&x.trim()).filter(Boolean);
   parts.forEach(p=>{ const low=p.toLowerCase().replace(/^(so|ok|okay|and|now|right|alright|um|uh|well)\s+/,''); mirClassify(low,now); if(/\?$/.test(p)||Q_RE.test(low)){ if(/^(hey roomie|roomie)/.test(low)) return; const q={text:p.slice(0,140),open:OPEN_RE.test(low),at:(now-M.t0)/1000,end:M.lastTeacher||now,wait:null};
@@ -3545,7 +3591,7 @@ function mirClassify(low,now){ if(/^(hey roomie|roomie)/.test(low)) return; cons
   if(ATT_RE.test(low)){ const last=M.ev.filter(x=>x.k==='att').pop(); if(!last||at-last.at>10) M.ev.push({k:'att',at}); return; }
   if(PRAISE_RE.test(low)&&!/^(stop|don'?t|no )/.test(low)){ M.ev.push({k:SPEC_RE.test(low)?'ps':'p',at}); return; }
   if(CORR_RE.test(low)){ M.ev.push({k:'c',at,n:(low.replace(/[^a-z' \[\]]/g,' ').replace(/\s+/g,' ').trim()).slice(0,50)}); } }
-function mirStop(){ if(!M.on) return; try{ slidesStop(); }catch(_){ } M.on=false; clearInterval(M.h); try{ M.sp&&(M.sp.onaudioprocess=null,M.sp.disconnect()); M.cs&&M.cs.stop(); M.z&&M.z.disconnect(); }catch(_){ } M.sp=M.cs=M.z=null; try{ M.sr&&M.sr.stop(); }catch(_){ } M.sr=null; [M.room,M.worn].forEach(c=>c&&c.st.getTracks().forEach(t=>t.stop())); if(M.cur.t+M.cur.s+M.cur.q>0) M.buckets.push(M.cur);
+function mirStop(){ M.epoch++; M.starting=false; mirSpeechStop(); if(!M.on) return; try{ slidesStop(); }catch(_){ } M.on=false; clearInterval(M.h); try{ M.sp&&(M.sp.onaudioprocess=null,M.sp.disconnect()); M.cs&&M.cs.stop(); M.z&&M.z.disconnect(); }catch(_){ } M.sp=M.cs=M.z=null; [M.room,M.worn].forEach(c=>c&&c.st.getTracks().forEach(t=>t.stop())); if(M.cur.t+M.cur.s+M.cur.q>0) M.buckets.push(M.cur);
   const tot=Math.max(1,M.teacher+M.students+M.quiet), Q=M.qs, wq=Q.filter(q=>q.wait!=null);
   const rep={id:uid(),date:now().toISOString(),mins:Math.round((Date.now()-M.t0)/60000),block:(A.P&&A.P.block&&A.P.block.name)||'',teacher:M.teacher/tot,students:M.students/tot,quiet:M.quiet/tot,qs:Q.map(q=>({text:q.text,open:q.open,wait:q.wait==null?null:Math.round(q.wait*10)/10,at:Math.round(q.at)})),wait:wq.length?wq.reduce((a,q)=>a+q.wait,0)/wq.length:null,longest:M.longest,trace:M.trace,ev:M.ev,words:M.words,slides:SL.on||M.slides.length?M.slides:undefined,marks:M.marks,goal:M.goal,buckets:M.buckets.map(b=>{ const s=b.t+b.s+b.q||1; return [b.t/s,b.s/s,b.q/s].map(x=>Math.round(x*100)/100); }),worn:!!M.worn,note:''};
   S.mirrors=[rep].concat(S.mirrors||[]).slice(0,60); const G=rep.goal&&((S.coach||{}).goals||[]).find(x=>x.id===rep.goal); if(G) G.attempts.push(rep.id); save(); mirMark(); A.mirId=rep.id; Bird.say('Your lesson mirror is ready.');
@@ -3642,7 +3688,7 @@ async function moveSend(){ if(DEMO.active){ toast('Exit demo before moving a sav
   try{ const raw=new TextEncoder().encode(JSON.stringify(S)); const z=typeof CompressionStream!=='undefined'; const data=z?await mvZip(raw,true):raw;
     for(let tries=0;tries<4;tries++){ const code=mvCode(), key=await mvKey(code), iv=crypto.getRandomValues(new Uint8Array(12)); const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,data));
       const blob=(z?'z':'r')+b64(iv)+'.'+b64(ct); const ok=await rpc('put_transfer',{p_id:code.slice(0,4),p_blob:blob});
-      if(ok){ if(box) box.innerHTML='<div class="mvcode"><small>Your move code</small><b>'+mvFmt(code)+'</b><p>On the other computer, open Roomie and choose <b>Move my Roomie here</b> (in Setup → Privacy, backup & move, or on the welcome screen). Type this code. It works once, for the next 30 minutes.</p></div>'; return code; } }
+      if(ok){ if(box) box.innerHTML='<div class="mvcode"><small>Your move code</small><b>'+mvFmt(code)+'</b><p>On the other computer, open Roomie and choose <b>Move my Roomie here</b> (in Setup → Privacy, backup & move, or on the welcome screen). Enter this code. Treat it like a password and share it only with the person moving your class data.</p></div>'; return code; } }
     throw 0; }
   catch(_){ if(box) box.innerHTML='<div class="warnbox">Roomie couldn’t make a move code. Check the internet and try again.</div>'; } }
 async function moveTake(input,msgEl){ if(DEMO.active){ toast('Exit demo before moving a saved class.'); return false; } const code=mvClean(input); const say=h=>{ if(msgEl) msgEl.innerHTML=h; };
@@ -3650,11 +3696,11 @@ async function moveTake(input,msgEl){ if(DEMO.active){ toast('Exit demo before m
   const blocked=typeof classProfileBlockReason==='function'?classProfileBlockReason():((S.liveOn||S.remote||(typeof M!=='undefined'&&M.on))?'End student-device, remote and coaching sessions before moving a class here.':''); if(blocked){ say('<div class="warnbox">'+esc(blocked)+'</div>'); return false; }
   if(code.length!==8){ say('<div class="warnbox">Move codes have 8 letters and numbers, like ABCD-2345.</div>'); return false; }
   say('<p class="hint">Fetching and unlocking…</p>');
-  try{ const blob=await rpc('take_transfer',{p_id:code.slice(0,4)}); if(!blob){ say('<div class="warnbox">That code didn’t work. It may be mistyped, already used, or older than 30 minutes. Make a new code on the other computer.</div>'); return false; }
+  try{ const blob=await rpc('take_transfer',{p_id:code.slice(0,4)}); if(!blob){ say('<div class="warnbox">That code didn’t work. Check it carefully, or make a new code on the other computer.</div>'); return false; }
     const z=blob[0]==='z', [iv,ct]=blob.slice(1).split('.'); const key=await mvKey(code); let data=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(iv)},key,unb64(ct))); if(z) data=await mvZip(data,false);
     const o=JSON.parse(new TextDecoder().decode(data)); if(!isValidClassData(o)) throw new Error('Invalid transferred class'); S=classWithDefaults(o); if(typeof clearClassRuntime==='function') clearClassRuntime(); if(!save()){ say('<div class="warnbox">Your class was received, but this browser could not save it. Keep this page open and download the current backup before closing it.</div>'); refreshLabels(); return false; } say('<div class="okbox">Your Roomie is saved here. Reloading…</div>'); setTimeout(()=>location.reload(),900); return true; }
   catch(_){ say('<div class="warnbox">That code couldn’t unlock anything. Check each letter, or make a new code on the other computer.</div>'); return false; } }
-function moveHTML(){ return '<div class="mvbox"><h3 style="margin:0">Move my Roomie to another computer</h3><p class="hint" style="margin:0">Takes your class, day plan, routines, points, seating, helpers and coaching to another computer in under a minute. It’s encrypted with your code before upload. Anyone with the move code can open it, so share the code privately. The client requests a temporary transfer; server deletion has not been independently verified. Audio files you added stay here.</p><div class="row"><button class="btn sm" type="button" data-mv="send">Get a move code</button></div><div id="mvOut"></div>'+
+function moveHTML(){ return '<div class="mvbox"><h3 style="margin:0">Move my Roomie to another computer</h3><p class="hint" style="margin:0">Takes your class, day plan, routines, points, seating, helpers and coaching to another computer in under a minute. It’s encrypted with your code before upload. Anyone with the move code can open it, so share the code privately. The client requests a temporary transfer; server deletion has not been independently verified. Uploaded audio, videos, PDFs and routine image attachments stay on this computer. Keep the originals to add them again. Your school crest and pictures added under “Your pictures” are included.</p><div class="row"><button class="btn sm" type="button" data-mv="send">Get a move code</button></div><div id="mvOut"></div>'+
   '<h3 style="margin:8px 0 0">Move my Roomie here</h3><p class="hint" style="margin:0">Got a code from your other computer? This replaces all classes saved on this computer. Download a backup first if you want to keep them.</p><div class="row" style="flex-wrap:nowrap"><input id="mvIn" type="text" maxlength="12" placeholder="ABCD-2345" autocomplete="off" style="max-width:220px;text-transform:uppercase;letter-spacing:.1em"><button class="btn alt sm" type="button" data-mv="take">Move it here</button></div><div id="mvMsg"></div></div>'; }
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-mv]'); if(!b) return; const a=b.dataset.mv;
   if(a==='send') moveSend();
@@ -3721,28 +3767,33 @@ function buildDay(o,band){ const T=dayFor(band), lessT=T.filter(b=>b.kind==='les
   const lessons=(a,b)=>{ const len=b-a; const n=len>=100?2:1; for(let i=0;i<n;i++){ const r5=x=>Math.round(x/5)*5, s=i?r5(a+len*i/n):a, e=i===n-1?b:r5(a+len*(i+1)/n); const t=lessT[li%lessT.length]||{}; out.push(B(s,e,names[li%names.length],'lesson',{startR:t.startR||'',endR:t.endR||'',exp:t.exp||'',entry:!!t.entry,exit:!!t.exit,bbAt:t.bbAt,bbId:t.bbId})); li++; } };
   lessons(st+15,r1); out.push(B(r1,r2,'Recess','break')); lessons(r2,l1); out.push(B(l1,l2,'Lunch','break')); lessons(l2,en-15); out.push(B(en-15,en,'End of day','routine',{startR:'endofday'}));
   return out.filter(b=>toMin(b.end)>toMin(b.start)); }
-function wizHTML(){ const s=WZ.step, d=WZ.d; const dots='<div class="wzdots">'+[0,1,2,3].map(i=>'<i class="'+(i===s?'on':i<s?'done':'')+'"></i>').join('')+'</div>';
+function wizardMode(){ return ((WZ.d&&WZ.d.mode)||S.mode)==='tools'?'tools':'day'; }
+function wizHTML(){ const s=WZ.step, d=WZ.d, tools=wizardMode()==='tools'; const dots='<div class="wzdots">'+(tools?[0,1,3]:[0,1,2,3]).map(i=>'<i class="'+(i===s?'on':i<s?'done':'')+'"></i>').join('')+'</div>';
   let body='';
-  if(s===0) body='<h2>Let’s make Roomie yours</h2><p class="lead">Three quick steps. About three minutes.</p><label class="thin"><span>What does your class call itself?</span><input id="wzRoom" type="text" maxlength="40" value="'+esc(d.room)+'" placeholder="e.g. Room 7, 5B, Year 7 Blue"></label><label class="thin"><span>What do students call you?</span><input id="wzTeacher" type="text" maxlength="40" value="'+esc(d.teacher)+'" placeholder="e.g. Ms B"></label>';
+  if(s===0) body='<h2>Let’s make Roomie yours</h2><p class="lead">'+(tools?'Two quick steps: your class and an optional class list. Your timetable stays off.':'Three quick steps. About three minutes.')+'</p><label class="thin"><span>What does your class call itself?</span><input id="wzRoom" type="text" maxlength="40" value="'+esc(d.room)+'" placeholder="e.g. Room 7, 5B, Year 7 Blue"></label><label class="thin"><span>What do students call you?</span><input id="wzTeacher" type="text" maxlength="40" value="'+esc(d.teacher)+'" placeholder="e.g. Ms B"></label>';
   if(s===1) body='<h2>Your class list</h2><p class="lead">Paste names, choose the format, then check the editable preview. Names in any language and compound given names are preserved.</p><label class="thin"><span>Source list</span><textarea id="wzNames" rows="4" placeholder="One name per line, or paste spreadsheet columns">'+esc(d.names)+'</textarea></label><label class="thin"><span>Import format</span><select id="wzNameFormat">'+[['auto','Detect format — check the preview'],['lines','One display name per line (keep spaces)'],['surname','Surname, given name — one student per line'],['list','Names separated by commas or semicolons'],['table','Spreadsheet columns (headings recommended)']].map(([v,l])=>opt(v,l,d.nameFormat)).join('')+'</select></label><label class="thin"><span>Names Roomie will use — edit here, one per line</span><textarea id="wzPreviewNames" rows="5">'+esc(d.previewNames)+'</textarea></label><div id="wzNameStatus" role="status" aria-live="polite">'+wizardNameStatus()+'</div>';
-  if(s===2) body='<h2>Your day</h2><p class="lead">Roomie builds your timetable from these. Change subjects and times later in Setup → Day plan.</p><div class="wzgrid"><label class="thin"><span>School starts</span><input id="wzStart" type="time" value="'+d.start+'"></label><label class="thin"><span>Recess starts</span><input id="wzRecess" type="time" value="'+d.recess+'"></label><label class="thin"><span>Recess minutes</span><input id="wzRecessLen" type="number" min="5" max="60" value="'+d.recessLen+'"></label><label class="thin"><span>Lunch starts</span><input id="wzLunch" type="time" value="'+d.lunch+'"></label><label class="thin"><span>Lunch minutes</span><input id="wzLunchLen" type="number" min="10" max="90" value="'+d.lunchLen+'"></label><label class="thin"><span>Home time</span><input id="wzEnd" type="time" value="'+d.end+'"></label></div><div class="wzprev">'+wizPreview()+'</div>';
-  if(s===3) body='<h2>Roomie is ready, '+esc(d.teacher||'teacher')+'!</h2><p class="lead">'+esc(d.room)+' is set up with '+wizardNames().length+' students and the same plan every weekday.</p><ul class="wzdone"><li><b>Different subjects each day?</b> Setup → Day plan, pick the day.</li><li><b>Assembly or sports carnival?</b> Setup → Day plan → “Just tomorrow”. Your usual day stays the same.</li><li><b>Using Roomie on another computer too?</b> Setup → Privacy, backup &amp; move.</li></ul>';
-  const back=s>0&&s<3?'<button class="btn alt" type="button" data-wz="back">Back</button>':'', next=s<2?'<button class="btn" type="button" data-wz="next">Next</button>':s===2?'<button class="btn" type="button" data-wz="finish">Build my day</button>':'<button class="btn" type="button" data-wz="close">Show me my board</button>';
-  return '<div class="wz" role="dialog" aria-label="Quick setup"><div class="wzin">'+dots+body+'<div class="row" style="justify-content:space-between;margin-top:6px"><button type="button" class="linkbtn" data-wz="skip">'+(s<3?'Skip for now':'')+'</button><div class="row">'+back+next+'</div></div></div></div>'; }
+  if(s===2&&!tools) body='<h2>Your day</h2><p class="lead">Roomie builds your timetable from these. Change subjects and times later in Setup → Day plan.</p><div class="wzgrid"><label class="thin"><span>School starts</span><input id="wzStart" type="time" value="'+d.start+'"></label><label class="thin"><span>Recess starts</span><input id="wzRecess" type="time" value="'+d.recess+'"></label><label class="thin"><span>Recess minutes</span><input id="wzRecessLen" type="number" min="5" max="60" value="'+d.recessLen+'"></label><label class="thin"><span>Lunch starts</span><input id="wzLunch" type="time" value="'+d.lunch+'"></label><label class="thin"><span>Lunch minutes</span><input id="wzLunchLen" type="number" min="10" max="90" value="'+d.lunchLen+'"></label><label class="thin"><span>Home time</span><input id="wzEnd" type="time" value="'+d.end+'"></label></div><div class="wzprev">'+wizPreview()+'</div>';
+  if(s===3) body='<h2>'+(tools?'Your toolkit':'Roomie')+' is ready, '+esc(d.teacher||'teacher')+'!</h2><p class="lead">'+esc(d.room)+' is set up with '+wizardNames().length+' students'+(tools?'. Choose a tool when you need it.':' and the same plan every weekday.')+'</p><ul class="wzdone">'+(tools?'<li><b>Start with a timer or routine.</b> Your timetable stays off in toolkit mode.</li><li><b>Want a timetable later?</b> Setup → Day plan.</li>':'<li><b>Different subjects each day?</b> Setup → Day plan, pick the day.</li><li><b>Assembly or sports carnival?</b> Setup → Day plan → “Just tomorrow”. Your usual day stays the same.</li>')+'<li><b>Using Roomie on another computer too?</b> Setup → Privacy, backup &amp; move.</li></ul><p class="hint">The tour is optional. You can open it any time from Tour on the board.</p>';
+  const back=s>0&&s<3?'<button class="btn alt" type="button" data-wz="back">Back</button>':'', next=s===3?'<button class="btn" type="button" data-wz="close">'+(tools?'Open my toolkit':'Show me my board')+'</button>':s===2||(tools&&s===1)?'<button class="btn" type="button" data-wz="finish">'+(tools?'Set up my toolkit':'Build my day')+'</button>':'<button class="btn" type="button" data-wz="next">Next</button>';
+  const secondary=s<3?'<button type="button" class="linkbtn" data-wz="skip">Skip for now</button>':'<button type="button" class="btn alt" data-wz="tour">Show me around</button>';
+  return '<div class="wz" role="dialog" aria-label="Quick setup"><div class="wzin">'+dots+body+'<div class="row" style="justify-content:space-between;margin-top:6px">'+secondary+'<div class="row">'+back+next+'</div></div></div></div>'; }
 function wizPreview(){ wizRead(); try{ const day=buildDay(WZ.d,S.band); return day.map(b=>'<span class="k-'+b.kind+'">'+fmtClock(toMin(b.start))+' '+esc(b.name)+'</span>').join(''); }catch(_){ return ''; } }
 function wizRead(){ const v=id=>{ const e=document.getElementById(id); return e?e.value:null; }; const d=WZ.d; [['wzRoom','room'],['wzTeacher','teacher'],['wzNames','names'],['wzNameFormat','nameFormat'],['wzPreviewNames','previewNames'],['wzStart','start'],['wzRecess','recess'],['wzRecessLen','recessLen'],['wzLunch','lunch'],['wzLunchLen','lunchLen'],['wzEnd','end']].forEach(([id,k])=>{ const x=v(id); if(x!=null) d[k]=x; }); }
 function wizDraw(){ let h=document.getElementById('wzHost'); if(!h){ h=document.createElement('div'); h.id='wzHost'; document.body.appendChild(h); } h.innerHTML=wizHTML(); const f=h.querySelector('input,textarea'); if(f) setTimeout(()=>f.focus(),50); }
-function wizOpen(){ const T=dayFor(S.band); WZ.step=0; WZ.d={room:S.studentsAreExample?'':S.room,teacher:S.studentsAreExample?'':S.teacher,names:S.studentsAreExample?'':S.students.join('\n'),nameFormat:S.studentsAreExample?'auto':'lines',previewNames:S.studentsAreExample?'':S.students.join('\n'),start:'08:40',recess:'10:40',recessLen:20,lunch:'12:40',lunchLen:50,end:'15:00'}; wizDraw(); }
-function wizClose(){ const h=document.getElementById('wzHost'); if(h) h.remove(); S.wizDone=true; save(); if(!S.toured&&typeof startTour==='function') setTimeout(()=>{ if(!TOUR) startTour(); },600); }
+function wizOpen(){ WZ.step=0; WZ.d={mode:S.mode==='tools'?'tools':'day',room:S.studentsAreExample?'':S.room,teacher:S.studentsAreExample?'':S.teacher,names:S.studentsAreExample?'':S.students.join('\n'),nameFormat:S.studentsAreExample?'auto':'lines',previewNames:S.studentsAreExample?'':S.students.join('\n'),start:'08:40',recess:'10:40',recessLen:20,lunch:'12:40',lunchLen:50,end:'15:00'}; wizDraw(); }
+function wizClose(){ const h=document.getElementById('wzHost'); if(h) h.remove(); S.wizDone=true; save(); }
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-wz]'); if(!b) return; audio(); const a=b.dataset.wz; wizRead(); const d=WZ.d;
   if(a==='next'){ if(WZ.step===0&&!d.room.trim()){ toast('Give your class a name first.'); return; } WZ.step++; wizDraw(); }
   if(a==='back'){ WZ.step--; wizDraw(); }
   if(a==='skip'||a==='close'){ wizClose(); render(true); }
+  if(a==='tour'){ wizClose(); render(true); if(typeof startTour==='function') startTour(); }
   if(a==='finish'){
-    const problem=validateWizardDay(d); if(problem){ toast(problem); return; }
-    const names=wizardNames(); if(DEMO.active) endDemo(false); resetExampleClass();
+    const mode=wizardMode(); if(mode==='day'){ const problem=validateWizardDay(d); if(problem){ toast(problem); return; } }
+    const names=wizardNames(); if(DEMO.active) endDemo(false); const wasExample=S.studentsAreExample; resetExampleClass();
     S.room=d.room.trim()||S.room; S.teacher=d.teacher.trim()||S.teacher; S.students=names; S.studentsAreExample=false; A.pickPool=[]; A.groups=[];
-    const day=buildDay(d,S.band); DAYS.forEach(k=>{ S.days[k]=day.map(x=>Object.assign({},x,{id:uid()})); }); S.mode='day'; save(); WZ.step=3; wizDraw(); refreshLabels(); if(typeof resetTimetableSession==='function') resetTimetableSession(); A.phaseKey=''; tick(true); render(true);
+    if(mode==='day'){ const day=buildDay(d,S.band); DAYS.forEach(k=>{ S.days[k]=day.map(x=>Object.assign({},x,{id:uid()})); }); }
+    else if(wasExample){ S.days=Object.fromEntries(DAYS.map(k=>[k,[]])); S.reminders=Object.fromEntries(DAYS.map(k=>[k,''])); }
+    S.mode=mode; S.wizDone=true; save(); WZ.step=3; wizDraw(); refreshLabels(); markMode(); if(typeof resetTimetableSession==='function') resetTimetableSession(); A.phaseKey=''; tick(true); render(true);
   } });
 document.addEventListener('input',e=>{
   if(e.target.id==='wzNames'){ WZ.d.names=e.target.value; rebuildNamePreview(); }
@@ -4239,8 +4290,15 @@ function picsSetupHTML(){ const P=S.pics||{}, used=Math.round(picsTotal()/PIC_TO
    '<details class="picmore"'+(Object.keys(P).some(k=>k!=='crest')?' open':'')+'><summary>Pictures for other screens</summary><div class="picgrid">'+PIC_SLOTS.slice(1).map(row).join('')+'</div></details>'+
    (used>0?'<p class="hint" style="margin:0">Picture space used: '+used+'%</p>':''); }
 async function picImportFile(k,file){ const sheet=document.querySelector('#sheetHost .sheet'), refresh=()=>{ if(sheet&&sheet===document.querySelector('#sheetHost .sheet')) renderSetup(); };
-  try{ const d=await picResize(file); const P=Object.assign({},S.pics||{}); const was=(P[k]||'').length; if(picsTotal()-was+d.length>PIC_TOTAL){ toast('Picture space is full. Remove a picture first.'); return; }
-    P[k]=d; S.pics=P; save(); try{ const back=JSON.parse(localStorage.getItem('bellbird.v2')||'{}'); if(!back.pics||back.pics[k]!==d) throw 0; }catch(_){ delete P[k]; S.pics=P; save(); toast('This browser is out of space for pictures. Try a smaller one.'); refresh(); return; }
+  try{ const d=await picResize(file); const owner=S, hadPics=Object.hasOwn(S,'pics'), P=Object.assign({},S.pics||{}), hadPicture=Object.hasOwn(P,k), previous=P[k]; const was=(previous||'').length; if(picsTotal()-was+d.length>PIC_TOTAL){ toast('Picture space is full. Remove a picture first.'); return; }
+    P[k]=d; S.pics=P; let saved=false; try{ saved=save()===true; }catch(_){}
+    if(!saved){
+      // Undo only this attempted slot; keep any newer picture or other edits.
+      if(S===owner&&S.pics&&S.pics[k]===d){ const restored=Object.assign({},S.pics); if(hadPicture) restored[k]=previous; else delete restored[k]; if(!hadPics&&!Object.keys(restored).length) delete S.pics; else S.pics=restored; }
+      // save() owns persistence and its recovery warning. Do not issue a cleanup
+      // write (or a redundant read-back) that could erase that warning or image.
+      toast('This browser couldn’t save that picture. Try a smaller one or use the backup controls.'); refresh(); return;
+    }
     toast('Picture added.'); refresh(); scRefresh(); picTop(); }catch(err){ toast(typeof err==='string'?err:'Roomie couldn’t use that picture.'); } }
 document.addEventListener('change',e=>{ const t=e.target; if(t.matches&&t.matches('[data-crestall]')){ S.crestAll=t.checked; save(); picTop(); return; }
   if(!t.matches||!t.matches('[data-picup]')||!t.files||!t.files[0]) return; return picImportFile(t.dataset.picup,t.files[0]); });
@@ -4411,8 +4469,7 @@ document.addEventListener('click',e=>{ const t=e.target.closest('[data-tour]'); 
   if(a==='setup'){ endTour(); if(S.studentsAreExample&&typeof wizOpen==='function') wizOpen(); } });
 document.addEventListener('keydown',e=>{ if(!TOUR) return; if(e.key==='Escape') endTour(); if(e.key==='ArrowRight'&&TOUR.i<TOUR.steps.length-1){ TOUR.i++; drawTour(); } if(e.key==='ArrowLeft'&&TOUR.i>0){ TOUR.i--; drawTour(); } });
 addEventListener('resize',()=>{ if(TOUR) setTimeout(drawTour,80); });
-/* first time: start the tour after the board appears */
-document.getElementById('startBtn').addEventListener('click',()=>{ if(!S.toured&&!(S.studentsAreExample&&!S.wizDone)) setTimeout(()=>{ if(!TOUR) startTour(); },1200); });
+/* The tour opens only when requested at setup completion or from the board. */
 
 /* ================= Roomie the monster (mascot option) ================= */
 const ROOMIE_COLS={pink:['#FF8CC6','#F06AAE','#FFE1F0','#FF4F8B'],blue:['#7EC3FF','#5AA3EC','#E2F1FF','#FF7AA8'],green:['#7FDCA6','#56C189','#E2F8EA','#FF7AA8'],orange:['#FFAA6E','#F28B4C','#FFEBDD','#FF6F8E'],purple:['#B49BFF','#8F72F5','#E9E1FF','#FF6FA8']};
@@ -4562,7 +4619,7 @@ closeSetup=function(){ const frame=uiModalFrames.find(f=>f.key==='setup'), resul
 const uiWizDrawBase=wizDraw;
 wizDraw=function(){
   const opener=document.activeElement, result=uiWizDrawBase.apply(this,arguments), root=document.querySelector('#wzHost .wz');
-  if(root){ const title=root.querySelector('h2'); if(title){ title.id='quickSetupTitle'; root.setAttribute('aria-labelledby',title.id); } const names=root.querySelector('#wzNames'); if(names&&!names.getAttribute('aria-label')) names.setAttribute('aria-label','Class list'); const skip=root.querySelector('[data-wz="skip"]'); if(skip&&!skip.textContent.trim()) skip.hidden=true; if(uiEnterModal('wizard',root,()=>wizClose(),opener)) uiFocusFirst(root,'input,textarea'); }
+  if(root){ const title=root.querySelector('h2'); if(title){ title.id='quickSetupTitle'; root.setAttribute('aria-labelledby',title.id); } const names=root.querySelector('#wzNames'); if(names&&!names.getAttribute('aria-label')) names.setAttribute('aria-label','Class list'); const skip=root.querySelector('[data-wz="skip"]'); if(skip&&!skip.textContent.trim()) skip.hidden=true; if(uiEnterModal('wizard',root,()=>wizClose(),opener)) uiFocusFirst(root,WZ.step===3?'[data-wz="close"]':'input,textarea'); }
   return result;
 };
 const uiWizCloseBase=wizClose;
@@ -4727,7 +4784,7 @@ function clearClassRuntime(){
   Music.stop(); YT_.stop(); Focus.stop();
   if(typeof speechSynthesis!=='undefined') try{ speechSynthesis.cancel(); }catch(_){}
   cancelAnimationFrame(N.raf); if(N.stream) N.stream.getTracks().forEach(track=>track.stop()); Object.assign(N,{on:false,stream:null,an:null,raf:0,lvl:0});
-  V.on=false; try{ if(V.rec) V.rec.stop(); }catch(_){} V.rec=null; V.awake=0; V.last=''; clearTimeout(V.ht); clearTimeout(V.sh);
+  vResetSession(); V.last=''; clearTimeout(V.ht); clearTimeout(V.sh);
   if(A.pip) try{ A.pip.close(); }catch(_){}
   const overlay=document.getElementById('overlayHost'); if(overlay) overlay.innerHTML='';
   ['livewall','vheard','vsug'].forEach(id=>{ const el=document.getElementById(id); if(el) el.remove(); });
