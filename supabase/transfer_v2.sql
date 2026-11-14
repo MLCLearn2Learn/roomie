@@ -56,7 +56,7 @@ EXCEPTION
 END;
 $function$;
 
-CREATE OR REPLACE FUNCTION public.take_transfer_v2(
+CREATE OR REPLACE FUNCTION public.peek_transfer_v2(
   p_id text
 )
 RETURNS text
@@ -73,25 +73,41 @@ BEGIN
     RETURN NULL;
   END IF;
 
-  DELETE FROM public.transfers_v2
+  SELECT blob INTO b FROM public.transfers_v2
   WHERE id = p_id
-    AND created_at > now() - interval '30 minutes'
-  RETURNING blob INTO b;
+    AND created_at > now() - interval '30 minutes';
 
   RETURN b;
 END;
 $function$;
 
+-- Acknowledge only after successful local persistence. Failed reads remain retryable.
+CREATE OR REPLACE FUNCTION public.finish_transfer_v2(p_id text)
+RETURNS boolean LANGUAGE plpgsql SECURITY DEFINER SET search_path = ''
+AS $function$
+DECLARE removed_count integer;
+BEGIN
+  IF p_id IS NULL OR p_id !~ '^[A-Za-z0-9_-]{22}$' THEN RETURN false; END IF;
+  DELETE FROM public.transfers_v2 WHERE id=p_id AND created_at > now() - interval '30 minutes';
+  GET DIAGNOSTICS removed_count = ROW_COUNT;
+  RETURN removed_count=1;
+END;
+$function$;
+-- Remove the development prototype's consuming read if it was installed previously.
+DROP FUNCTION IF EXISTS public.take_transfer_v2(text);
+REVOKE ALL ON FUNCTION public.finish_transfer_v2(text) FROM PUBLIC, authenticated;
+GRANT EXECUTE ON FUNCTION public.finish_transfer_v2(text) TO anon;
+
 REVOKE ALL ON FUNCTION public.put_transfer_v2(text,text)
   FROM PUBLIC, authenticated;
 
-REVOKE ALL ON FUNCTION public.take_transfer_v2(text)
+REVOKE ALL ON FUNCTION public.peek_transfer_v2(text)
   FROM PUBLIC, authenticated;
 
 GRANT EXECUTE ON FUNCTION public.put_transfer_v2(text,text)
   TO anon;
 
-GRANT EXECUTE ON FUNCTION public.take_transfer_v2(text)
+GRANT EXECUTE ON FUNCTION public.peek_transfer_v2(text)
   TO anon;
 
 COMMIT;

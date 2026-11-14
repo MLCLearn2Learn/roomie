@@ -1,7 +1,7 @@
 
 /*
  * Roomie Secure Transfer V2
- * Development only — not connected to the live app.
+ * Development branch — secure classroom transfer.
  * Uses Web Crypto to generate and separate secrets.
  */
 (function () {
@@ -26,14 +26,13 @@
       throw new Error("Invalid code");
     }
     const padded = value.replace(/-/g, "+").replace(/_/g, "/");
-    return Uint8Array.from(
-      atob(padded.padEnd(Math.ceil(padded.length / 4) * 4, "=")),
-      c => c.charCodeAt(0)
-    );
+    const bytes = Uint8Array.from(atob(padded.padEnd(Math.ceil(padded.length / 4) * 4, "=")), c => c.charCodeAt(0));
+    if (encode(bytes) !== value) throw new Error("Non-canonical encoding");
+    return bytes;
   }
 
   function createCode() {
-    if (!crypto?.getRandomValues || !crypto.subtle) {
+    if (!globalThis.crypto?.getRandomValues || !globalThis.crypto.subtle) {
       throw new Error("Secure browser required");
     }
     return encode(crypto.getRandomValues(new Uint8Array(32)));
@@ -91,13 +90,13 @@
       )
     );
 
-    return {
-      id,
-      blob: "v2.r." + encode(iv) + "." + encode(ciphertext)
-    };
+    const blob = "v2.r." + encode(iv) + "." + encode(ciphertext);
+    if (blob.length > 4000000) throw new Error("Transfer too large");
+    return { id, blob };
   }
 
   async function decrypt(blob, code) {
+    if (typeof blob !== "string" || blob.length > 4000000) throw new Error("Invalid transfer package");
     const { key } = await derive(code);
     const parts = String(blob).split(".");
 

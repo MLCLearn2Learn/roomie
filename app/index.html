@@ -1245,13 +1245,14 @@ body.ui-calm-look .mascot *,body.ui-calm-look .bigbird *,body.ui-calm-look .stk 
       <button class="btn gold" id="demoBtn" type="button">Try a demo day from 8:40</button>
     </div>
     <p class="hint" style="margin:0">Your board data is saved in this browser. Optional online and microphone features are explained in Setup → Privacy, backup &amp; move.</p>
-    <p style="margin:0;display:flex;flex-wrap:wrap;gap:6px 20px"><a class="linkbtn" href="https://mlclearn2learn.github.io/roomie/?home" target="_blank" rel="noopener" id="aboutLink">What is Roomie? See how it works</a><button type="button" class="linkbtn" data-mv="splash">Already use Roomie on another computer? Move it here</button></p><div id="mvSplash" hidden><div class="row" style="flex-wrap:nowrap"><input id="mvSplashIn" type="text" maxlength="12" placeholder="Move code, e.g. ABCD-2345" autocomplete="off" style="max-width:260px;text-transform:uppercase;letter-spacing:.08em"><button class="btn alt sm" type="button" data-mv="takeSplash">Move it here</button></div><p class="hint" style="margin:4px 0 0">Get the code on your other computer: Setup → Privacy, backup &amp; move → Get a move code.</p><div id="mvSplashMsg"></div></div>
+    <p style="margin:0;display:flex;flex-wrap:wrap;gap:6px 20px"><a class="linkbtn" href="https://mlclearn2learn.github.io/roomie/?home" target="_blank" rel="noopener" id="aboutLink">What is Roomie? See how it works</a><button type="button" class="linkbtn" data-mv="splash">Already use Roomie on another computer? Move it here</button></p><div id="mvSplash" hidden><div class="row" style="flex-wrap:nowrap"><input id="mvSplashIn" type="text" maxlength="43" placeholder="Paste secure transfer code" spellcheck="false" autocapitalize="none" autocomplete="off" style="max-width:420px"><button class="btn alt sm" type="button" data-mv="takeSplash">Move it here</button></div><p class="hint" style="margin:4px 0 0">Get the code on your other computer: Setup → Privacy, backup &amp; move → Get a move code.</p><div id="mvSplashMsg"></div></div>
   </div>
 </div>
 
 <div id="sheetHost"></div>
 <div id="overlayHost"></div>
 
+<script src="./transfer-v2.js"></script>
 <script>
 (function(){
 'use strict';
@@ -3674,39 +3675,66 @@ function slideMoments(r,F,from,to){ const sp=slideSpans(r,from,to); if(sp.length
     if(busy.length) fix.push({at:busy[0].a,quote:(busy.length===1?'Slide ':'Slides ')+busy.slice(0,4).map(s=>s.n).join(', '),sep:' ',note:(busy.length===1?'was':'were')+' text-heavy, and you talked for most of the time '+(busy.length===1?'it was':'they were')+' up. Mayer (2021) found people learn less when they must read on-screen text while listening to the same words. Cut the text, or pause while students read.'}); }
   return {good,fix}; }
 
-/* ---- v2.2: Move my Roomie. Everything is locked (AES-GCM) on this computer with the move code before it leaves,
-   so the server only ever holds scrambled data it can't read. One pickup, then it's deleted; gone after 30 minutes anyway. ---- */
-const MV_AB='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-function mvCode(){ const r=crypto.getRandomValues(new Uint8Array(8)); return [...r].map(x=>MV_AB[x%MV_AB.length]).join(''); }
-const mvFmt=c=>c.slice(0,4)+'-'+c.slice(4);
-const mvClean=c=>String(c||'').toUpperCase().replace(/[^A-Z0-9]/g,'').replace(/O/g,'0').replace(/[IL]/g,'1').replace(/0/g,'O').replace(/1/g,'I');
-async function mvKey(code){ const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(code),'PBKDF2',false,['deriveKey']); return crypto.subtle.deriveKey({name:'PBKDF2',salt:new TextEncoder().encode('roomie-move-'+code.slice(0,4)),iterations:150000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']); }
-const b64=u=>{ let s=''; for(let i=0;i<u.length;i+=0x8000) s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000)); return btoa(s); };
-const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-async function mvZip(u,dir){ if(typeof CompressionStream==='undefined') return u; const st=new Blob([u]).stream().pipeThrough(dir?new CompressionStream('gzip'):new DecompressionStream('gzip')); return new Uint8Array(await new Response(st).arrayBuffer()); }
-async function moveSend(){ if(DEMO.active){ toast('Exit demo before moving a saved class.'); return false; } const box=document.getElementById('mvOut'); if(box) box.innerHTML='<p class="hint">Locking your Roomie…</p>';
-  try{ const raw=new TextEncoder().encode(JSON.stringify(S)); const z=typeof CompressionStream!=='undefined'; const data=z?await mvZip(raw,true):raw;
-    for(let tries=0;tries<4;tries++){ const code=mvCode(), key=await mvKey(code), iv=crypto.getRandomValues(new Uint8Array(12)); const ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,data));
-      const blob=(z?'z':'r')+b64(iv)+'.'+b64(ct); const ok=await rpc('put_transfer',{p_id:code.slice(0,4),p_blob:blob});
-      if(ok){ if(box) box.innerHTML='<div class="mvcode"><small>Your move code</small><b>'+mvFmt(code)+'</b><p>On the other computer, open Roomie and choose <b>Move my Roomie here</b> (in Setup → Privacy, backup & move, or on the welcome screen). Enter this code. Treat it like a password and share it only with the person moving your class data.</p></div>'; return code; } }
-    throw 0; }
-  catch(_){ if(box) box.innerHTML='<div class="warnbox">Roomie couldn’t make a move code. Check the internet and try again.</div>'; } }
-async function moveTake(input,msgEl){ if(DEMO.active){ toast('Exit demo before moving a saved class.'); return false; } const code=mvClean(input); const say=h=>{ if(msgEl) msgEl.innerHTML=h; };
-  if(STORAGE.original!==null){ say('<div class="warnbox">Resolve the saved-data warning and download the original before moving another class here.</div>'); return false; }
-  const blocked=typeof classProfileBlockReason==='function'?classProfileBlockReason():((S.liveOn||S.remote||(typeof M!=='undefined'&&M.on))?'End student-device, remote and coaching sessions before moving a class here.':''); if(blocked){ say('<div class="warnbox">'+esc(blocked)+'</div>'); return false; }
-  if(code.length!==8){ say('<div class="warnbox">Move codes have 8 letters and numbers, like ABCD-2345.</div>'); return false; }
-  say('<p class="hint">Fetching and unlocking…</p>');
-  try{ const blob=await rpc('take_transfer',{p_id:code.slice(0,4)}); if(!blob){ say('<div class="warnbox">That code didn’t work. Check it carefully, or make a new code on the other computer.</div>'); return false; }
-    const z=blob[0]==='z', [iv,ct]=blob.slice(1).split('.'); const key=await mvKey(code); let data=new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(iv)},key,unb64(ct))); if(z) data=await mvZip(data,false);
-    const o=JSON.parse(new TextDecoder().decode(data)); if(!isValidClassData(o)) throw new Error('Invalid transferred class'); S=classWithDefaults(o); if(typeof clearClassRuntime==='function') clearClassRuntime(); if(!save()){ say('<div class="warnbox">Your class was received, but this browser could not save it. Keep this page open and download the current backup before closing it.</div>'); refreshLabels(); return false; } say('<div class="okbox">Your Roomie is saved here. Reloading…</div>'); setTimeout(()=>location.reload(),900); return true; }
-  catch(_){ say('<div class="warnbox">That code couldn’t unlock anything. Check each letter, or make a new code on the other computer.</div>'); return false; } }
-function moveHTML(){ return '<div class="mvbox"><h3 style="margin:0">Move my Roomie to another computer</h3><p class="hint" style="margin:0">Takes your class, day plan, routines, points, seating, helpers and coaching to another computer in under a minute. It’s encrypted with your code before upload. Anyone with the move code can open it, so share the code privately. The client requests a temporary transfer; server deletion has not been independently verified. Uploaded audio, videos, PDFs and routine image attachments stay on this computer. Keep the originals to add them again. Your school crest and pictures added under “Your pictures” are included.</p><div class="row"><button class="btn sm" type="button" data-mv="send">Get a move code</button></div><div id="mvOut"></div>'+
-  '<h3 style="margin:8px 0 0">Move my Roomie here</h3><p class="hint" style="margin:0">Got a code from your other computer? This replaces all classes saved on this computer. Download a backup first if you want to keep them.</p><div class="row" style="flex-wrap:nowrap"><input id="mvIn" type="text" maxlength="12" placeholder="ABCD-2345" autocomplete="off" style="max-width:220px;text-transform:uppercase;letter-spacing:.1em"><button class="btn alt sm" type="button" data-mv="take">Move it here</button></div><div id="mvMsg"></div></div>'; }
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-mv]'); if(!b) return; const a=b.dataset.mv;
-  if(a==='send') moveSend();
-  if(a==='take') moveTake((document.getElementById('mvIn')||{}).value,document.getElementById('mvMsg'));
-  if(a==='splash'){ const w=document.getElementById('mvSplash'); if(w) w.hidden=!w.hidden; }
-  if(a==='takeSplash') moveTake((document.getElementById('mvSplashIn')||{}).value,document.getElementById('mvSplashMsg')); });
+/* Secure transfer v2: the full secret stays in the browser, never in RPC arguments. */
+let moveBusy=false;
+function moveBlocked(){
+  if(STUDENT||DEMO.active)return 'Exit student or demo mode before moving a saved class.';
+  if(STORAGE.original!==null)return 'Resolve the saved-data warning and back up the original first.';
+  return typeof classProfileBlockReason==='function'?classProfileBlockReason():'';
+}
+function moveMessage(host,message,kind='okbox'){if(host)host.innerHTML='<div class="'+kind+'">'+esc(message)+'</div>';}
+async function moveSend(){
+  const box=document.getElementById('mvOut'),blocked=moveBlocked();
+  if(blocked){toast(blocked);return false;} if(moveBusy)return false;
+  moveBusy=true;moveMessage(box,'Encrypting your Roomie…');
+  try{
+    const t=window.RoomieTransferV2,code=t.createCode(),{id,blob}=await t.encrypt(S,code);
+    if(await rpc('put_transfer_v2',{p_id:id,p_blob:blob})!==true)throw Error('Unavailable');
+    const link=new URL(location.href);link.search='?join-transfer';link.hash='move='+code;
+    if(box)box.innerHTML='<div class="mvcode"><small>Your private move code</small><b style="overflow-wrap:anywhere">'+code+'</b><p>Copy this full code to Roomie on your other computer. Keep it private: anyone with the code can open your saved classes.</p><a href="'+esc(link.href)+'" rel="noreferrer">Private transfer link</a><p>Available for 30 minutes. Deleted after a successful receipt.</p></div>';
+    return code;
+  }catch(_){moveMessage(box,'Roomie could not create a secure transfer. Check your connection and that the development transfer service is ready.','warnbox');return false;}
+  finally{moveBusy=false;}
+}
+async function moveTake(input,msgEl){
+  const say=(message,kind)=>moveMessage(msgEl,message,kind),blocked=moveBlocked();
+  if(blocked){say(blocked,'warnbox');return false;}if(moveBusy)return false;
+  const code=String(input||'').trim();
+  if(!/^[A-Za-z0-9_-]{43}$/.test(code)){say('Paste the complete 43-character secure code. Letter case matters. Older short codes are not supported.','warnbox');return false;}
+  if(!window.confirm('This replaces all Roomie classes saved in this browser. Download a backup first if you need to keep them. Continue?')){say('Transfer cancelled. Nothing has changed.');return false;}
+  moveBusy=true;say('Retrieving your encrypted Roomie…');
+  try{
+    const t=window.RoomieTransferV2,{id}=await t.derive(code),blob=await rpc('peek_transfer_v2',{p_id:id});
+    const next=await t.decrypt(blob,code);if(!isValidClassData(next))throw Error('Invalid class');
+    // Recheck after network/decryption awaits: a session may have started meanwhile.
+    const blockedNow=moveBlocked();if(blockedNow){say(blockedNow,'warnbox');return false;}
+    const previous=S;S=classWithDefaults(next);
+    let saved=false;try{saved=save()===true;}catch(_){}
+    if(!saved){S=previous;say('This browser could not save the transfer. Your previous classes are kept; correct the storage problem and retry this code.','warnbox');return false;}
+    let acknowledged=false;
+    try{acknowledged=await rpc('finish_transfer_v2',{p_id:id})===true;}catch(_){}
+    if(typeof clearClassRuntime==='function')clearClassRuntime();
+    say(acknowledged?'Your Roomie is saved here. Transfer deleted. Reloading…':'Your Roomie is saved here. Deletion could not be confirmed; keep the code private until the 30-minute expiry. Reloading…');
+    setTimeout(()=>location.reload(),900);return true;
+  }catch(_){say('The transfer was unavailable or could not be unlocked. Check the full code and retry within 30 minutes. Your saved classes have not changed.','warnbox');return false;}
+  finally{moveBusy=false;}
+}
+function moveHTML(){return '<div class="mvbox"><h3>Move Roomie to another computer</h3><p class="hint">A private secure code encrypts a temporary copy of all your saved classes before upload. Available for 30 minutes; deleted after a successful receipt. Anyone with the code can open it, so share privately. Uploaded audio, videos, PDFs and routine attachments stay on this computer. School crests and pictures under “Your pictures” are included.</p><button class="btn sm" type="button" data-mv="send">Get a move code</button><div id="mvOut"></div><h3>Move my Roomie here</h3><p class="hint">This replaces all classes saved here. Back up first and use a trusted device.</p><div class="row"><input id="mvIn" type="text" maxlength="43" placeholder="Paste secure transfer code" autocomplete="off" spellcheck="false" autocapitalize="none" style="flex:1;min-width:220px"><button class="btn alt sm" type="button" data-mv="take">Move it here</button></div><div id="mvMsg"></div></div>';}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-mv]');if(!b)return;const a=b.dataset.mv;
+  if(a==='send')moveSend();
+  if(a==='take')moveTake((document.getElementById('mvIn')||{}).value,document.getElementById('mvMsg'));
+  if(a==='splash'){const w=document.getElementById('mvSplash');if(w)w.hidden=!w.hidden;}
+  if(a==='takeSplash')moveTake((document.getElementById('mvSplashIn')||{}).value,document.getElementById('mvSplashMsg'));
+});
+// The secret is in the fragment, not the URL query or server request. Remove it immediately.
+function captureMoveLink(){
+  if(!location.hash.startsWith('#move='))return;
+  const code=location.hash.slice(6);history.replaceState(null,'',location.pathname+location.search);
+  if(!/^[A-Za-z0-9_-]{43}$/.test(code)||STUDENT)return;
+  const input=document.getElementById('mvSplashIn'),box=document.getElementById('mvSplash');
+  if(input&&box){input.value=code;box.hidden=false;}
+}
+captureMoveLink();
 
 /* ---- v2.2: three-minute setup ---- */
 const WZ={step:0};

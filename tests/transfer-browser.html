@@ -1,0 +1,37 @@
+<!doctype html><meta charset="utf-8"><title>Roomie transfer integration checks</title>
+<h1>Roomie development transfer integration</h1><p>Uses fictional classes and an in-memory transfer service. No production requests. Restores previous browser storage after testing.</p><button id="run">Run isolated browser checks</button><pre id="out"></pre><iframe id="app" title="Development classroom" style="width:100%;height:300px" sandbox="allow-scripts allow-same-origin allow-modals"></iframe>
+<script>
+const out=document.getElementById('out'),frame=document.getElementById('app');
+const log=m=>out.textContent+=m+'\n';const check=(ok,m)=>{if(!ok)throw Error(m);log('PASS: '+m);};
+document.getElementById('run').onclick=async()=>{
+ out.textContent='';const original=localStorage.getItem('bellbird.v2');const stores=new Map();let w;
+ const fixture={days:{},routines:[],students:['Fictional A'],room:'Fictional transfer',voice:false,liveOn:false,remote:false,classProfileId:'fictional-a',classProfiles:[{id:'fictional-b',data:{days:{},routines:[],students:['Fictional B'],room:'Second fictional class'}}]};
+ try{
+ localStorage.setItem('bellbird.v2',JSON.stringify(fixture));
+ let source=await (await fetch('../app/')).text();
+ const bridge=`window.__transferTest={moveSend,moveTake,setState:o=>{S=classWithDefaults(o);save();},setRpc:fn=>rpc=fn,failSave:()=>{const old=save;save=()=>false;return ()=>save=old;}};`;
+ source=source.replace('<head>','<head><base href="'+new URL('../app/',location.href).href+'">');
+ const at=source.lastIndexOf('})();');source=source.slice(0,at)+bridge+source.slice(at);
+ await new Promise(resolve=>{frame.onload=()=>{if(frame.contentWindow.__transferTest)resolve();};frame.srcdoc=source;});w=frame.contentWindow;const t=w.__transferTest;
+ // No test may reach a live backend. The actual application transfer functions run unchanged.
+ w.fetch=async()=>{throw Error('Network disabled by test');};w.confirm=()=>true;
+ const nativeTimeout=w.setTimeout.bind(w);w.setTimeout=(fn,ms,...args)=>ms===900?0:nativeTimeout(fn,ms,...args);
+ t.setRpc(async(fn,args)=>{
+ if(fn==='put_transfer_v2'){stores.set(args.p_id,args.p_blob);return true;}
+ if(fn==='peek_transfer_v2')return stores.get(args.p_id)||null;
+ if(fn==='finish_transfer_v2')return stores.delete(args.p_id);
+ throw Error('Unexpected RPC');});
+ const code=await t.moveSend();check(typeof code==='string'&&code.length===43,'Actual classroom sender generates secure code');
+ check(stores.size===1&&!Array.from(stores.values())[0].includes('Fictional'),'Only ciphertext reaches service');
+ t.setState({days:{},routines:[],students:['Receiving class'],room:'Receiving class'});
+ const msg=w.document.createElement('div');check(await t.moveTake(code,msg),'Actual receiver completes import');
+ const saved=JSON.parse(localStorage.getItem('bellbird.v2'));check(saved.students[0]==='Fictional A'&&saved.classProfiles[0].data.students[0]==='Fictional B','Real localStorage contains both transferred classes');
+ check(stores.size===0,'Acknowledgement removes saved package');
+ const before=localStorage.getItem('bellbird.v2');check(await t.moveTake(code,msg)===false&&localStorage.getItem('bellbird.v2')===before,'Consumed code cannot overwrite classes');
+ const retry=await t.moveSend();const restoreSave=t.failSave();
+ check(await t.moveTake(retry,msg)===false&&stores.size===1&&localStorage.getItem('bellbird.v2')===before,'Storage failure preserves data and retryable transfer');
+ restoreSave();check(await t.moveTake(retry,msg)&&stores.size===0,'Same code succeeds after storage recovery');
+ log('ALL BROWSER INTEGRATION CHECKS PASSED');
+ }catch(e){log('FAIL: '+e.message);}finally{if(original===null)localStorage.removeItem('bellbird.v2');else localStorage.setItem('bellbird.v2',original);frame.removeAttribute('srcdoc');frame.src='about:blank';}
+};
+</script>
