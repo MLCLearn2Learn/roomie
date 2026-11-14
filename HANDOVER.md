@@ -87,3 +87,6 @@ Antoinette approved three separate finder groups: Teaching (Timer, Tickets, Thin
 
 ## Styling constraint — explicit user direction
 Antoinette requires all original styling to remain unchanged; current scope is navigation fixes only. Preserve colours, bright multicoloured headings, fonts, scrapbook decorations, backgrounds and button styling. Browser inspection confirmed the original bright heading palette and fonts are currently rendered. No appearance setting was changed during this check. Do not introduce visual redesigns or change appearance preferences while continuing navigation work.
+
+## Setup entry and return labels
+Setup button now explicitly opens Day plan, irrespective of the last Setup section visited. Look still opens Look & colours. The Setup close button reads Back to my board and preserves existing behavior of returning to the current activity. Only the entry handler and button text changed; no CSS, appearance preferences, picture or mascot settings changed. All 173 automated tests passed. Browser checks verified Look opens appearance, Setup after Look opens Day plan, and returning from Setup preserves the Timer screen. Production unchanged.
