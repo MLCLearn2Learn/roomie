@@ -1439,7 +1439,11 @@ function brainBreakVariant(base,keepEveryone=S.keepEveryoneInGame===true){
   if(b.type==='movement'||b.type==='game') b.how+=' Join in seated or standing, choose a comfortable movement or signal, or watch this round.';
   return b;
 }
-function brainBreakSettingsHTML(){ return '<h3>Brain breaks</h3><label class="chk"><input type="checkbox" id="fKeepEveryoneInGame" '+(S.keepEveryoneInGame===true?'checked':'')+'><span>Keep everyone in the game<span class="hint" style="display:block">No elimination in Heads or Hips, Rhyme Chain and Rock, Paper, Champion. Includes seated and movement choices. Applies to the next brain break you start.</span></span></label>'; }
+function brainPlaybackSettingsHTML(){
+  const tap=S.brainPace!=='auto', voice=S.brainVoice!==false;
+  return '<div class="row bopts"><span class="hint">Pace</span><button type="button" class="chip bopt'+(tap?' on':'')+'" data-bpace="tap" aria-pressed="'+tap+'">I tap Next</button><button type="button" class="chip bopt'+(!tap?' on':'')+'" data-bpace="auto" aria-pressed="'+!tap+'">Auto</button><span class="hint" style="margin-left:10px">Roomie’s voice</span><button type="button" class="chip bopt'+(voice?' on':'')+'" data-bvoice="1" aria-pressed="'+voice+'" aria-label="Roomie’s voice '+(voice?'on':'off')+'">'+(voice?'On':'Off')+'</button></div>';
+}
+function brainBreakSettingsHTML(){ return brainPlaybackSettingsHTML()+'<h3>Participation</h3><label class="chk"><input type="checkbox" id="fKeepEveryoneInGame" '+(S.keepEveryoneInGame===true?'checked':'')+'><span>Keep everyone in the game<span class="hint" style="display:block">No elimination in Heads or Hips, Rhyme Chain and Rock, Paper, Champion. Includes seated and movement choices. Applies to the next brain break you start.</span></span></label>'; }
 
 
 /* ================= Data ================= */
@@ -1738,7 +1742,7 @@ function paintBreath(){ if(bH) return; let i=0; const run=()=>{ const d=document
 
 /* ================= Overlays (teacher tools) ================= */
 function openOverlay(name,data){ if(A.overlay!==name) navRemember(A.overlay); A.overlay=name; Object.assign(A,data||{}); markTools(); markHero(); render(true); }
-function closeOverlay(){ if(NAV.owner&&NAV.owner===A.overlay) navStopActivity(); else navBack(); }
+function closeOverlay(){ if(NAV.owner==='brain'&&A.overlay==='brain') brainFinish(); else if(NAV.owner&&NAV.owner===A.overlay) navStopActivity(); else navBack(); }
 const NAV={trail:[],owner:null};
 const NAV_LABELS={timer:'timer',brain:'brain break',calm:'calm breathing',manualRoutine:'routine',practise:'routine practice',rotate:'rotations',ticket:'ticket',reflect:'reflection',think:'thinking activity',packup:'pack up',reteach:'expectation practice'};
 function navRemember(key){ if(NAV.trail[NAV.trail.length-1]!==key||!NAV.trail.length) NAV.trail.push(key||null); if(NAV.trail.length>20) NAV.trail.shift(); }
@@ -1756,6 +1760,7 @@ function navBoard(){ NAV.trail=[]; navShow(null); }
 function navStopActivity(redraw){
   const was=NAV.owner||A.overlay;
   MT.stop(); clearActivity();
+  if(was==='brain'&&typeof speechSynthesis!=='undefined') try{ speechSynthesis.cancel(); }catch(_){}
   if(['brain','calm','manualRoutine','practise','party','rotate','packup'].includes(was)) Music.fadeStop();
   if(was==='hero'&&A.heroStage==='shown') A.heroStage='';
   NAV.owner=null; NAV.trail=[]; A.rot=null; A.overlay=null;
@@ -1772,11 +1777,11 @@ function navPrepareStart(key){
 function navStartTimer(seconds){ if(!navPrepareStart('timer')) return false; MT.stop(); MT.start(seconds,()=>{ chime(3); say('Time’s up.'); }); A.overlay='timer'; markTools(); render(true); return true; }
 function navControls(){
   const row=document.getElementById('activityNav'); if(!row) return;
-  row.hidden=STUDENT||!NAV.owner||!navHasActivity(); if(row.hidden) return;
+  row.hidden=STUDENT||!NAV.owner||!navHasActivity()||(NAV.owner==='brain'&&A.overlay==='brain'); if(row.hidden) return;
   const label=NAV_LABELS[NAV.owner]||'activity', state=MT.running?'running':MT.remaining()>0?'paused':'in progress';
   document.getElementById('activityNavStatus').textContent=label.charAt(0).toUpperCase()+label.slice(1)+' '+state+(MT.total>0?' · '+fmtLeft(MT.remaining()):'');
   const back=document.getElementById('activityReturn'); back.hidden=A.overlay===NAV.owner; back.textContent='Return to '+label;
-  document.getElementById('activityStop').textContent='Stop '+label;
+  document.getElementById('activityStop').textContent=NAV.owner==='brain'?'Finish break':'Stop '+label;
 }
 function markTools(){ document.querySelectorAll('.tool[data-tool]').forEach(b=>b.classList.toggle('on', b.dataset.tool===A.overlay || ((A.overlay==='brainpick')&&b.dataset.tool==='brain') || ((A.overlay==='tpick'||A.overlay==='ticket')&&b.dataset.tool==='exit') || ((A.overlay==='rpick'||A.overlay==='reflect')&&b.dataset.tool==='reflect') || ((A.overlay==='thpick'||A.overlay==='think')&&b.dataset.tool==='think') || (A.overlay==='manualRoutine'&&b.dataset.tool==='routines') || (A.overlay==='practise'&&b.dataset.tool==='routines')));  markMenus(); }
 let actH=[]; function clearActivity(){ actH.forEach(h=>{clearTimeout(h);clearInterval(h);}); actH=[]; }
@@ -1812,7 +1817,7 @@ function startBrain(type,id){ if(!navPrepareStart('brain')) return; const off=S.
   MT.start(b.secs,()=>{ chime(2); Music.fadeStop(); clearActivity(); const c=$('#call'); if(c){ c.className='call'; c.textContent='Brain break done. Back to your spot.'; } setTimeout(()=>{ if(A.overlay==='brain') closeOverlay(); },4000); });
   if(b.calls) actH.push(setInterval(()=>{ A.callIdx=(A.callIdx+1)%b.calls.length; const c=$('#call'); if(c) c.textContent=b.calls[A.callIdx]; },(b.every||8)*1000));
   if(b.freeze) freezeLoop(); render(true); }
-function freezeLoop(){ actH.push(setTimeout(()=>{ if(A.overlay!=='brain') return; Music.pause(); const c=$('#call'); if(c){ c.className='call freeze'; c.textContent='FREEZE!'; } actH.push(setTimeout(()=>{ if(A.overlay!=='brain'||!MT.running) return; Music.resume(); const c=$('#call'); if(c){ c.className='call'; c.textContent='Dance!'; } freezeLoop(); },3000)); },4000+Math.random()*5000)); }
+function freezeLoop(){ actH.push(setTimeout(()=>{ if(NAV.owner!=='brain'||!MT.running) return; Music.pause(); const c=$('#call'); if(c){ c.className='call freeze'; c.textContent='FREEZE!'; } actH.push(setTimeout(()=>{ if(NAV.owner!=='brain'||!MT.running) return; Music.resume(); const c=$('#call'); if(c){ c.className='call'; c.textContent='Dance!'; } freezeLoop(); },3000)); },4000+Math.random()*5000)); }
 function renderBrain(full){ const b=A.brain; if(full) setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Brain break · '+esc(b.type)+'</div>'+backBtn('Stop')+'</div><h1 class="big">'+esc(b.name)+'</h1><p class="lead">'+esc(b.how)+'</p><div class="call" id="call">'+esc(b.calls?b.calls[A.callIdx]:(b.freeze?'Dance!':'Go!'))+'</div></section><aside class="side"><section class="card sm" style="align-items:center">'+ringHTML('main','left')+'</section>'+(b.song?npHTML():'')+'<div class="row"><button class="btn alt sm" type="button" data-brain="movement">Movement</button><button class="btn alt sm" type="button" data-brain="game">Game</button><button class="btn alt sm" type="button" data-brain="calm">Quiet</button><button class="btn sm" type="button" data-brain="">Another one</button><button class="btn alt sm" type="button" data-tool="calm">Calm breathing</button></div></aside>');
   paintRing('main',MT.remaining(),MT.total); if(full) updateNowPlaying(); }
 
@@ -1968,7 +1973,7 @@ function onPhaseChange(P,prev){
 /* ================= Actions ================= */
 function act(a,el){
   if(a==='back'){ navBack(); return; }
-  if(a==='stopActivity'){ if(el&&el.dataset.stopScreen&&NAV.owner&&A.overlay!==NAV.owner) navBack(); else navStopActivity(); return; }
+  if(a==='stopActivity'){ if(el&&el.dataset.stopScreen&&NAV.owner&&A.overlay!==NAV.owner) navBack(); else if(NAV.owner==='brain') brainFinish(); else navStopActivity(); return; }
   if(a==='rotStart') return startRotations();
   const P=(a==='plus5'||a==='startNow')?phaseAt(now()):(A.P||phaseAt(now()));
   if(a==='plus5'&&P.block){ A.ext[P.block.id]=(A.ext[P.block.id]||0)+5; toast('5 more minutes'); tick(true); return; }
@@ -2076,8 +2081,8 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('keydown',e=>{ if(e.target.closest('input,textarea,select,[role="menu"],[role="dialog"][aria-modal="true"]')||$('#sheetHost').innerHTML) return; const k=e.key.toLowerCase();
   if(k==='a') attention(); else if(k==='r') resetRoom(); else if(k==='d') openOverlay('door'); else if(k==='l') openOverlay('late');
-  else if(k==='arrowright'){ const P=A.P; if(A.overlay==='manualRoutine') act('mrNext'); else if(P&&P.phase==='routine'){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)+1; render(false); } }
-  else if(k==='arrowleft'){ const P=A.P; if(A.overlay==='manualRoutine') act('mrBack'); else if(P&&P.phase==='routine'){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)-1; render(false); } } });
+  else if(k==='arrowright'){ const P=A.P; if(A.overlay==='manualRoutine') act('mrNext'); else if(!A.overlay&&P&&P.phase==='routine'){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)+1; render(false); } }
+  else if(k==='arrowleft'){ const P=A.P; if(A.overlay==='manualRoutine') act('mrBack'); else if(!A.overlay&&P&&P.phase==='routine'){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)-1; render(false); } } });
 document.addEventListener('dblclick',e=>{ const li=e.target.closest('.steps li'); if(!li) return; const P=A.P; if(P&&P.phase==='routine'&&!A.overlay){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)+1; render(false); } });
 $('#setupBtn').addEventListener('click',()=>{ tab='plan'; openSetup(); });
 $('#fsBtn').addEventListener('click',()=>{ try{ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(()=>toast('Full screen isn’t available here.')); }catch(e){ toast('Full screen isn’t available here.'); } });
@@ -2580,7 +2585,7 @@ const BCATS=[['all','All'],['movement','Move'],['calm','Calm'],['game','Games'],
 function bcatOf(b){ return b.breath?'calm':b.type; }
 function renderBrainPicker(full){ if(!full) return; const off=S.breakOff||[]; const cat=A.bcat||'all'; const L=BREAKS.filter(b=>!b.breath&&(cat==='all'||bcatOf(b)===cat)).map(b=>brainBreakVariant(b));
   const tabs='<div class="row bcats" role="tablist">'+BCATS.filter(([k])=>k==='all'||BREAKS.some(b=>bcatOf(b)===k)).map(([k,l])=>'<button type="button" role="tab" aria-selected="'+(k===cat)+'" class="chip bcat'+(k===cat?' on':'')+'" data-bcat="'+k+'">'+l+' <small>'+(k==='all'?BREAKS.filter(b=>!b.breath).length+1:BREAKS.filter(b=>bcatOf(b)===k&&!b.breath).length+(k==='calm'?1:0))+'</small></button>').join('')+'</div>';
-  setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Brain breaks</h1><div class="row"><button class="btn gold" type="button" data-bpick="">Surprise me</button>'+backBtn()+'</div></div><details><summary class="btn alt sm">Brain break settings</summary>'+brainBreakSettingsHTML()+'</details>'+tabs+'<p class="hint" style="margin:0">Untick any you don’t want in the surprise mix.</p><div class="tgrid">'+L.map(b=>'<div class="tcard'+(off.includes(b.id)?' off':'')+'"><span class="chip" style="align-self:flex-start;font-size:13px;padding:3px 10px">'+esc({movement:'Move',calm:'Calm',game:'Game',primer:'Primer',video:'Video'}[b.type]||'Break')+' · '+Math.round(b.secs/60*10)/10+' min</span><b>'+esc(b.name)+'</b><span>'+esc(b.how)+'</span><div class="row" style="margin-top:auto;justify-content:space-between"><label class="chk" style="font-size:14px"><input type="checkbox" data-boff="'+b.id+'" '+(off.includes(b.id)?'':'checked')+'> In the mix</label><button class="btn sm" type="button" data-bpick="'+b.id+'">Start</button></div></div>').join('')+((cat==='all'||cat==='calm')?'<div class="tcard"><span class="chip" style="align-self:flex-start;font-size:13px;padding:3px 10px">Calm · 1 min</span><b>Calm breathing</b><span>Breathe in as the circle grows, out as it shrinks.</span><div class="row" style="margin-top:auto;justify-content:flex-end"><button class="btn sm" type="button" data-tool="calm">Start</button></div></div>':'')+'</div></section>'); }
+  setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Brain breaks</h1><div class="row"><button class="btn gold" type="button" data-bpick="">Surprise me</button>'+backBtn()+'</div></div><details data-brain-settings><summary class="btn alt sm">Brain break settings</summary>'+brainBreakSettingsHTML()+'</details>'+tabs+'<p class="hint" style="margin:0">Untick any you don’t want in the surprise mix.</p><div class="tgrid">'+L.map(b=>'<div class="tcard'+(off.includes(b.id)?' off':'')+'"><span class="chip" style="align-self:flex-start;font-size:13px;padding:3px 10px">'+esc({movement:'Move',calm:'Calm',game:'Game',primer:'Primer',video:'Video'}[b.type]||'Break')+' · '+Math.round(b.secs/60*10)/10+' min</span><b>'+esc(b.name)+'</b><span>'+esc(b.how)+'</span><div class="row" style="margin-top:auto;justify-content:space-between"><label class="chk" style="font-size:14px"><input type="checkbox" data-boff="'+b.id+'" '+(off.includes(b.id)?'':'checked')+'> In the mix</label><button class="btn sm" type="button" data-bpick="'+b.id+'">Start</button></div></div>').join('')+((cat==='all'||cat==='calm')?'<div class="tcard"><span class="chip" style="align-self:flex-start;font-size:13px;padding:3px 10px">Calm · 1 min</span><b>Calm breathing</b><span>Breathe in as the circle grows, out as it shrinks.</span><div class="row" style="margin-top:auto;justify-content:flex-end"><button class="btn sm" type="button" data-tool="calm">Start</button></div></div>':'')+'</div></section>'); }
 
 /* FEATURE_SETTINGS_START */
 document.addEventListener('input',e=>{
@@ -4301,34 +4306,53 @@ function visThinkInject(){ if(A.overlay!=='think'||!S.thinkVis) return; const ca
 { const f=render; render=function(){ const r=f.apply(this,arguments); try{ visThinkInject(); }catch(e){ console.warn(e); } return r; }; }
 
 /* ---- v2.6 Brain breaks you control: tap Next (default) or let Roomie run them, voice on or off ---- */
+/* BRAIN_NAV_START */
+function brainBrowse(category){ A.bcat=category||'all'; openOverlay('brainpick'); }
+function brainFinish(){ navStopActivity(false); openOverlay('brainpick'); }
+function brainRefreshSettings(selector){
+  render(true); const details=document.querySelector('#stage [data-brain-settings]'); if(details) details.open=true;
+  const control=document.querySelector(selector); if(control) control.focus({preventScroll:true});
+}
+/* BRAIN_NAV_END */
 function brainPaceTap(){ return S.brainPace!=='auto'; }
 function brainVoiceOn(){ return S.brainVoice!==false; }
 function speakLine(t){ if(!window.speechSynthesis||!t) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(String(t).replace(/[⟵⟶·×]/g,' ')); u.lang=S.lang||'en-AU'; u.rate=S.voiceRate||0.95; u.pitch=S.voicePitch||1; const v=(typeof pickVoice==='function'?pickVoice():null); if(v) u.voice=v; speechSynthesis.speak(u); }catch(_){} }
 function brainSay(t){ if(brainVoiceOn()) { if(typeof ownVoicePlay==='function'&&ownVoicePlay(t)) return; speakLine(t); } }
-function brainShow(i){ const b=A.brain; if(!b||!b.calls) return; A.callIdx=(i+b.calls.length)%b.calls.length; const c=$('#call'); if(c){ c.className='call'; c.textContent=b.calls[A.callIdx]; c.classList.remove('callpop'); void c.offsetWidth; c.classList.add('callpop'); }
-  const n=$('#bstepn'); if(n) n.textContent=(A.callIdx+1)+' / '+b.calls.length; const nx=$('[data-bstep="1"]'); if(nx) nx.textContent=A.callIdx>=b.calls.length-1?'Start again ↻':'Next ▶'; brainSay(b.calls[A.callIdx]); }
+function brainShow(i){ const b=A.brain; if(!b||!b.calls) return; A.callIdx=Math.max(0,i)%b.calls.length; const c=$('#call'); if(c){ c.className='call'; c.textContent=b.calls[A.callIdx]; c.classList.remove('callpop'); void c.offsetWidth; c.classList.add('callpop'); }
+  const n=$('#bstepn'); if(n) n.textContent=(A.callIdx+1)+' / '+b.calls.length; const previous=$('[data-bstep="-1"]'); if(previous) previous.disabled=A.callIdx===0; const nx=$('[data-bstep="1"]'); if(nx) nx.textContent=A.callIdx>=b.calls.length-1?'Start again ↻':'Next prompt ▶'; brainSay(b.calls[A.callIdx]); }
 startBrain=function(type,id){ if(!navPrepareStart('brain')) return; const off=S.breakOff||[]; let pool=BREAKS.filter(b=>!b.breath&&!off.includes(b.id)&&(!type||b.type===type)&&(!A.brain||b.id!==A.brain.id)); if(!pool.length) pool=BREAKS.filter(b=>!b.breath);
   const b=brainBreakVariant((id&&BREAKS.find(x=>x.id===id))||pool[Math.floor(Math.random()*pool.length)]||BREAKS[0]);
   clearActivity(); if(b.gen) b.calls=b.gen(); A.brain=b; A.callIdx=0; A.overlay='brain'; markTools(); if(b.song) Music.play(b.song); else Music.stop();
   if(brainVoiceOn()) speakLine(b.name+'. '+b.how+(b.calls?' '+b.calls[0]:''));
-  MT.start(b.secs,()=>{ chime(2); Music.fadeStop(); clearActivity(); const c=$('#call'); if(c){ c.className='call'; c.textContent=brainPaceTap()?'Time’s up! Tap Finish, or keep going.':'Brain break done. Back to your spot.'; } if(brainVoiceOn()) speakLine(brainPaceTap()?'Time’s up!':'Brain break done. Back to your spot.'); if(!brainPaceTap()) setTimeout(()=>{ if(A.overlay==='brain') closeOverlay(); },4000); });
+  MT.start(b.secs,()=>{ chime(2); Music.fadeStop(); clearActivity(); const c=$('#call'); if(c){ c.className='call'; c.textContent=brainPaceTap()?'Time’s up! Tap Finish break, or keep going.':'Brain break done. Back to your spot.'; } if(brainVoiceOn()) speakLine(brainPaceTap()?'Time’s up!':'Brain break done. Back to your spot.'); if(!brainPaceTap()) actH.push(setTimeout(()=>{ if(NAV.owner==='brain'&&A.brain===b){ if(A.overlay==='brain') brainFinish(); else { const screen=A.overlay; navStopActivity(false); navShow(screen); } } },4000)); });
   if(b.calls&&!brainPaceTap()) actH.push(setInterval(()=>brainShow(A.callIdx+1),(b.every||8)*1000));
   if(b.freeze&&!brainPaceTap()) freezeLoop(); render(true); };
-renderBrain=function(full){ const b=A.brain; if(full){ const tap=brainPaceTap(), many=b.calls&&b.calls.length>1;
-    const ctl='<div class="row bctl">'+(many?'<button class="btn alt" type="button" data-bstep="-1" aria-label="Previous">◀ Back</button><span class="bstepn" id="bstepn">'+(A.callIdx+1)+' / '+b.calls.length+'</span><button class="btn" type="button" data-bstep="1">'+(A.callIdx>=b.calls.length-1?'Start again ↻':'Next ▶')+'</button>':'')+(b.freeze?'<button class="btn gold" type="button" data-bfreeze="1">Freeze now!</button>':'')+'<button class="btn alt" type="button" data-bfinish="1">Finish</button></div>'+
-      '<div class="row bopts"><span class="hint">Pace</span><button type="button" class="chip bopt'+(tap?' on':'')+'" data-bpace="tap">I tap Next</button><button type="button" class="chip bopt'+(!tap?' on':'')+'" data-bpace="auto">Auto</button><span class="hint" style="margin-left:10px">Roomie’s voice</span><button type="button" class="chip bopt'+(brainVoiceOn()?' on':'')+'" data-bvoice="1">'+(brainVoiceOn()?'On':'Off')+'</button></div>';
-    setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Brain break · '+esc({movement:'Move',calm:'Calm',game:'Game',primer:'Positive primer',video:'Roomie video'}[b.type]||b.type)+'</div>'+backBtn('Stop')+'</div><h1 class="big">'+esc(b.name)+'</h1><p class="lead">'+esc(b.how)+'</p><div class="call" id="call">'+esc(b.calls?b.calls[A.callIdx]:(b.freeze?'Dance!':'Go!'))+'</div>'+ctl+'</section><aside class="side"><section class="card sm" style="align-items:center">'+ringHTML('main','left')+'</section>'+(b.song?npHTML():'')+'<div class="row"><button class="btn alt sm" type="button" data-brain="movement">Move</button><button class="btn alt sm" type="button" data-brain="game">Game</button><button class="btn alt sm" type="button" data-brain="calm">Calm</button><button class="btn sm" type="button" data-brain="">Another one</button><button class="btn alt sm" type="button" data-tool="calm">Calm breathing</button></div></aside>'); }
+renderBrain=function(full){ const b=A.brain; if(full){ const many=b.calls&&b.calls.length>1;
+    const ctl='<div class="row bctl">'+(many?'<button class="btn alt" type="button" data-bstep="-1" aria-label="Previous prompt" '+(A.callIdx===0?'disabled':'')+'>◀ Previous prompt</button><span class="bstepn" id="bstepn">'+(A.callIdx+1)+' / '+b.calls.length+'</span><button class="btn" type="button" data-bstep="1">'+(A.callIdx>=b.calls.length-1?'Start again ↻':'Next prompt ▶')+'</button>':'')+(b.freeze?'<button class="btn gold" type="button" data-bfreeze="1">Freeze now!</button>':'')+'<button class="btn alt" type="button" data-bfinish="1">Finish break</button></div>';
+    setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Brain break · '+esc({movement:'Move',calm:'Calm',game:'Game',primer:'Positive primer',video:'Roomie video'}[b.type]||b.type)+'</div><button class="btn alt sm" type="button" data-browsebrain="all">Choose another break</button></div><h1 class="big">'+esc(b.name)+'</h1><p class="lead">'+esc(b.how)+'</p><div class="call" id="call">'+esc(b.calls?b.calls[A.callIdx]:(b.freeze?'Dance!':'Go!'))+'</div>'+ctl+'</section><aside class="side"><section class="card sm" style="align-items:center">'+ringHTML('main','left')+'</section>'+(b.song?npHTML():'')+'<div class="row"><button class="btn alt sm" type="button" data-browsebrain="movement">Move</button><button class="btn alt sm" type="button" data-browsebrain="game">Games</button><button class="btn alt sm" type="button" data-browsebrain="calm">Calm</button></div></aside>'); }
   paintRing('main',MT.remaining(),MT.total); if(full) updateNowPlaying(); };
-function brainFreezeNow(){ Music.pause(); const c=$('#call'); if(c){ c.className='call freeze'; c.textContent='FREEZE!'; } brainSay('Freeze!'); actH.push(setTimeout(()=>{ if(A.overlay!=='brain') return; Music.resume(); const c=$('#call'); if(c){ c.className='call'; c.textContent='Dance!'; } },3000)); }
-function brainNext(d){ const b=A.brain; if(!b) return false; if(b.calls&&b.calls.length>1){ brainShow(A.callIdx+(d||1)); return true; } if(b.freeze){ brainFreezeNow(); return true; } return false; }
-document.addEventListener('click',e=>{ if(A.overlay!=='brain') return; const t=e.target;
-  const s=t.closest('[data-bstep]'); if(s){ audio(); brainNext(+s.dataset.bstep); return; }
+function brainFreezeNow(){ Music.pause(); const c=$('#call'); if(c){ c.className='call freeze'; c.textContent='FREEZE!'; } brainSay('Freeze!'); actH.push(setTimeout(()=>{ if(NAV.owner!=='brain') return; Music.resume(); const c=$('#call'); if(c){ c.className='call'; c.textContent='Dance!'; } },3000)); }
+function brainNext(d){ const b=A.brain; if(!b) return false; if(b.calls&&b.calls.length>1){ if(d<0&&A.callIdx===0) return false; brainShow(A.callIdx+(d||1)); return true; } if(b.freeze){ brainFreezeNow(); return true; } return false; }
+/* BRAIN_CONTROLS_START */
+document.addEventListener('click',e=>{
+  const browse=e.target.closest('[data-browsebrain]'); if(browse){ brainBrowse(browse.dataset.browsebrain); return; }
+  if(A.overlay!=='brain'&&A.overlay!=='brainpick') return; const t=e.target;
+  const step=t.closest('[data-bstep]'); if(step){ audio(); brainNext(+step.dataset.bstep); return; }
   if(t.closest('[data-bfreeze]')){ audio(); brainFreezeNow(); return; }
-  if(t.closest('[data-bfinish]')){ audio(); MT.stop&&MT.stop(); Music.fadeStop(); clearActivity(); closeOverlay(); return; }
-  const p=t.closest('[data-bpace]'); if(p){ audio(); S.brainPace=p.dataset.bpace; save(); const b=A.brain, i=A.callIdx; clearActivity(); if(b.calls&&!brainPaceTap()) actH.push(setInterval(()=>brainShow(A.callIdx+1),(b.every||8)*1000)); if(b.freeze&&!brainPaceTap()) freezeLoop(); A.callIdx=i; render(true); toast(brainPaceTap()?'You’re in charge: tap Next.':'Roomie moves on by itself.'); return; }
-  if(t.closest('[data-bvoice]')){ audio(); S.brainVoice=!brainVoiceOn(); save(); if(!brainVoiceOn()) try{ speechSynthesis.cancel(); }catch(_){} render(true); } });
-document.addEventListener('keydown',e=>{ if(A.overlay!=='brain'||e.target.closest('[role="menu"],[role="dialog"][aria-modal="true"]')) return; const tag=(e.target.tagName||'').toLowerCase(); if(tag==='input'||tag==='textarea') return;
-  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ if(brainNext(1)) e.preventDefault(); } else if(e.key==='ArrowLeft'||e.key==='PageUp'){ if(brainNext(-1)) e.preventDefault(); } });
+  if(t.closest('[data-bfinish]')){ audio(); brainFinish(); return; }
+  const pace=t.closest('[data-bpace]'); if(pace){
+    audio(); S.brainPace=pace.dataset.bpace; save();
+    if(NAV.owner==='brain'&&A.brain){ const b=A.brain; clearActivity(); if(b.calls&&!brainPaceTap()) actH.push(setInterval(()=>brainShow(A.callIdx+1),(b.every||8)*1000)); if(b.freeze&&!brainPaceTap()) freezeLoop(); }
+    brainRefreshSettings('[data-bpace="'+S.brainPace+'"]'); return;
+  }
+  if(t.closest('[data-bvoice]')){ audio(); S.brainVoice=!brainVoiceOn(); save(); if(!brainVoiceOn()) try{ speechSynthesis.cancel(); }catch(_){} brainRefreshSettings('[data-bvoice]'); }
+});
+document.addEventListener('keydown',e=>{
+  if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.altKey||A.overlay!=='brain'||e.target.closest('button,a,input,textarea,select,summary,[contenteditable="true"],[role="menu"],[role="dialog"]')) return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ if(brainNext(1)) e.preventDefault(); }
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){ if(brainNext(-1)) e.preventDefault(); }
+});
+/* BRAIN_CONTROLS_END */
 
 /* ---- v2.5: the floating window shows the actual screen (live copy you can tap), or mini Roomie ---- */
 A.pipView=A.pipView||'screen';
