@@ -21,3 +21,6 @@ Use npm run dev for the local server; open /app/ for the classroom app.
 Run git diff --check. For UI changes, inspect the affected flow in a browser at desktop and narrow widths, including keyboard use.
 Record checks actually performed and distinguish mocks/local PostgreSQL from hosted integration.
 Before a development push, verify its target; never force-push over another assistant's work.
+
+## Explicit styling constraint
+Antoinette requires all existing visual styling to be preserved: original colours, bright multicoloured headings, fonts, scrapbook decorations, backgrounds and button styling. Current work is navigation only. Do not enable a calmer look, change appearance preferences, redesign screens, or restyle existing components as part of navigation changes. Preserve this constraint in future handovers.

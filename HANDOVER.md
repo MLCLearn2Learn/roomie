@@ -84,3 +84,6 @@ Antoinette confirmed that class-management tools should live under Students rath
 
 ## Tool grouping refinement
 Antoinette approved three separate finder groups: Teaching (Timer, Tickets, Thinking, Reflect, Quiz games, Poll, Finished?), Routines (Routines, Pack up, Practise expectations), Wellbeing (Brain break, Calm breathing, Check-in). Same 13 tools; Students remains separate. All 173 automated tests pass. No production changes.
+
+## Styling constraint — explicit user direction
+Antoinette requires all original styling to remain unchanged; current scope is navigation fixes only. Preserve colours, bright multicoloured headings, fonts, scrapbook decorations, backgrounds and button styling. Browser inspection confirmed the original bright heading palette and fonts are currently rendered. No appearance setting was changed during this check. Do not introduce visual redesigns or change appearance preferences while continuing navigation work.
