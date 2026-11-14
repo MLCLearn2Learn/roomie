@@ -1,0 +1,67 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Roomie Transfer V2 Test</title>
+</head>
+<body>
+  <h1>Roomie Transfer Security Test</h1>
+  <button id="run">Run tests</button>
+  <pre id="results"></pre>
+
+  <script src="./transfer-v2.js"></script>
+  <script>
+    document.getElementById("run").onclick = async () => {
+      const output = document.getElementById("results");
+      const log = text => output.textContent += text + "\n";
+      output.textContent = "";
+
+      try {
+        const t = window.RoomieTransferV2;
+        if (!t) throw new Error("Module not loaded");
+
+        const original = {
+          room: "Fictional Class",
+          students: ["Sample A", "Sample B"]
+        };
+
+        const code = t.createCode();
+        const encrypted = await t.encrypt(original, code);
+        const restored = await t.decrypt(encrypted.blob, code);
+
+        if (JSON.stringify(restored) !== JSON.stringify(original))
+          throw new Error("Round-trip failed");
+        log("PASS: Encrypt and decrypt");
+
+        const second = t.createCode();
+        if (second === code) throw new Error("Repeated code");
+        log("PASS: Different random codes");
+
+        try {
+          await t.decrypt(encrypted.blob, second);
+          throw new Error("Wrong code accepted");
+        } catch (e) {
+          if (e.message === "Wrong code accepted") throw e;
+          log("PASS: Wrong code rejected");
+        }
+
+        const altered = encrypted.blob.slice(0, -1) +
+          (encrypted.blob.endsWith("A") ? "B" : "A");
+
+        try {
+          await t.decrypt(altered, code);
+          throw new Error("Altered data accepted");
+        } catch (e) {
+          if (e.message === "Altered data accepted") throw e;
+          log("PASS: Altered data rejected");
+        }
+
+        log("ALL TESTS PASSED");
+      } catch (e) {
+        log("FAIL: " + e.message);
+      }
+    };
+  </script>
+</body>
+</html>
