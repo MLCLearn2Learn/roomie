@@ -1,0 +1,72 @@
+# Roomie — shared developer handover
+
+Updated 14 November 2026.
+
+## Goal and authority
+Antoinette wants a polished, reliable classroom app and the ability to switch between ChatGPT and Claude.
+Continue development autonomously on roomie-development. Production deployment still requires explicit approval.
+
+## Repository and branch
+Repository: https://github.com/MLCLearn2Learn/roomie
+Development: roomie-development
+Production: main
+Production was verified at f37f3577655504f696b94e2a0e97fdb7f16b1dd5 on 14 November.
+Secure transfer implementation commit: 2109705fe505c2f93006be2f0a6437153fde6437.
+Documentation follow-up: 42565a51eff729fc39e901df3837bd7c65595949.
+Always inspect current remote heads rather than treating these as permanent.
+
+## Setup
+Clone the repository, check out roomie-development and read AGENTS.md.
+Use Node 22+ and Python 3.
+Run npm ci --ignore-scripts, npm test, then npm run dev.
+Preview at http://127.0.0.1:4173/app/.
+Landing page is /; classroom app is /app/.
+Do not substitute the landing page for the app during QA.
+
+## Code map
+- app/index.html: main application, inline UI/styles/state/scheduler/classroom tools.
+- app/transfer-v2.js: browser Web Crypto transfer helpers.
+- supabase/transfer_v2.sql: additive transfer migration; not applied to hosted production by this work.
+- tests/: application regression tests, isolated PGlite migration tests, browser harness.
+- scripts/preview.py: local static server.
+- DEVELOPMENT_TRANSFER.md: detailed transfer behavior, verification and release limitations.
+- README.md: brief original project description.
+
+## Data and compatibility
+Classroom settings include localStorage bellbird.v2 and older bellbird.v1 migration.
+Media also uses IndexedDB. Inspect persistence helpers before editing.
+Preserve all profiles and their data. Never use real student data in test fixtures.
+The development app may reference live services: opening it does not establish a separate staging backend.
+
+## Completed transfer work
+AES-256-GCM encrypted packages, HKDF-separated lookup/encryption keys, 43-character private codes.
+Link secrets stay in fragments and are scrubbed on receipt; importing requires confirmation.
+Validate and persist all profiles before acknowledging remote deletion.
+Failed saves preserve previous state and leave the package retryable.
+Legacy short transfer codes are rejected.
+See DEVELOPMENT_TRANSFER.md for exact guarantees and limitations.
+
+## Verification
+168 automated tests passed again on 14 November before the implementation push.
+Uploaded implementation tree matched the tested local source exactly.
+Earlier recorded Chrome checks: four Web Crypto checks and eight isolated browser integration checks passed.
+Hosted Supabase/PostgREST staging and two-device testing remain unverified.
+No production migration, merge or deployment was performed.
+
+## Open release work
+Verify a separate staging Supabase project and exercise actual RPCs with fictional data.
+Assess anonymous endpoint abuse controls and scheduled expiry cleanup before public release.
+Reads followed by save/acknowledgement do not provide an atomic single-reader claim.
+Physical expiry cleanup occurs on a subsequent successful upload, not through an installed scheduled purge.
+Do not describe the feature as fully hosted-verified or strictly single-reader.
+
+## Next improvement pass
+Follow ROADMAP.md. Start with a browser walkthrough of teacher setup and a normal lesson.
+Observe actual friction before selecting a focused UI change; preserve established branding and existing tools.
+Implement and test on development, then update this handover with exact commits, checks and remaining work.
+
+## Switching assistants
+Give the next assistant repository access separately.
+Ask it to open roomie-development and read CLAUDE.md, AGENTS.md, HANDOVER.md and ROADMAP.md.
+These tracked files provide continuity; prior chat messages are not required.
+If another assistant has pushed changes, inspect them before continuing and never overwrite them blindly.
