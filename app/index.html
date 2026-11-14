@@ -4705,7 +4705,7 @@ applyDock=function(){
 };
 dockSetupHTML=function(){
   const hidden=S.dockHide||[], order=dockOrder(), simple=S.dockPreset==='simple';
-  return '<div class="dockset"><h3 style="margin:0">Your dock</h3><p class="hint" style="margin:0">Keep a few everyday tools close by, or choose your own. Every tool is always available in More tools.</p><div class="dock-preset"><div class="row" role="group" aria-label="Dock preset"><button class="btn alt" type="button" data-dock-preset="simple" aria-pressed="'+simple+'">Simple: four everyday tools</button><button class="btn alt" type="button" data-dock-preset="custom" aria-pressed="'+!simple+'">My custom dock</button></div>'+(simple?'<p class="hint" style="margin:0">Routines, Timer, Brain break and Pick a name. Your custom tools and order are kept; switch back any time.</p>':'')+'</div><div class="docklist"'+(simple?' hidden':'')+'>'+order.map((k,i)=>'<div class="dockrow'+(hidden.includes(k)?' off':'')+'"><label class="chk"><input type="checkbox" data-dk="show:'+k+'" '+(hidden.includes(k)?'':'checked')+'><span>'+esc(DOCK_NAMES[k])+'</span></label><span><button type="button" class="btn alt sm" data-dk="up:'+k+'" '+(i?'':'disabled')+' aria-label="Move '+esc(DOCK_NAMES[k])+' earlier">←</button><button type="button" class="btn alt sm" data-dk="down:'+k+'" '+(i<order.length-1?'':'disabled')+' aria-label="Move '+esc(DOCK_NAMES[k])+' later">→</button></span></div>').join('')+'</div><button type="button" class="linkbtn" data-dk="reset:x"'+(simple?' hidden':'')+'>Show all tools in the usual order</button></div>';
+  return '<div class="dockset"><h3 style="margin:0">Your dock</h3><p class="hint" style="margin:0">Keep a few everyday tools close by, or choose your own. Teaching tools are in More tools; class tools are under Students.</p><div class="dock-preset"><div class="row" role="group" aria-label="Dock preset"><button class="btn alt" type="button" data-dock-preset="simple" aria-pressed="'+simple+'">Simple: four everyday tools</button><button class="btn alt" type="button" data-dock-preset="custom" aria-pressed="'+!simple+'">My custom dock</button></div>'+(simple?'<p class="hint" style="margin:0">Routines, Timer, Brain break and Pick a name. Your custom tools and order are kept; switch back any time.</p>':'')+'</div><div class="docklist"'+(simple?' hidden':'')+'>'+order.map((k,i)=>'<div class="dockrow'+(hidden.includes(k)?' off':'')+'"><label class="chk"><input type="checkbox" data-dk="show:'+k+'" '+(hidden.includes(k)?'':'checked')+'><span>'+esc(DOCK_NAMES[k])+'</span></label><span><button type="button" class="btn alt sm" data-dk="up:'+k+'" '+(i?'':'disabled')+' aria-label="Move '+esc(DOCK_NAMES[k])+' earlier">←</button><button type="button" class="btn alt sm" data-dk="down:'+k+'" '+(i<order.length-1?'':'disabled')+' aria-label="Move '+esc(DOCK_NAMES[k])+' later">→</button></span></div>').join('')+'</div><button type="button" class="linkbtn" data-dk="reset:x"'+(simple?' hidden':'')+'>Show all tools in the usual order</button></div>';
 };
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-dock-preset]'); if(!b) return; S.dockPreset=b.dataset.dockPreset; save(); applyDock(); renderSetup(); });
 let uiDMenuOpener=null;
@@ -4737,13 +4737,6 @@ const UI_TOOL_GROUPS=[
     ['reflect','Reflect','Pause and review learning','reflection review'],
     ['quiz','Quiz games','Practise through play','quiz questions games'],
     ['poll','Poll','Hear from the whole class','vote voting survey']]],
-  ['Class and groups',[
-    ['seats','Seating plan','Find everyone’s place','seats desk layout'],
-    ['pick','Pick a name','Give everyone a fair turn','random student name picker'],
-    ['groups','Groups','Make pairs or small groups','pairs teams random groups'],
-    ['rotate','Rotations','Run timed stations','stations rotation'],
-    ['jobs','Helpers','Manage classroom jobs','jobs classroom helpers'],
-    ['hero','Mystery Hero','Celebrate a secret star','reward mystery hero']]],
   ['Routines and wellbeing',[
     ['routines','Routines','Run or practise a routine','routine transitions'],
     ['brain','Brain break','Move, play or reset','movement active break'],
@@ -4764,12 +4757,12 @@ function uiFindTools(query){
 function uiToolResults(menu,query){
   const groups=uiFindTools(query), count=groups.reduce((n,[,tools])=>n+tools.length,0);
   menu.querySelector('#toolResults').innerHTML=groups.map(([label,tools],i)=>'<section class="tool-group" aria-labelledby="toolGroup'+i+'"><h3 id="toolGroup'+i+'">'+esc(label)+'</h3><div class="tool-grid">'+tools.map(([key,label,detail])=>'<button class="tool finder-tool" type="button" data-tool="'+key+'"><b>'+esc(label)+'</b><span>'+esc(detail)+'</span></button>').join('')+'</div></section>').join('');
-  menu.querySelector('#toolResultCount').textContent=count?count+' tool'+(count===1?'':'s'):'No matching tools. Try “timer”, “seating” or “tickets”.';
+  menu.querySelector('#toolResultCount').textContent=count?count+' tool'+(count===1?'':'s'):'No matching tools. Try “timer”, “brain break” or “tickets”.';
 }
 function uiBuildToolFinder(menu){
   closeClassPop();
   menu.setAttribute('role','dialog'); menu.setAttribute('aria-label','Find a classroom tool');
-  menu.innerHTML='<div class="finder-head"><h2>Find a tool</h2><button type="button" class="btn alt sm" data-finder-close aria-label="Close tool finder">Close</button></div><label class="finder-label" for="toolSearch">Search tools</label><input id="toolSearch" type="search" placeholder="Try timer, seating or exit ticket" autocomplete="off" aria-controls="toolResults"><p id="toolResultCount" class="hint" role="status" aria-live="polite"></p><div id="toolResults"></div>';
+  menu.innerHTML='<div class="finder-head"><h2>Find a tool</h2><button type="button" class="btn alt sm" data-finder-close aria-label="Close tool finder">Close</button></div><label class="finder-label" for="toolSearch">Search tools</label><input id="toolSearch" type="search" placeholder="Try timer, brain break or exit ticket" autocomplete="off" aria-controls="toolResults"><p id="toolResultCount" class="hint" role="status" aria-live="polite"></p><div id="toolResults"></div>';
   uiToolResults(menu,'');
 }
 function uiToolFinderKey(e,menu){

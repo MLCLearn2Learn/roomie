@@ -7,12 +7,16 @@ const source=html.slice(html.indexOf('const UI_TOOL_GROUPS='),html.indexOf('/* T
 const ctx=vm.createContext({}); vm.runInContext(source,ctx);
 const find=q=>JSON.parse(JSON.stringify(ctx.uiFindTools(q)));
 const keys=q=>find(q).flatMap(([,tools])=>tools.map(t=>t[0]));
-test('tool finder includes every dock tool and class tools once',()=>{
- const result=keys('');assert.equal(result.length,19);assert.equal(new Set(result).size,19);
- for(const key of ['routines','timer','brain','checkin','exit','reflect','think','quiz','poll','pick','finish','packup','reteach','seats','groups','rotate','jobs','hero','calm']) assert.ok(result.includes(key));
+test('tool finder lists teaching tools without duplicating the Students menu',()=>{
+ const result=keys('');assert.equal(result.length,13);assert.equal(new Set(result).size,13);
+ for(const key of ['routines','timer','brain','checkin','exit','reflect','think','quiz','poll','finish','packup','reteach','calm']) assert.ok(result.includes(key));
+ for(const key of ['seats','pick','groups','rotate','jobs','hero']) assert.ok(!result.includes(key));
+ const classSource=html.slice(html.indexOf('const CLASS_TOOLS='),html.indexOf('function closeClassPop('));
+ const classes=vm.createContext({});vm.runInContext(classSource+';this.tools=CLASS_TOOLS;',classes);
+ for(const key of ['seats','pick','groups','rotate','jobs','hero']) assert.ok(classes.tools.some(t=>t[0]===key));
 });
 test('teacher phrases, punctuation and case find the intended tools',()=>{
- for(const [query,key] of [['EXIT ticket','exit'],['check-in','checkin'],['seating','seats'],['classroom jobs','jobs'],['early finishers','finish'],['breathing','calm'],['stations','rotate'],['random groups','groups']]) assert.deepEqual(keys(query),[key]);
+ for(const [query,key] of [['EXIT ticket','exit'],['check-in','checkin'],['early finishers','finish'],['breathing','calm']]) assert.deepEqual(keys(query),[key]);
  assert.deepEqual(keys('  '),keys(''));assert.deepEqual(keys('zzzxxy'),[]);
 });
 test('filtering never mutates the catalogue and text is not treated as code',()=>{

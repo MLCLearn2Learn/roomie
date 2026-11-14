@@ -77,3 +77,7 @@ More tools now opens a searchable, non-modal finder covering 19 existing tools i
 Changed app/index.html; added tests/navigation.test.cjs and tests/navigation-preview.html (manual responsive QA frame).
 173 automated tests passed. Chrome checks verified search-to-tool, no results, Escape preserving a running timer, focus on destination, and panel bounds at 390px and 768px plus desktop inspection. No hosted migration or production deployment.
 Next: review teacher feedback on the finder, then walk through Setup navigation before choosing another change. The remaining secure-transfer staging/operational limitations above still apply.
+
+## Navigation refinement — Students menu ownership
+Antoinette confirmed that class-management tools should live under Students rather than also appearing in More tools. Removed Seating plan, Pick a name, Groups, Rotations, Helpers and Mystery Hero from the finder. More tools now has 13 teaching/routine/wellbeing tools in two groups. Updated search hints and dock-help wording. Existing dock shortcuts remain as configured; Students still contains all six class tools and Class list.
+173 automated tests pass, including checks that these tools are absent from the finder and remain in Students. No production deployment or database changes. This supersedes the earlier 19-tool/three-group catalogue description.
