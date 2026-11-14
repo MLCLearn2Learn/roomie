@@ -90,3 +90,6 @@ Antoinette requires all original styling to remain unchanged; current scope is n
 
 ## Setup entry and return labels
 Setup button now explicitly opens Day plan, irrespective of the last Setup section visited. Look still opens Look & colours. The Setup close button reads Back to my board and preserves existing behavior of returning to the current activity. Only the entry handler and button text changed; no CSS, appearance preferences, picture or mascot settings changed. All 173 automated tests passed. Browser checks verified Look opens appearance, Setup after Look opens Day plan, and returning from Setup preserves the Timer screen. Production unchanged.
+
+## Appearance shortcut consolidation
+Antoinette approved removing the separate Look button from the top bar. Look & colours remains an unchanged Setup tab. Removed the unused button handler and updated tour guidance to point at Setup. No CSS, colours, fonts, pictures, mascot or appearance settings changed. All 173 automated tests passed. This supersedes earlier guidance about a standalone Look button.
