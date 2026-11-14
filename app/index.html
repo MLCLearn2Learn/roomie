@@ -1158,13 +1158,29 @@ body.ui-calm-look .mascot *,body.ui-calm-look .bigbird *,body.ui-calm-look .stk 
   .dmenu[data-for="more"]{grid-template-columns:1fr}
   .sheet .row>.fld{min-width:0!important;max-width:100%}
 }
+
+/* Searchable classroom tool finder. Keep its header and search visible while browsing. */
+.dmenu[data-for="more"]{display:flex;flex-direction:column;gap:8px;width:min(560px,calc(100vw - 24px));max-height:min(680px,calc(100dvh - 24px));overflow:hidden;padding:18px}
+.finder-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.finder-head h2{font-size:24px;margin:0}
+.finder-label{font-weight:700;font-size:14px}
+#toolSearch{box-sizing:border-box;width:100%;min-height:46px;padding:10px 12px;border:2px solid var(--edge,#aaa);border-radius:10px;background:#fff;color:#16302A;font:inherit;font-size:16px}
+#toolResultCount{margin:0;min-height:20px}
+#toolResults{overflow:auto;overscroll-behavior:contain;min-height:0}
+.tool-group h3{font-size:14px;margin:14px 0 8px}
+.tool-group:first-child h3{margin-top:0}
+.tool-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.dmenu .finder-tool{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px 12px;min-height:68px;white-space:normal;text-align:left}
+.finder-tool b{font:inherit;font-weight:800}
+.finder-tool span{font-family:var(--body,sans-serif);font-size:13px;font-weight:400;line-height:1.35}
+@media(max-width:599px){.tool-grid{grid-template-columns:1fr}.dmenu[data-for="more"]{padding:12px}}
 </style>
 
 <svg class="land" viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60 C 260 10 520 40 760 70 S 1200 100 1440 50 L1440 150 L0 150 Z" fill="#7CC79A" id="hill1"></path><path d="M0 110 C 300 80 600 105 900 120 S 1260 130 1440 100 L1440 150 L0 150 Z" fill="#2F8F6B"></path></svg>
 
 <div class="app" id="app">
   <header class="top">
-    <button class="homebtn" id="homeBtn" type="button" title="Back to the home screen (Esc)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/></svg><span>Home</span></button><button class="classbtn" id="classBtn" type="button" aria-haspopup="true" aria-expanded="false" title="My class: seating plan, pick a name, groups"><span class="room" id="roomLabel">Room 7</span><span class="cbsub"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.2 3-5 6-5s5.4 1.8 6 5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.2c2.6.1 4.4 1.7 5 4.8"/></svg>Students <span id="classCount"></span> ▾</span></button>
+    <button class="homebtn" id="homeBtn" type="button" title="Show the board; your activity keeps running"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/></svg><span>Home</span></button><button class="classbtn" id="classBtn" type="button" aria-haspopup="true" aria-expanded="false" title="My class: seating plan, pick a name, groups"><span class="room" id="roomLabel">Room 7</span><span class="cbsub"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 19c.6-3.2 3-5 6-5s5.4 1.8 6 5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.2c2.6.1 4.4 1.7 5 4.8"/></svg>Students <span id="classCount"></span> ▾</span></button>
     <span class="date" id="dateLabel"></span>
     <button class="demo" id="demoTag" type="button" hidden title="Exit the demo and restore your class">Demo · Exit demo</button>
     <div class="top-r">
@@ -1176,7 +1192,6 @@ body.ui-calm-look .mascot *,body.ui-calm-look .bigbird *,body.ui-calm-look .stk 
       <button class="ibtn" data-tool="remote" type="button" aria-label="Phone remote" title="Use your phone as a remote"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="7" width="10" height="15" rx="2"/><path d="M11 18.5h2"/><path d="M8.5 4.2a5 5 0 0 1 7 0"/><path d="M6.4 2.2a8 8 0 0 1 11.2 0"/></svg><i class="lbl">Remote</i></button>
       <button class="livebtn" id="liveBtn" type="button" title="Student devices"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M11 18h2"/></svg><span>Student devices</span></button>
       <button class="ibtn" data-tour="start" type="button" aria-label="Take the tour" title="Take the tour"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9.2a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.4-2.7 4"/><circle cx="12" cy="17.6" r=".6" fill="currentColor"/></svg><i class="lbl">Tour</i></button>
-      <button class="ibtn" id="lookBtn" type="button" aria-label="Look and colours" title="Look & colours"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.7-.9 1.4-1.8-.4-1.2.5-2.2 1.6-2.2H17a4 4 0 0 0 4-4c0-5.5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.3"/><circle cx="10" cy="7" r="1.3"/><circle cx="15" cy="7" r="1.3"/></svg><i class="lbl">Look</i></button>
       <button class="ibtn" id="setupBtn" type="button" aria-label="Setup"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg><i class="lbl">Setup</i></button>
     </div>
     <div class="schedule-controls" id="scheduleControls" hidden>
@@ -1184,6 +1199,7 @@ body.ui-calm-look .mascot *,body.ui-calm-look .bigbird *,body.ui-calm-look .stk 
       <span id="scheduleStatus" role="status" aria-live="polite"></span>
       <button type="button" id="scheduleSwitch" data-schedule="switch" hidden>End activity and switch</button>
     </div>
+    <div class="schedule-controls" id="activityNav" hidden><span id="activityNavStatus"></span><button type="button" class="btn alt sm" id="activityReturn" data-nav-return>Return to activity</button><button type="button" class="btn alt sm" id="activityStop" data-act="stopActivity">Stop activity</button></div>
   </header>
   <nav class="strip" id="strip" aria-label="Today's timetable"></nav>
   <main class="stage" id="stage" aria-live="polite"></main>
@@ -1257,7 +1273,7 @@ body.ui-calm-look .mascot *,body.ui-calm-look .bigbird *,body.ui-calm-look .stk 
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.7.1 · 14 Nov 2026';
+const VERSION='Roomie v2.7.2 · 14 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1422,7 +1438,11 @@ function brainBreakVariant(base,keepEveryone=S.keepEveryoneInGame===true){
   if(b.type==='movement'||b.type==='game') b.how+=' Join in seated or standing, choose a comfortable movement or signal, or watch this round.';
   return b;
 }
-function brainBreakSettingsHTML(){ return '<h3>Brain breaks</h3><label class="chk"><input type="checkbox" id="fKeepEveryoneInGame" '+(S.keepEveryoneInGame===true?'checked':'')+'><span>Keep everyone in the game<span class="hint" style="display:block">No elimination in Heads or Hips, Rhyme Chain and Rock, Paper, Champion. Includes seated and movement choices. Applies to the next brain break you start.</span></span></label>'; }
+function brainPlaybackSettingsHTML(){
+  const tap=S.brainPace!=='auto', voice=S.brainVoice!==false;
+  return '<div class="row bopts"><span class="hint">Pace</span><button type="button" class="chip bopt'+(tap?' on':'')+'" data-bpace="tap" aria-pressed="'+tap+'">I tap Next</button><button type="button" class="chip bopt'+(!tap?' on':'')+'" data-bpace="auto" aria-pressed="'+!tap+'">Auto</button><span class="hint" style="margin-left:10px">Roomie’s voice</span><button type="button" class="chip bopt'+(voice?' on':'')+'" data-bvoice="1" aria-pressed="'+voice+'" aria-label="Roomie’s voice '+(voice?'on':'off')+'">'+(voice?'On':'Off')+'</button></div>';
+}
+function brainBreakSettingsHTML(){ return brainPlaybackSettingsHTML()+'<h3>Participation</h3><label class="chk"><input type="checkbox" id="fKeepEveryoneInGame" '+(S.keepEveryoneInGame===true?'checked':'')+'><span>Keep everyone in the game<span class="hint" style="display:block">No elimination in Heads or Hips, Rhyme Chain and Rock, Paper, Champion. Includes seated and movement choices. Applies to the next brain break you start.</span></span></label>'; }
 
 
 /* ================= Data ================= */
@@ -1606,7 +1626,7 @@ function stepIndexFor(P){ const st=stepsOf(P.routine); if(!st.length) return 0; 
 
 /* ================= Manual timer (tools) ================= */
 const MT={ total:0,left:0,endAt:0,running:false,onDone:null,h:null,
-  start(sec,onDone){ this.total=sec; this.left=sec; this.onDone=onDone||null; this.resume(); },
+  start(sec,onDone){ if(!NAV.owner) NAV.owner=A.overlay||'timer'; this.total=sec; this.left=sec; this.onDone=onDone||null; this.resume(); },
   resume(){ if(this.left<=0) return; this.running=true; this.endAt=Date.now()+this.left*1000; clearInterval(this.h); this.h=setInterval(()=>this.tick(),250); },
   pause(){ if(!this.running) return; this.left=Math.max(0,(this.endAt-Date.now())/1000); this.running=false; clearInterval(this.h); },
   stop(){ this.running=false; clearInterval(this.h); this.left=0; this.total=0; this.onDone=null; },
@@ -1633,14 +1653,20 @@ function setStage(cls,html){ stage.className='stage '+(cls||''); stage.innerHTML
 function renderStrip(P){
   const d=now(); const day=P.day||computeDay(d); const mins=P.mins;
   const total=day.reduce((a,x)=>a+(x.en-x.st),0)||1;
-  $('#strip').innerHTML=day.map((x,i)=>{ let c=''; if(x.en<=mins) c='past'; else if(x.st<=mins) c='now'; else if(P.next&&x===P.next&&(P.phase==='warning'||P.phase==='held')) c='next'; else if(x.b.kind==='break') c='brk';
+  let markup=day.map((x,i)=>{ let c=''; if(x.en<=mins) c='past'; else if(x.st<=mins) c='now'; else if(P.next&&x===P.next&&(P.phase==='warning'||P.phase==='held')) c='next'; else if(x.b.kind==='break') c='brk';
     const label=(c==='now'?(x.en-x.st>=40?x.b.name+' · until '+fmtClock(x.en):x.b.name):(c===''||c==='brk'||c==='next'?(x.b.kind==='break'?'':fmtClock(x.st)+' ')+x.b.name:x.b.name));
     if(document.body.classList.contains('tl-side')){ const xb=x.b, ex=xb.kind==='lesson'&&c!=='past'?[xb.entry?'Entry ticket':'',xb.bbAt?'Brain break':'',xb.acAt?((xb.acW||'think').startsWith('reflect')?'Reflection':(xb.acW||'').startsWith('quiz')?'Quiz':(xb.acW||'')==='checkin'?'Check-in':'Thinking'):'',xb.exit?'Exit ticket':''].filter(Boolean):[];
-      return '<div class="seg '+c+'" data-seg="'+i+'" role="button" tabindex="0"><small>'+fmtClock(x.st)+(c==='now'?' – '+fmtClock(x.en):'')+'</small><b>'+esc(x.b.name)+'</b>'+(ex.length&&c!=='past'?'<em>'+esc(ex.join(' · '))+'</em>':'')+'</div>'; }
-    return '<div class="seg '+c+'" data-seg="'+i+'" role="button" tabindex="0" style="flex:'+Math.max(8,(x.en-x.st))+'" title="'+esc(fmtClock(x.st)+' '+x.b.name)+'">'+esc(label)+'</div>'; }).join('');
-  if(document.body.classList.contains('tl-side')) $('#strip').insertAdjacentHTML('afterbegin','<h2 class="tlh">Today</h2>');
+      return '<div class="seg '+c+'" data-seg="'+i+'" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false"><small>'+fmtClock(x.st)+(c==='now'?' – '+fmtClock(x.en):'')+'</small><b>'+esc(x.b.name)+'</b>'+(ex.length&&c!=='past'?'<em>'+esc(ex.join(' · '))+'</em>':'')+'</div>'; }
+    return '<div class="seg '+c+'" data-seg="'+i+'" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false" style="flex:'+Math.max(8,(x.en-x.st))+'" title="'+esc(fmtClock(x.st)+' '+x.b.name)+'">'+esc(label)+'</div>'; }).join('');
+  if(document.body.classList.contains('tl-side')) markup='<h2 class="tlh">Today</h2>'+markup;
+  const strip=$('#strip'); if(strip._navMarkup===markup) return;
+  const focused=document.activeElement&&document.activeElement.closest('[data-seg]'), index=focused&&strip.contains(focused)?focused.dataset.seg:null;
+  strip._navMarkup=markup; strip.innerHTML=markup;
+  if(index!==null){ const replacement=strip.querySelector('[data-seg="'+index+'"]'); if(replacement) replacement.focus({preventScroll:true}); }
+
 }
 function render(full){
+  navControls();
   const d=now(), current=phaseAt(d), P=scheduleDisplayPhase(current); A.P=P;
   renderStrip(current); scheduleControls(current);
   document.body.classList.toggle('calm', !!((!A.overlay&&P.phase==='routine'&&P.routine&&P.routine.breathe)||A.overlay==='calm'));
@@ -1719,20 +1745,82 @@ let bH=null; const BR=[['Breathe in',4],['Slowly out',6]];
 function paintBreath(){ if(bH) return; let i=0; const run=()=>{ const d=document.getElementById('bdot'), t=document.getElementById('btxt'); if(!d||!t){ clearTimeout(bH); bH=null; return; } const [l,s]=BR[i%2]; t.textContent=l; d.style.transitionDuration=s+'s'; d.style.transform=i%2?'scale(.55)':'scale(1)'; i++; bH=setTimeout(run,s*1000); }; bH=setTimeout(run,50); }
 
 /* ================= Overlays (teacher tools) ================= */
-function openOverlay(name,data){ A.overlay=name; Object.assign(A,data||{}); markTools(); markHero(); render(true); }
-function closeOverlay(){ const was=A.overlay; A.overlay=null; MT.stop(); clearActivity(); if(was==='brain'||was==='calm'||was==='manualRoutine'||was==='practise'||was==='party'||was==='rotate') Music.fadeStop(); if(was==='hero'&&A.heroStage==='shown') A.heroStage=''; A.rot=null; markTools(); markHero(); A.phaseKey=''; tick(true); }
+function openOverlay(name,data){ if(A.overlay!==name) navRemember(A.overlay); A.overlay=name; Object.assign(A,data||{}); markTools(); markHero(); render(true); }
+function closeOverlay(){ if(NAV.owner==='brain'&&A.overlay==='brain') brainFinish(); else if(NAV.owner&&NAV.owner===A.overlay) navStopActivity(); else navBack(); }
+const NAV={trail:[],owner:null,origin:null};
+const NAV_LABELS={timer:'timer',brain:'brain break',calm:'calm breathing',manualRoutine:'routine',practise:'routine practice',rotate:'rotations',ticket:'ticket',reflect:'reflection',think:'thinking activity',packup:'pack up',reteach:'expectation practice'};
+const NAV_CHOOSERS=['brainpick','tpick','rpick','thpick','routines','rotationSetup'];
+function navCapture(key){ return {key:key||null,phase:!key?A.P:null,segX:key==='peek'?A.segX:null,returnedLesson:key==='peek'&&!!A.returnedLesson}; }
+function navRemember(key){
+  const view=navCapture(key), last=NAV.trail[NAV.trail.length-1];
+  if(!last||last.key!==view.key||(view.key==='peek'&&last.segX!==view.segX)) NAV.trail.push(view);
+  if(NAV.trail.length>20) NAV.trail.shift();
+}
+function navActivityOrigin(key){
+  if(NAV.origin) return NAV.origin;
+  const views=[navCapture(A.overlay),...NAV.trail.slice().reverse()];
+  return views.find(view=>view.key!==key&&!NAV_CHOOSERS.includes(view.key))||navCapture(null);
+}
+function navHasActivity(){
+  if(!NAV.owner) return MT.total>0&&MT.remaining()>0;
+  if(NAV.owner==='practise') return !!A.pr&&!A.pr.done;
+  if(NAV.owner==='brain') return !!A.brain; // Tap-paced breaks remain active until Finish.
+  if(NAV.owner==='think') return !!A.th&&!A.th.done;
+  if(NAV.owner==='rotate') return !!A.rot&&A.rot.mode!=='done';
+  return MT.total>0&&MT.remaining()>0;
+}
+function navShow(destination){
+  const view=destination&&typeof destination==='object'?destination:{key:destination||null};
+  A.returnedLesson=!!view.returnedLesson;
+  if(view.key==='peek'&&view.segX) A.segX=view.segX;
+  let key=view.key;
+  if(!key&&view.phase&&view.phase.block&&phaseSig(view.phase)!==phaseSig(scheduleDisplayPhase(phaseAt(now())))){
+    const previous=(view.phase.day||[]).find(item=>item.b.id===view.phase.block.id);
+    if(previous){ A.segX=previous; A.returnedLesson=true; key='peek'; }
+  }
+  A.overlay=key||null; markTools(); markHero(); A.phaseKey=''; tick(true);
+}
+function navBack(){ const previous=NAV.trail.length?NAV.trail.pop():null; navShow(previous); }
+function navBoard(){ NAV.trail=[]; navShow(null); }
+function navStopActivity(redraw){
+  const was=NAV.owner||A.overlay, destination=NAV.origin;
+  MT.stop(); clearActivity();
+  if(was==='brain'&&typeof speechSynthesis!=='undefined') try{ speechSynthesis.cancel(); }catch(_){}
+  if(['brain','calm','manualRoutine','practise','party','rotate','packup'].includes(was)) Music.fadeStop();
+  if(was==='hero'&&A.heroStage==='shown') A.heroStage='';
+  NAV.owner=null; NAV.origin=null; NAV.trail=[]; A.rot=null; A.overlay=null;
+  if(redraw!==false) navShow(destination);
+}
+function navPrepareStart(key){
+  const destination=navActivityOrigin(key);
+  if(navHasActivity()){
+    const old=NAV_LABELS[NAV.owner]||'activity', next=NAV_LABELS[key]||'activity';
+    if(typeof confirm!=='function'||!confirm('Stop the current '+old+' and start '+(key===NAV.owner?'a new '+next:next)+'? Choose Cancel to keep it running.')) return false;
+    navStopActivity(false);
+  }
+  if(A.overlay!==key) navRemember(A.overlay); NAV.origin=destination; NAV.owner=key; return true;
+}
+function navStartTimer(seconds){ if(!navPrepareStart('timer')) return false; MT.stop(); MT.start(seconds,()=>{ chime(3); say('Time’s up.'); }); A.overlay='timer'; markTools(); render(true); return true; }
+function navControls(){
+  const row=document.getElementById('activityNav'); if(!row) return;
+  row.hidden=STUDENT||!NAV.owner||!navHasActivity()||(NAV.owner==='brain'&&A.overlay==='brain'); if(row.hidden) return;
+  const label=NAV_LABELS[NAV.owner]||'activity', state=MT.running?'running':MT.remaining()>0?'paused':'in progress';
+  document.getElementById('activityNavStatus').textContent=label.charAt(0).toUpperCase()+label.slice(1)+' '+state+(MT.total>0?' · '+fmtLeft(MT.remaining()):'');
+  const back=document.getElementById('activityReturn'); back.hidden=A.overlay===NAV.owner; back.textContent='Return to '+label;
+  document.getElementById('activityStop').textContent=NAV.owner==='brain'?'Finish break':'Stop '+label;
+}
 function markTools(){ document.querySelectorAll('.tool[data-tool]').forEach(b=>b.classList.toggle('on', b.dataset.tool===A.overlay || ((A.overlay==='brainpick')&&b.dataset.tool==='brain') || ((A.overlay==='tpick'||A.overlay==='ticket')&&b.dataset.tool==='exit') || ((A.overlay==='rpick'||A.overlay==='reflect')&&b.dataset.tool==='reflect') || ((A.overlay==='thpick'||A.overlay==='think')&&b.dataset.tool==='think') || (A.overlay==='manualRoutine'&&b.dataset.tool==='routines') || (A.overlay==='practise'&&b.dataset.tool==='routines')));  markMenus(); }
 let actH=[]; function clearActivity(){ actH.forEach(h=>{clearTimeout(h);clearInterval(h);}); actH=[]; }
-function backBtn(label){ return '<button class="btn alt sm" type="button" data-act="close">'+esc(label||'Back to the plan')+'</button>'; }
+function backBtn(label){ const stop=!!label&&/^(Stop|Finish)/.test(label); return '<button class="btn alt sm" type="button" data-act="'+(stop?'stopActivity':'back')+'"'+(stop?' data-stop-screen="1"':'')+'>'+esc(label||'Back')+'</button>'; }
 function renderOverlay(full){
   const o=A.overlay, P=A.P;
   if(renderFunOverlay(o,full)) return;
   if(o==='routines'){ if(!full) return; setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Routines</h1>'+backBtn()+'</div><p class="lead">Run one now, or practise it: the class times itself and tries to beat its best.</p><div class="rlist">'+S.routines.map(r=>'<div class="rbtn"><b>'+esc(r.name)+'</b><span>'+stepsOf(r).length+' steps · '+r.minutes+' min'+(r.best?' · best '+fmtLeft(r.best):'')+'</span><div class="row" style="margin-top:6px"><button class="btn sm" type="button" data-run="'+esc(r.id)+'">Run</button><button class="btn alt sm" type="button" data-practise="'+esc(r.id)+'">Practise</button></div></div>').join('')+'</div></section>'); return; }
   if(o==='manualRoutine'){ const R=routineById(A.mr.id); const st=stepsOf(R); const cur=A.mr.step;
-    if(full||A.mr.drawn!==cur){ A.mr.drawn=cur; setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Routine</div>'+backBtn('Stop')+'</div><h1 class="big">'+esc(R.name)+'</h1>'+stepsHTML(st,cur)+'<div class="row" style="margin-top:auto"><button class="btn" type="button" data-act="mrNext">'+(cur>=st.length-1?'Finish':'Next step')+'</button><button class="btn alt" type="button" data-act="mrBack">Back</button></div></section><aside class="side">'+(R.checkin?'<section class="card sm">'+weatherHTML()+'</section>':'')+'<section class="card sm" style="align-items:center">'+(R.checkin?'<div style="width:150px">'+ringHTML('main','left','sm')+'</div>':ringHTML('main','left'))+'</section>'+npHTML()+'</aside>'); updateNowPlaying(); }
+    if(full||A.mr.drawn!==cur){ A.mr.drawn=cur; setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Routine</div>'+backBtn('Stop')+'</div><h1 class="big">'+esc(R.name)+'</h1>'+stepsHTML(st,cur)+'<div class="row" style="margin-top:auto"><button class="btn" type="button" data-act="mrNext">'+(cur>=st.length-1?'Finish':'Next step')+'</button><button class="btn alt" type="button" data-act="mrBack">Previous step</button></div></section><aside class="side">'+(R.checkin?'<section class="card sm">'+weatherHTML()+'</section>':'')+'<section class="card sm" style="align-items:center">'+(R.checkin?'<div style="width:150px">'+ringHTML('main','left','sm')+'</div>':ringHTML('main','left'))+'</section>'+npHTML()+'</aside>'); updateNowPlaying(); }
     paintRing('main',MT.remaining(),MT.total); return; }
   if(o==='practise'){ const R=routineById(A.pr.id); const el=A.pr.done?A.pr.done:(Date.now()-A.pr.t0)/1000;
-    if(full){ setStage('two','<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Practise · '+esc(R.name)+'</div>'+backBtn('Stop')+'</div><h1 class="big">Can we beat '+(R.best?fmtLeft(R.best):'our first try')+'?</h1>'+stepsHTML(stepsOf(R),-1)+'</section><section class="card" style="align-items:center;justify-content:center;gap:18px"><div class="pick" id="prT" style="padding:0">0:00</div><div id="prMsg" class="lead" style="text-align:center">Go! Tap “We’re done” when everyone is ready.</div><div class="row"><button class="btn gold" type="button" data-act="prDone" id="prDoneBtn">We’re done!</button><button class="btn alt" type="button" data-act="prAgain">Do it again</button></div></section>'); }
+    if(full){ setStage('two','<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Practise · '+esc(R.name)+'</div>'+backBtn(A.pr.done?'Finish practice':'Stop practice')+'</div><h1 class="big">Can we beat '+(R.best?fmtLeft(R.best):'our first try')+'?</h1>'+stepsHTML(stepsOf(R),-1)+'</section><section class="card" style="align-items:center;justify-content:center;gap:18px"><div class="pick" id="prT" style="padding:0">0:00</div><div id="prMsg" class="lead" style="text-align:center">Go! Tap “We’re done” when everyone is ready.</div><div class="row"><button class="btn gold" type="button" data-act="prDone" id="prDoneBtn">We’re done!</button><button class="btn alt" type="button" data-act="prAgain">Do it again</button></div></section>'); }
     const t=document.getElementById('prT'); if(t) t.textContent=fmtLeft(el); return; }
   if(o==='timer'){ if(full){ setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Timer</h1>'+backBtn()+'</div><div class="row">'+[1,2,3,5,10,15].map(m=>'<button class="btn alt" type="button" data-timer="'+m*60+'">'+m+' min</button>').join('')+'<button class="btn alt" type="button" data-timer="30">30 sec</button></div><div class="row"><button class="btn alt sm" type="button" data-add="60">+1 min</button><button class="btn alt sm" type="button" data-add="-60">−1 min</button><button class="btn alt sm" type="button" data-act="mtPause" id="mtPause">Pause</button></div></section><aside class="side"><section class="card sm" style="align-items:center">'+ringHTML('main','left')+'</section></aside>'); }
     paintRing('main',MT.remaining(),MT.total); const pb=document.getElementById('mtPause'); if(pb) pb.textContent=MT.running?'Pause':'Resume'; return; }
@@ -1750,12 +1838,12 @@ function renderOverlay(full){
 function lateCard(b,solo){ return '<section class="card"><div class="row" style="justify-content:space-between"><h2 class="mid" style="color:var(--gum-d)">Just arrived? Welcome!</h2>'+(solo?backBtn('Done'):'')+'</div><ol class="steps"><li><span class="n">'+icon('bag',22,'currentColor')+'</span><span>Bag on your hook, note in the tray</span></li><li><span class="n">'+icon('pencil',22,'currentColor')+'</span><span>'+esc(b&&b.materials?b.materials:'Get out what you need for '+(b?b.name:'this lesson'))+'</span></li><li><span class="n">'+icon('people',22,'currentColor')+'</span><span>Ask your partner where we’re up to</span></li></ol></section>'; }
 
 /* brain breaks */
-function startBrain(type,id){ const off=S.breakOff||[]; let pool=BREAKS.filter(b=>!b.breath&&!off.includes(b.id)&&(!type||b.type===type)&&(!A.brain||b.id!==A.brain.id)); if(!pool.length) pool=BREAKS.filter(b=>!b.breath); const b=brainBreakVariant((id&&BREAKS.find(x=>x.id===id))||pool[Math.floor(Math.random()*pool.length)]||BREAKS[0]);
+function startBrain(type,id){ if(!navPrepareStart('brain')) return; const off=S.breakOff||[]; let pool=BREAKS.filter(b=>!b.breath&&!off.includes(b.id)&&(!type||b.type===type)&&(!A.brain||b.id!==A.brain.id)); if(!pool.length) pool=BREAKS.filter(b=>!b.breath); const b=brainBreakVariant((id&&BREAKS.find(x=>x.id===id))||pool[Math.floor(Math.random()*pool.length)]||BREAKS[0]);
   clearActivity(); if(b.gen) b.calls=b.gen(); A.brain=b; A.callIdx=0; A.overlay='brain'; markTools(); if(b.song) Music.play(b.song); else Music.stop(); say(b.name+'. '+b.how);
   MT.start(b.secs,()=>{ chime(2); Music.fadeStop(); clearActivity(); const c=$('#call'); if(c){ c.className='call'; c.textContent='Brain break done. Back to your spot.'; } setTimeout(()=>{ if(A.overlay==='brain') closeOverlay(); },4000); });
   if(b.calls) actH.push(setInterval(()=>{ A.callIdx=(A.callIdx+1)%b.calls.length; const c=$('#call'); if(c) c.textContent=b.calls[A.callIdx]; },(b.every||8)*1000));
   if(b.freeze) freezeLoop(); render(true); }
-function freezeLoop(){ actH.push(setTimeout(()=>{ if(A.overlay!=='brain') return; Music.pause(); const c=$('#call'); if(c){ c.className='call freeze'; c.textContent='FREEZE!'; } actH.push(setTimeout(()=>{ if(A.overlay!=='brain'||!MT.running) return; Music.resume(); const c=$('#call'); if(c){ c.className='call'; c.textContent='Dance!'; } freezeLoop(); },3000)); },4000+Math.random()*5000)); }
+function freezeLoop(){ actH.push(setTimeout(()=>{ if(NAV.owner!=='brain'||!MT.running) return; Music.pause(); const c=$('#call'); if(c){ c.className='call freeze'; c.textContent='FREEZE!'; } actH.push(setTimeout(()=>{ if(NAV.owner!=='brain'||!MT.running) return; Music.resume(); const c=$('#call'); if(c){ c.className='call'; c.textContent='Dance!'; } freezeLoop(); },3000)); },4000+Math.random()*5000)); }
 function renderBrain(full){ const b=A.brain; if(full) setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Brain break · '+esc(b.type)+'</div>'+backBtn('Stop')+'</div><h1 class="big">'+esc(b.name)+'</h1><p class="lead">'+esc(b.how)+'</p><div class="call" id="call">'+esc(b.calls?b.calls[A.callIdx]:(b.freeze?'Dance!':'Go!'))+'</div></section><aside class="side"><section class="card sm" style="align-items:center">'+ringHTML('main','left')+'</section>'+(b.song?npHTML():'')+'<div class="row"><button class="btn alt sm" type="button" data-brain="movement">Movement</button><button class="btn alt sm" type="button" data-brain="game">Game</button><button class="btn alt sm" type="button" data-brain="calm">Quiet</button><button class="btn sm" type="button" data-brain="">Another one</button><button class="btn alt sm" type="button" data-tool="calm">Calm breathing</button></div></aside>');
   paintRing('main',MT.remaining(),MT.total); if(full) updateNowPlaying(); }
 
@@ -1803,7 +1891,7 @@ function pipRender(force){ if(!A.pipDoc) return; const P=A.P||phaseAt(now()); le
     html='<div class="r"><div><div class="k">NOW</div><div class="t">'+esc(title)+'</div></div><div class="big">'+left+'</div></div>'+(P.phase==='lesson'&&b&&S.expect[b.exp]?'<div class="chips">'+S.expect[b.exp].items.slice(0,3).map(x=>'<span>'+esc(x[1])+'</span>').join('')+'</div>':'')+'<div style="font-size:14px;opacity:.9">'+esc(sub)+'</div><div class="meter" id="pmeter"></div>'+(A.pipPicked?'<div class="r"><span class="k">QUIET PICK · ONLY YOU SEE THIS IF THE BOARD SHOWS YOUR SLIDES</span></div><div class="t">Ask '+esc(A.pipPicked)+'</div>':'')+'<div class="btns"><button class="a" data-pact="attention">Attention</button><button data-pact="pick">Pick</button><button data-pact="door">Door</button><button data-pact="point">+1 point</button><button data-pact="reset">Reset</button></div>'; }
   if(!A.pipBig){ const b=P.block; const title=A.attnClose?'Eyes this way':P.phase==='warning'?'2 minutes to finish':P.phase==='routine'?P.routine.name:P.phase==='exit'?'Exit ticket':P.phase==='entry'?'Entry ticket':(b?b.name:'Roomie'); const left=A.attnClose?'':(P.to?fmtLeft((P.to-P.mins)*60):''); html='<button class="roo" data-pact="'+(A.attnClose?'attention':'expand')+'" title="Tap for Roomie’s controls">'+birdSVG()+'</button>'+(left?'<div class="mt">'+left+'</div>':'')+'<div class="ms">'+esc(title)+'</div>'+(left?'':'<div class="hint2">Tap Roomie for controls</div>'); cls=(cls?cls+' ':'')+'mini'; }
   else html=html+'<button class="shr" data-pact="shrink">Shrink back to Roomie</button>';
-  if(typeof M!=='undefined'&&M.on){ const gg=M.goal&&(((S.coach||{}).goals||[]).find(x=>x.id===M.goal)), g=gg&&focusOf(gg); 
+  if(typeof M!=='undefined'&&M.on){ const gg=M.goal&&(((S.coach||{}).goals||[]).find(x=>x.id===M.goal)), g=gg&&focusOf(gg);
     html='<div class="mir'+(M.inPart?' on':'')+'"><span><i></i>Mirror <em id="pmt"></em>'+(A.pipBig?' · <em id="pml"></em> heard'+(SL.on?' · slides linked':''):'')+'</span>'+(A.pipBig?'<span class="mb">'+(g&&g.part?'<button data-pact="mirmark">'+(M.inPart?'End '+esc(g.part):'Mark '+esc(g.part))+'</button>':'')+((S.coach||{}).slides&&!SL.on?'<button data-pact="mirslides">Link slides</button>':'')+'<button data-pact="mirstop">End lesson</button></span>':(M.inPart?'<b>marking</b>':''))+'</div>'+html; }
   const sig=cls+html; if(!force&&sig===A.pipSig){ pipMirUpd(); return; } A.pipSig=sig; const root=A.pipDoc.getElementById('pip'); if(root){ root.className=cls; root.innerHTML=html; } paintMeter(); pipMirUpd(); }
 function pipMirUpd(){ if(!A.pipDoc||typeof M==='undefined'||!M.on) return; const t=A.pipDoc.getElementById('pmt'), l=A.pipDoc.getElementById('pml'); if(t) t.textContent=mirFmt((Date.now()-M.t0)/1000); if(l){ const n=(M.words||[]).length; l.textContent=n+' line'+(n===1?'':'s'); } }
@@ -1818,7 +1906,7 @@ function resetTimetableSession(){
   if(typeof hideNudge==='function') hideNudge();
 }
 function scheduleProtected(){
-  return !!(A.overlay || (MT.total>0&&(MT.running||MT.remaining()>0)) || A.attnClose ||
+  return !!(navHasActivity() || A.overlay || (MT.total>0&&(MT.running||MT.remaining()>0)) || A.attnClose ||
     (typeof RZ!=='undefined'&&RZ.on) || (typeof RS!=='undefined'&&RS.on) ||
     ['sheetHost','wzHost','rmkHost','rmHost','tour'].some(id=>{ const el=document.getElementById(id); return el&&!!el.innerHTML; }));
 }
@@ -1867,7 +1955,7 @@ function switchToTimetable(){
   SCHED.paused=false; SCHED.pinned=null; SCHED.pending=null;
   scheduleSkipDue(current); A.phaseKey=phaseSig(current);
   /* This is the explicit, labelled action that ends the current activity. */
-  goHome(); MT.stop(); clearActivity(); Music.fadeStop();
+  navStopActivity(false); goHome(); MT.stop(); clearActivity(); Music.fadeStop();
   A.overlay=null; A.rot=null; markTools();
   A.phaseKey=phaseSig(phaseAt(now())); lastStep=-1; tick(true);
 }
@@ -1910,6 +1998,9 @@ function onPhaseChange(P,prev){
 
 /* ================= Actions ================= */
 function act(a,el){
+  if(a==='back'){ navBack(); return; }
+  if(a==='stopActivity'){ if(el&&el.dataset.stopScreen&&NAV.owner&&A.overlay!==NAV.owner) navBack(); else if(NAV.owner==='brain') brainFinish(); else navStopActivity(); return; }
+  if(a==='rotStart') return startRotations();
   const P=(a==='plus5'||a==='startNow')?phaseAt(now()):(A.P||phaseAt(now()));
   if(a==='plus5'&&P.block){ A.ext[P.block.id]=(A.ext[P.block.id]||0)+5; toast('5 more minutes'); tick(true); return; }
   if(a==='hold'&&P.block){ pauseTimetable(); return; }
@@ -1940,8 +2031,8 @@ function act(a,el){
   if(a==='prDone'){ const R=routineById(A.pr.id); if(A.pr.done) return; A.pr.done=(Date.now()-A.pr.t0)/1000; clearActivity(); Music.fadeStop(); const t=A.pr.done; const beat=!R.best||t<R.best; const m=$('#prMsg'); if(beat){ R.best=Math.round(t); save(); chime(3); if(m) m.innerHTML='<b style="color:var(--gum-d);font-size:28px">New best! '+fmtLeft(t)+'</b><br><button class="btn gold sm" type="button" data-act="point" style="margin-top:10px">+1 class point</button>'; } else { chime(1); if(m) m.textContent='Our best is still '+fmtLeft(R.best)+'. Do it again?'; } return; }
   if(a==='prAgain'){ startPractise(A.pr.id); return; }
 }
-function runRoutine(id){ const R=routineById(id); if(!R) return; clearActivity(); A.mr={id,step:0}; MT.start(R.minutes*60,()=>{ chime(2); Music.fadeStop(); toast('Time’s up for '+R.name); }); if(R.song&&R.song!=='none') Music.play(R.song,R.id); say(R.name+'. Step 1. '+(stepsOf(R)[0]||'')); openOverlay('manualRoutine'); }
-function startPractise(id){ const R=routineById(id); clearActivity(); A.pr={id,t0:Date.now(),done:0}; if(R.song&&R.song!=='none') Music.play(R.song,R.id); chime(1); openOverlay('practise'); }
+function runRoutine(id){ const R=routineById(id); if(!R) return; if(!navPrepareStart('manualRoutine')) return; clearActivity(); A.mr={id,step:0}; MT.start(R.minutes*60,()=>{ chime(2); Music.fadeStop(); toast('Time’s up for '+R.name); }); if(R.song&&R.song!=='none') Music.play(R.song,R.id); say(R.name+'. Step 1. '+(stepsOf(R)[0]||'')); openOverlay('manualRoutine'); }
+function startPractise(id){ const R=routineById(id); if(!R||!navPrepareStart('practise')) return; clearActivity(); A.pr={id,t0:Date.now(),done:0}; if(R.song&&R.song!=='none') Music.play(R.song,R.id); chime(1); openOverlay('practise'); }
 function beginDemo(){
   if(DEMO.active) return true;
   const blocked=typeof classProfileBlockReason==='function'?classProfileBlockReason():((S.liveOn||S.remote||(typeof M!=='undefined'&&M.on))?'Turn off student devices, remote control and lesson coaching before starting a demo.':''); if(blocked){ toast(blocked.replace('changing classes','starting a demo')); return false; }
@@ -1968,15 +2059,19 @@ document.addEventListener('click',e=>{
   const t=e.target.closest('button,[data-wx]'); if(!t) return;
   if(t.closest('#sheetHost')) return;
   const tool=t.dataset.tool;
-  if(tool){ audio();
+  if(tool){
+    if(t.closest('#dmenu[data-for="more"]')){ closeDMenu(); requestAnimationFrame(()=>{ const heading=document.querySelector('#stage h1,#stage h2'); if(heading){ heading.tabIndex=-1; heading.focus({preventScroll:true}); } }); }
+    audio();
     if(tool==='attention') return attention();
     if(tool==='float') return floatOpen();
     if(tool==='point') return act('point',t);
     if(tool==='reset') return resetRoom();
-    if(tool==='hero') return A.overlay==='hero'?closeOverlay():openHero();
-    if((A.overlay===tool&&tool!=='brain')||(tool==='brain'&&A.overlay==='brainpick')||(tool==='exit'&&(A.overlay==='tpick'||A.overlay==='ticket'))||(tool==='reflect'&&(A.overlay==='rpick'||A.overlay==='reflect'))||(tool==='think'&&(A.overlay==='thpick'||A.overlay==='think'))){ closeOverlay(); return; }
+    const owned={routines:['manualRoutine','practise'],brain:['brain'],exit:['ticket'],reflect:['reflect'],think:['think'],rotate:['rotate'],packup:['packup'],reteach:['reteach'],timer:['timer'],calm:['calm']};
+    if(navHasActivity()&&(owned[tool]||[]).includes(NAV.owner)){ if(A.overlay!==NAV.owner) navRemember(A.overlay); navShow(NAV.owner); return; }
+    if(tool==='hero') return A.overlay==='hero'?navBack():openHero();
+    if((A.overlay===tool&&tool!=='brain')||(tool==='brain'&&A.overlay==='brainpick')||(tool==='exit'&&(A.overlay==='tpick'||A.overlay==='ticket'))||(tool==='reflect'&&(A.overlay==='rpick'||A.overlay==='reflect'))||(tool==='think'&&(A.overlay==='thpick'||A.overlay==='think'))){ navBack(); return; }
     if(tool==='routines') return openOverlay('routines');
-    if(tool==='rotate') return startRotations();
+    if(tool==='rotate') return openOverlay('rotationSetup');
     if(tool==='exit') return openTicketPicker('exit',false);
     if(tool==='reflect') return openOverlay('rpick');
     if(tool==='think') return openOverlay('thpick');
@@ -1991,7 +2086,7 @@ document.addEventListener('click',e=>{
     if(tool==='reteach'){ A.rt=null; return openOverlay('reteach'); }
     if(tool==='timer'){ return openOverlay('timer'); }
     if(tool==='brain') return openOverlay('brainpick');
-    if(tool==='calm'){ clearActivity(); MT.start(60,()=>{ chime(1); Music.fadeStop(); }); Music.play('still'); return openOverlay('calm'); }
+    if(tool==='calm'){ if(!navPrepareStart('calm')) return; clearActivity(); MT.start(60,()=>{ chime(1); Music.fadeStop(); }); Music.play('still'); return openOverlay('calm'); }
     if(tool==='pick') return openOverlay('pick');
     if(tool==='groups') return A.groups.length?openOverlay('groups'):makeGroups({size:4});
     if(tool==='door'||tool==='late') return openOverlay(tool);
@@ -1999,11 +2094,11 @@ document.addEventListener('click',e=>{
   if(t.dataset.wx){ A.feel=feelBucket(); A.feel[t.dataset.wx]++; if(A.overlay==='checkin'){ blip(); render(true); const nb=document.querySelector('.feel.big [data-wx="'+t.dataset.wx+'"]'); if(nb) nb.classList.add('tapped'); return; } t.classList.remove('tapped'); void t.offsetWidth; t.classList.add('tapped'); blip(); const box=t.closest('.card'); if(box){ const h=box.querySelector('.feel'); box.innerHTML=weatherHTML(); } return; }
   if(t.dataset.feelview){ A.feelView=!A.feelView; const box=t.closest('.card'); if(box) box.innerHTML=weatherHTML(); return; }
   if(t.dataset.focus!==undefined){ const k=t.dataset.focus; if(k) Focus.start(k); else Focus.stop(); document.querySelectorAll('[data-focus]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.focus===k))); if(k) Bird.say(k==='rain'?'Ahh, rain.':k==='birds'?'Tink, tink!':'Nice and calm.'); return; }
-  if(t.dataset.rt!==undefined){ A.rt=t.dataset.rt?{id:t.dataset.rt,mode:'learn'}:null; MT.stop(); render(true); return; }
+  if(t.dataset.rt!==undefined){ if(NAV.owner==='reteach'&&navHasActivity()){ if(!confirm('Stop the current expectation practice and choose another card?')) return; navStopActivity(false); A.overlay='reteach'; } A.rt=t.dataset.rt?{id:t.dataset.rt,mode:'learn'}:null; render(true); return; }
   if(t.dataset.rtgo) return rtGo(t.dataset.rtgo);
   if(t.dataset.run) return runRoutine(t.dataset.run);
   if(t.dataset.practise) return startPractise(t.dataset.practise);
-  if(t.dataset.timer){ MT.stop(); MT.start(+t.dataset.timer,()=>{ chime(3); say('Time’s up.'); }); render(true); return; }
+  if(t.dataset.timer){ navStartTimer(+t.dataset.timer); return; }
   if(t.dataset.add){ MT.add(+t.dataset.add); render(false); return; }
   if(t.dataset.brain!==undefined) return startBrain(t.dataset.brain||null);
   if(t.dataset.gsize) return makeGroups({size:+t.dataset.gsize});
@@ -2011,12 +2106,11 @@ document.addEventListener('click',e=>{
   if(t.dataset.act) return act(t.dataset.act,t);
 });
 document.addEventListener('keydown',e=>{ if(e.target.closest('input,textarea,select,[role="menu"],[role="dialog"][aria-modal="true"]')||$('#sheetHost').innerHTML) return; const k=e.key.toLowerCase();
-  if(k==='a') attention(); else if(k==='r') resetRoom(); else if(k==='d') openOverlay('door'); else if(k==='l') openOverlay('late'); else if(k==='escape'){ goHome(); }
-  else if(k==='arrowright'){ const P=A.P; if(A.overlay==='manualRoutine') act('mrNext'); else if(P&&P.phase==='routine'){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)+1; render(false); } }
-  else if(k==='arrowleft'){ const P=A.P; if(A.overlay==='manualRoutine') act('mrBack'); else if(P&&P.phase==='routine'){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)-1; render(false); } } });
+  if(k==='a') attention(); else if(k==='r') resetRoom(); else if(k==='d') openOverlay('door'); else if(k==='l') openOverlay('late');
+  else if(k==='arrowright'){ const P=A.P; if(A.overlay==='manualRoutine') act('mrNext'); else if(!A.overlay&&P&&P.phase==='routine'){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)+1; render(false); } }
+  else if(k==='arrowleft'){ const P=A.P; if(A.overlay==='manualRoutine') act('mrBack'); else if(!A.overlay&&P&&P.phase==='routine'){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)-1; render(false); } } });
 document.addEventListener('dblclick',e=>{ const li=e.target.closest('.steps li'); if(!li) return; const P=A.P; if(P&&P.phase==='routine'&&!A.overlay){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)+1; render(false); } });
-$('#setupBtn').addEventListener('click',()=>openSetup());
-$('#lookBtn').addEventListener('click',()=>{ tab='look'; openSetup(); });
+$('#setupBtn').addEventListener('click',()=>{ tab='plan'; openSetup(); });
 $('#fsBtn').addEventListener('click',()=>{ try{ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(()=>toast('Full screen isn’t available here.')); }catch(e){ toast('Full screen isn’t available here.'); } });
 function markMode(){ document.querySelectorAll('[data-mode]').forEach(x=>x.className='btn'+(x.dataset.mode===(S.mode||'day')?'':' alt')); document.body.classList.toggle('mode-tools',S.mode==='tools'); const start=document.getElementById('startBtn'); if(start) start.textContent=S.mode==='tools'?'Open my toolkit':'Start my day'; }
 document.addEventListener('click',e=>{ const m=e.target.closest('[data-mode]'); if(!m) return; S.mode=m.dataset.mode; save(); markMode(); A.phaseKey=null; if(document.getElementById('app').offsetParent!==null||true) tick(true); if(document.getElementById('sheetHost')&&typeof renderSetup==='function'&&m.closest('#sheetHost')) renderSetup(); });
@@ -2032,8 +2126,9 @@ function planSumHTML(b,i){ const ex=(typeof segInfo==='function'?segInfo({b}):[]
 function openSetup(){ if(Music.isYT&&!Music.paused) Music.pause(); editDay=editDay||(isWeekend(now())?'mon':dayKey(now())); renderSetup(); }
 function closeSetup(){ $('#sheetHost').innerHTML=''; refreshLabels(); A.phaseKey=''; tick(true); }
 function opt(v,l,cur){ return '<option value="'+esc(v)+'"'+(v===cur?' selected':'')+'>'+esc(l)+'</option>'; }
+function roomieAppearanceHTML(){ return '<h3>Roomie & celebrations</h3>'+'<div class="row" style="align-items:flex-end"><div class="fld" style="width:220px"><label for="fFun">Celebration level</label><select id="fFun">'+opt('calm','Calm: just the essentials',S.fun)+opt('lively','Lively (recommended)',S.fun)+opt('party','Party: everything on',S.fun)+'</select></div><button class="btn gold" type="button" data-sact="testFun">Test a celebration</button></div><label class="chk"><input type="checkbox" id="fMascot" '+(S.mascot!==false?'checked':'')+'><span>Show Roomie the mascot<span class="hint" style="display:block">Sings with the music, cheers for points, says hello at each change</span></span></label><p class="hint" style="margin:0">Controls how lively celebrations, races and reveals are. This does not change your colours, pictures or mascot choice. During learning the board stays calm. If a computer is set to reduce motion, Roomie turns the animations off.</p>'; }
 function renderSetup(){
-  const tabs=[['plan','Day plan'],['look','Look & colours'],['class','Class'],['routines','Routines'],['expect','Expectations'],['reminders','Reminders & goal'],['relief','Relief teacher page'],['fun','Fun & rotations'],['demo','Demo clock'],['privacy','Privacy, backup & move'],['coach','Coach (early access)']];
+  const tabs=[['plan','Day plan'],['look','Look, sound & Roomie'],['class','Class'],['routines','Routines'],['expect','Expectations'],['reminders','Reminders & goal'],['relief','Relief teacher page'],['demo','Demo clock'],['privacy','Privacy, backup & move'],['coach','Coach (early access)']];
   let body='';
   if(tab==='plan'){ const list=S.days[editDay]||[]; const rOpts=c=>opt('','—',c)+S.routines.map(r=>opt(r.id,r.name,c)).join(''); const eOpts=c=>opt('','—',c)+Object.entries(S.expect).map(([k,e])=>opt(k,e.name,c)).join('');
     body='<div class="okbox" style="font-size:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center"><b>Use Roomie as:</b><button class="btn sm'+(S.mode==='tools'?' alt':'')+'" type="button" data-mode="day">My whole day, with subjects</button><button class="btn sm'+(S.mode==='tools'?'':' alt')+'" type="button" data-mode="tools">Just the toolkit, no timetable</button></div>'+(S.mode==='tools'?'<p class="lead" style="margin:0">Roomie is in toolkit mode. The board shows your tools and nothing changes by itself. Switch to “My whole day” to use the plan below.</p>':'')+'<div class="row">'+DAYS.map(k=>'<button class="tab" type="button" data-day="'+k+'" aria-selected="'+(k===editDay)+'">'+DAYNAME[k]+'</button>').join('')+(isWeekend(now())?'':'<button class="tab once" type="button" data-once="today" aria-selected="'+(editDay===onceKey(now()))+'">Just today</button>')+'<button class="tab once" type="button" data-once="next" aria-selected="'+(editDay===onceKey(nextSchoolDay(now())))+'">Just '+(isWeekend(now())?'Monday':nextSchoolDay(now()).getDay()===1?'Monday':'tomorrow')+'</button></div>'+(/^d\d{8}$/.test(editDay)?'<div class="okbox row" style="justify-content:space-between;align-items:center;font-size:16px"><span><b>One-off plan for '+onceLabel(editDay)+'.</b> Change anything here for an assembly, excursion or carnival. Your usual '+(DAYNAME[dayKey(new Date(+editDay.slice(1,5),+editDay.slice(5,7)-1,+editDay.slice(7,9)))]||'day')+' stays the same.</span><button class="btn alt sm" type="button" data-once="undo">Go back to the usual plan</button></div>':'')+'<p class="hint" style="margin:0">Tap a block to change it: times, routines, expectations, tickets and planned activities. Roomie changes over by itself and pops up planned activities when they’re due.</p><div class="tablewrap"><div class="plan">'+
@@ -2049,12 +2144,11 @@ function renderSetup(){
     const RC=[['match','Match my colour',''],['pink','Pink','#FF8CC6'],['blue','Blue','#7EC3FF'],['green','Green','#7FDCA6'],['orange','Orange','#FFAA6E'],['purple','Purple','#B49BFF']];
     const LK=[['scrap','Scrapbook','#EFE6CC'],['grape','Grape soda','#7B5CFA'],['tomato','Tomato and navy','#FF6B4A'],['mint','Mint and bubblegum','#6EE7C5']];
     const sw=(attr,cur,list)=>'<div class="swatches">'+list.map(([k,l,c])=>'<button type="button" class="swatch" '+attr+'="'+k+'" aria-pressed="'+(cur===k)+'"><i style="background:'+(c||'conic-gradient(#E2558F,#3B82C4,#2E9466,#E8613F,#7457C9,#E2558F)')+'"></i><span>'+esc(l)+'</span></button>').join('')+'</div>';
-    body='<h3>Colour</h3>'+(S.theme==='scrap'?'':'<p class="hint" style="margin:0">Colours apply to the Scrapbook look.</p>')+sw('data-acc',S.accent||'pink',SW)+'<h3>Roomie’s colour</h3>'+sw('data-rc',S.roomieCol||'match',RC)+'<h3>Look</h3>'+sw('data-look',S.theme,LK)+'<h3>Today’s timetable</h3>'+sw('data-daypos',S.dayPos||'side',[['side','Down the side','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="9" height="28" rx="2" fill="#E2558F"/><rect x="16" y="6" width="20" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['top','Across the top','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="6" rx="2" fill="#E2558F"/><rect x="4" y="15" width="32" height="19" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['hide','Hidden','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover']])+'<p class="hint" style="margin:0">Changes show on the board straight away. Tap Done to see them.</p>'+(typeof dockSetupHTML==='function'?picsSetupHTML()+soundSetupHTML()+scSetupHTML()+dockSetupHTML():''); }
-  if(tab==='fun'){ body='<div class="row" style="align-items:flex-end"><div class="fld" style="width:220px"><label for="fFun">Fun level</label><select id="fFun">'+opt('calm','Calm: just the essentials',S.fun)+opt('lively','Lively (recommended)',S.fun)+opt('party','Party: everything on',S.fun)+'</select></div><button class="btn gold" type="button" data-sact="testFun">Test a celebration</button></div><label class="chk"><input type="checkbox" id="fMascot" '+(S.mascot!==false?'checked':'')+'><span>Show Roomie the mascot<span class="hint" style="display:block">Sings with the music, cheers for points, says hello at each change</span></span></label><label class="chk"><input type="checkbox" id="fSfx" '+(S.sfx!==false?'checked':'')+'><span>Celebration sounds<span class="hint" style="display:block">Fanfares, drumrolls and pops. The attention chime always plays.</span></span></label><p class="hint" style="margin:0">Fun comes in bursts: celebrations, races and reveals. During learning the board stays calm. If a computer is set to reduce motion, Roomie turns the animations off.</p>'+brainBreakSettingsHTML()+'<h3>Rotations</h3><div class="row" style="align-items:flex-start"><div class="fld" style="flex:1;min-width:240px"><label for="fStations">Stations, one per line (2 to 8)</label><textarea id="fStations" style="min-height:180px">'+esc(S.stations||'')+'</textarea></div><div class="fld" style="width:160px"><label for="fRotMin">Minutes at each</label><input id="fRotMin" type="number" min="2" max="40" value="'+(S.rotMin||12)+'"></div></div><p class="hint" style="margin:0">Roomie makes one crew per station from your class list. Crews move one station each round, with a 45-second move song.</p>'; }
+    body='<h3>Colour</h3>'+(S.theme==='scrap'?'':'<p class="hint" style="margin:0">Colours apply to the Scrapbook look.</p>')+sw('data-acc',S.accent||'pink',SW)+'<h3>Roomie’s colour</h3>'+sw('data-rc',S.roomieCol||'match',RC)+'<h3>Look</h3>'+sw('data-look',S.theme,LK)+'<h3>Today’s timetable</h3>'+sw('data-daypos',S.dayPos||'side',[['side','Down the side','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="9" height="28" rx="2" fill="#E2558F"/><rect x="16" y="6" width="20" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['top','Across the top','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="6" rx="2" fill="#E2558F"/><rect x="4" y="15" width="32" height="19" rx="2" fill="#E8DFC4"/></svg>')+') center/cover'],['hide','Hidden','url(data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" fill="#FFFDF3"/><rect x="4" y="6" width="32" height="28" rx="2" fill="#E8DFC4"/></svg>')+') center/cover']])+'<p class="hint" style="margin:0">Changes show on the board straight away. Tap Done to see them.</p>'+(typeof dockSetupHTML==='function'?picsSetupHTML()+soundSetupHTML()+roomieAppearanceHTML()+scSetupHTML()+dockSetupHTML():''); }
   if(tab==='demo'){ const P=phaseAt(now()); body='<div class="okbox" style="font-size:16px">Try your timetable with a demo clock. Demo edits, points and history stay in this open page. Exit demo to restore your saved class.</div><div class="row"><button class="btn gold" type="button" data-sact="demoStart">Start the day at 8:40</button><button class="btn" type="button" data-sact="demoNext">Jump to 10 seconds before the next change</button><button class="btn alt" type="button" data-sact="demoReal">Back to the real time</button></div><p class="lead">Board time now: '+fmtClock(P.mins)+' · '+esc(P.phase)+(P.block?' · '+esc(P.block.name):'')+'</p>'; }
   if(tab==='coach'){ body=coachTab(); setTimeout(coachFillMics,0); }
   if(tab==='privacy'){ body=moveHTML()+'<div class="okbox" style="font-size:16px;line-height:1.6"><b>Saved in this browser:</b> your class display names, plan, routines, settings, seating, points and up to 30 daily summaries. Summaries include activity counts and anonymous check-in totals. Uploaded audio and pictures stay in this browser. If you use coaching, lesson estimates and recognised text are saved here too.<br><b>Optional online features:</b> student-device answers and remote-control messages use Roomie’s server. Student answers include a display name only when requested; feelings do not include a name. A move code uploads an encrypted copy of your settings. Server retention needs to be checked with the service operator.<br><b>Microphone and AI:</b> the noise meter processes sound levels without saving an audio recording. Voice commands use on-device recognition by default. If you enable cloud listening, your browser sends audio to its speech service. Coaching can capture other speakers and transcription errors; review the text before copying or sending it to an AI service.<br><b>Backups:</b> contain all your saved classes, settings, connection keys, school crest and pictures added under “Your pictures”. Uploaded audio, videos, PDFs and routine image attachments are not included; keep their original files. Keep the backup private. Restoring it replaces all classes saved in this browser.</div><div class="fld"><label for="fBackup">Backup: copy this somewhere safe. Restoring from this box replaces all saved classes.</label><textarea id="fBackup" style="font-size:12px;font-family:ui-monospace,monospace">'+esc(JSON.stringify(S))+'</textarea></div><div class="row"><button class="btn alt sm" type="button" data-sact="copyBackup">Copy backup</button><button class="btn alt sm" type="button" data-sact="restore">Restore from the box</button><button class="btn alt sm" type="button" data-sact="erase">Erase everything on this computer</button></div><div id="privMsg"></div>'; }
-  $('#sheetHost').innerHTML='<div class="sheet" role="dialog" aria-label="Setup"><div class="sheet-in"><div class="row" style="justify-content:space-between"><h1 style="font-size:34px;color:var(--gum-d)">Setup</h1><button class="btn" type="button" data-sact="done"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px"><path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/></svg>Done, back to Home</button></div><div class="tabs" role="tablist">'+tabs.map(([k,l])=>'<button class="tab" role="tab" type="button" data-tab="'+k+'" aria-selected="'+(tab===k)+'">'+l+'</button>').join('')+'</div>'+body+'<p class="hint"><span data-save-caption>'+esc(storageCaption())+'</span> '+esc(VERSION)+'</p></div></div>';
+  $('#sheetHost').innerHTML='<div class="sheet" role="dialog" aria-label="Setup"><div class="sheet-in"><div class="row" style="justify-content:space-between"><h1 style="font-size:34px;color:var(--gum-d)">Setup</h1><button class="btn" type="button" data-sact="done"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="vertical-align:-3px;margin-right:6px"><path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/></svg>Back to my board</button></div><div class="tabs" role="tablist">'+tabs.map(([k,l])=>'<button class="tab" role="tab" type="button" data-tab="'+k+'" aria-selected="'+(tab===k)+'">'+l+'</button>').join('')+'</div>'+body+'<p class="hint"><span data-save-caption>'+esc(storageCaption())+'</span> '+esc(VERSION)+'</p></div></div>';
 }
 function reliefHTML(){ const k=isWeekend(now())?'mon':dayKey(now()); const day=(typeof blocksToday==='function'?blocksToday(now()):(S.days[k]||[])).slice().sort((a,b)=>toMin(a.start)-toMin(b.start));
   return '<div class="relief" id="reliefDoc"><h2>Relief teacher guide · '+esc(S.room)+'</h2><p style="margin:0">'+esc(DAYNAME[k])+'. Roomie runs the timetable, warnings and routines on the board. You only need to follow along.</p><h3>Today</h3><table><tbody>'+day.map(b=>'<tr><td style="width:90px">'+fmtClock(toMin(b.start))+'</td><td>'+esc(b.name)+'</td><td>'+esc([b.startR&&('Starts with '+(routineById(b.startR)||{}).name), b.endR&&('ends with '+(routineById(b.endR)||{}).name), b.exp&&S.expect[b.exp]&&S.expect[b.exp].name].filter(Boolean).join(' · '))+'</td></tr>').join('')+'</tbody></table><h3>Signals the class knows</h3><ul style="margin:0"><li><b>Attention:</b> press A (or the coral Attention button). A chime plays and the board says “Eyes this way”.</li><li><b>Voice levels:</b> 0 silent, 1 whisper, 2 partner, 3 group, 4 presenting.</li><li><b>Tickets:</b> tap Tickets for an entry or exit ticket.</li><li><b>Someone at the door:</b> press D. The board tells the class to keep going.</li><li><b>Late arrival:</b> press L. The board shows them what to do.</li></ul><h3>Routines</h3>'+S.routines.map(r=>'<p style="margin:0"><b>'+esc(r.name)+'</b> ('+r.minutes+' min): '+esc(stepsOf(r).join(' → '))+'</p>').join('')+(S.reliefNotes?'<h3>Notes from '+esc(S.teacher)+'</h3><p style="margin:0;white-space:pre-line">'+esc(S.reliefNotes)+'</p>':'')+'</div>'; }
@@ -2251,7 +2345,11 @@ const CREW=['Rockets','Comets','Dragons','Pandas','Sharks','Owls','Tigers','Peng
 const CREWC=['#FDEFD0','#E3F4EA','#DCEFFB','#FDE3DC','#EFE6FB','#F1F0D6','#FBE3EF','#E6F3F7'];
 const CREWD=['#F5B700','#2F8F6B','#2F7FB0','#F2785C','#7C4A99','#9AA02F','#D9558E','#3FA7C9'];
 const stationsList=()=>String(S.stations||'').split('\n').map(s=>s.trim()).filter(Boolean).slice(0,8);
-function startRotations(){ const st=stationsList(); if(st.length<2){ toast('Add at least 2 stations in Setup › Fun & rotations.'); return; } if(!names().length){ toast('Add your class in Setup first.'); return; }
+function renderRotationSetup(){
+  setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Rotations</h1>'+backBtn()+'</div><p class="lead">Review your stations, then start when your class is ready.</p><p class="hint" data-rotation-summary>'+stationsList().length+' stations · '+esc(S.rotMin||12)+' minutes at each</p><div class="row"><button class="btn gold" type="button" data-act="rotStart">Start rotations</button></div><details><summary class="btn alt sm">Edit stations & timing</summary><div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">'+'<div class="row" style="align-items:flex-start"><div class="fld" style="flex:1;min-width:240px"><label for="fStations">Stations, one per line (2 to 8)</label><textarea id="fStations" style="min-height:180px">'+esc(S.stations||'')+'</textarea></div><div class="fld" style="width:160px"><label for="fRotMin">Minutes at each</label><input id="fRotMin" type="number" min="2" max="40" value="'+(S.rotMin||12)+'"></div></div><p class="hint" style="margin:0">Roomie makes one crew per station from your class list. Crews move one station each round, with a 45-second move song.</p>'+'</div></details></section>');
+}
+function startRotations(){ const st=stationsList(); if(st.length<2){ toast('Add at least 2 stations in Edit stations & timing before starting.'); return; } if(!names().length){ toast('Add your class in Setup first.'); return; }
+  if(!navPrepareStart('rotate')) return;
   if(A.groups.length!==st.length) makeGroups({count:st.length,quiet:true}); clearActivity(); A.rot={round:0,mode:'work',n:st.length}; A.overlay='rotate'; markTools(); rotWork(); }
 function rotWork(){ A.rot.mode='work'; MT.start((S.rotMin||12)*60,rotMove); chime(1); Bird.say(A.rot.round?'New station. Go!':'Off you go!'); render(true); }
 function rotMove(){ if(A.rot.round>=A.rot.n-1){ A.rot.mode='done'; MT.stop(); render(true); celebrate('Every group did every station!','big'); return; }
@@ -2260,7 +2358,7 @@ function renderRotate(full){ const R=A.rot, st=stationsList(), n=R.n;
   if(full){ const mv=R.mode==='move';
     const cards=st.slice(0,n).map((s,i)=>{ const gi=((i-(mv?R.round+1:R.round))%n+n)%n; const g=A.groups[gi]||[]; return '<div class="station" style="background:'+CREWC[gi%8]+'"><div class="sn">'+esc(s)+'</div><div class="cw"><span class="dot" style="background:'+CREWD[gi%8]+'"></span>'+(mv?'→ ':'')+esc(CREW[gi%8])+'</div><div class="mem">'+esc(g.join(', '))+'</div></div>'; }).join('');
     const head=R.mode==='done'?'<h1 class="big">All done!</h1><p class="lead">Every group visited every station. Back to your seats.</p>':(mv?'<h1 class="big" style="color:var(--coral)">Rotate!</h1><p class="lead">Tidy your station, then move to the one shown with your crew’s name.</p>':'<h1 class="mid" style="color:var(--gum-d)">Round '+(R.round+1)+' of '+n+'</h1>');
-    setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Rotations</div>'+backBtn('Stop rotations')+'</div>'+head+(R.mode==='done'?'':'<div class="stations'+(mv?' moving':'')+'">'+cards+'</div>')+'</section><aside class="side"><section class="card sm" style="align-items:center">'+ringHTML('main',mv?'to move':'at this station','md')+'</section>'+(R.mode==='work'?'<div class="row"><button class="btn coral" type="button" data-act="rotNow">Rotate now</button><button class="btn alt sm" type="button" data-add="120">+2 min</button></div>':'')+(R.mode==='done'?'<button class="btn gold" type="button" data-act="point">+1 class point</button>':'')+'<p class="hint">Crews are made from your class list. Change stations and minutes in Setup › Fun & rotations.</p></aside>'); }
+    setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Rotations</div>'+backBtn(R.mode==='done'?'Finish rotations':'Stop rotations')+'</div>'+head+(R.mode==='done'?'':'<div class="stations'+(mv?' moving':'')+'">'+cards+'</div>')+'</section><aside class="side"><section class="card sm" style="align-items:center">'+ringHTML('main',mv?'to move':'at this station','md')+'</section>'+(R.mode==='work'?'<div class="row"><button class="btn coral" type="button" data-act="rotNow">Rotate now</button><button class="btn alt sm" type="button" data-add="120">+2 min</button></div>':'')+(R.mode==='done'?'<button class="btn gold" type="button" data-act="point">+1 class point</button>':'')+'<p class="hint">Crews are made from your class list. To change stations or minutes, stop rotations and reopen Students → Rotations.</p></aside>'); }
   paintRing('main',MT.remaining(),MT.total,R.mode==='move'?'#F2785C':null); }
 
 /* ---- Focus sounds (made live in the browser) ---- */
@@ -2300,7 +2398,7 @@ function renderReteach(full){ const r=A.rt&&RETEACH.find(x=>x.id===A.rt.id);
   if(full){ const show=A.rt.mode==='show', done=A.rt.mode==='done';
     setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Quick reteach</div><div class="row"><button class="btn alt sm" type="button" data-rt="">All cards</button>'+backBtn()+'</div></div><h1 class="big">'+esc(r.name)+'</h1><p class="lead">Why? '+esc(r.why)+'</p>'+stepsHTML(r.steps,-1,'',true)+(show||done?'<div class="rt-show">Show me! '+esc(r.show)+'</div>':'')+'<div class="row" style="margin-top:auto">'+(done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-rtgo="show">Practise again</button>':(show?'<button class="btn gold" type="button" data-rtgo="done">Nailed it!</button>':'<button class="btn" type="button" data-rtgo="show">Practise: show me!</button>'))+'</div></section><aside class="side"><section class="card sm" style="align-items:center">'+(show?ringHTML('main','to show me','md'):'<div class="bigbird" style="width:180px">'+birdSVG()+'</div>')+'</section></aside>'); }
   if(A.rt.mode==='show') paintRing('main',MT.remaining(),MT.total); }
-function rtGo(mode){ if(mode==='show'){ A.rt.mode='show'; chime(1); MT.start(20,()=>{ chime(1); }); render(true); Bird.say('Show me!'); } else if(mode==='done'){ A.rt.mode='done'; MT.stop(); render(true); celebrate('Nailed it!','big',null,rnd(['NAILED IT!','BOOM!','YES!'])); } }
+function rtGo(mode){ if(mode==='show'){ if(!navPrepareStart('reteach')) return; A.rt.mode='show'; chime(1); MT.start(20,()=>{ chime(1); }); render(true); Bird.say('Show me!'); } else if(mode==='done'){ A.rt.mode='done'; MT.stop(); render(true); celebrate('Nailed it!','big',null,rnd(['NAILED IT!','BOOM!','YES!'])); } }
 
 /* ---- Bush fact of the day ---- */
 const FACTS=['Octopuses have three hearts and blue blood.', 'Honey never goes off. Archaeologists found 3,000-year-old honey that was still good to eat.', 'A group of flamingos is called a flamboyance.', 'Bananas are berries, but strawberries are not.', 'Sharks were around before trees existed.', 'A day on Venus is longer than a year on Venus.', 'Your brain uses about 20% of your body’s energy.', 'Sloths can hold their breath for up to 40 minutes.', 'There are more stars in the universe than grains of sand on all of Earth’s beaches.', 'Butterflies taste with their feet.', 'A snail can sleep for up to three years.', 'The Eiffel Tower grows about 15 cm taller in summer as the metal heats up.', 'Cows have best friends and get stressed when they’re apart.', 'Hot water can freeze faster than cold water. It’s called the Mpemba effect.', 'Some turtles can breathe through their bottoms.', 'The heart of a blue whale is about the size of a small car.', 'Penguins propose with a pebble.', 'Lightning is about five times hotter than the surface of the Sun.', 'Sea otters hold hands when they sleep so they don’t drift apart.', 'A cloud can weigh more than a million kilograms.', 'Humans share about 60% of their DNA with bananas.', 'Dolphins give each other names: a special whistle for each one.', 'The shortest war in history lasted about 38 minutes.', 'An ostrich’s eye is bigger than its brain.', 'Saturn would float in a bath big enough to hold it.', 'Hummingbirds are the only birds that can fly backwards.', 'Your nose can remember about 50,000 different smells.', 'Starfish have no brain and no blood.', 'There’s enough water in Lake Superior to cover North and South America 30 cm deep.', 'Wombats do cube-shaped poo.'];
@@ -2313,6 +2411,7 @@ function renderFunOverlay(o,full){
   if(o==='hero'){ if(full){ const st=A.heroStage;
       setStage('one','<section class="card night" style="align-items:center;text-align:center"><div class="row" style="justify-content:space-between;width:100%"><div class="eyebrow">Mystery Hero</div>'+(st==='shown'?'':backBtn('Back to the lesson'))+'</div>'+(st==='chosen'?'<h1 class="mid">Someone is our Mystery Hero</h1><p class="lead">I’ve secretly picked one person. Show our expectations all lesson, because it might be you!</p>'+ENVELOPE+'<div class="row" style="justify-content:center" id="heroBtns"><button class="btn gold" type="button" data-act="heroReveal">They earned it: reveal!</button><button class="btn alt" type="button" data-act="heroKeep">Keep it secret this time</button><button class="btn peek" type="button" data-peek="1">Hold to peek</button></div><p class="hint" style="color:#B8B0FF">Not earned? Keep it secret, so nobody is singled out.</p>':'<div class="pick spin" id="heroName" style="color:#FFD45C">…</div><div class="row" style="justify-content:center" id="heroBtns"></div>')+'</section>'); }
     return true; }
+  if(o==='rotationSetup'){ if(full) renderRotationSetup(); return true; }
   if(o==='rotate'){ renderRotate(full); return true; }
   if(o==='ticket'){ exitScreen(A.xo,full,null); return true; }
   if(o==='tpick'){ renderTicketPicker(full); return true; }
@@ -2358,7 +2457,7 @@ function openDMenu(btn){ const k=btn.dataset.menu, was=document.getElementById('
   const m=document.createElement('div'); m.id='dmenu'; m.className='dmenu'; m.dataset.for=k; m.setAttribute('role','menu');
   m.innerHTML=DMENUS[k].map(([t,l])=>'<button class="tool" type="button" role="menuitem" data-tool="'+t+'">'+esc(l||(A.pip?'Close floating window':'Float over my slides'))+'</button>').join('');
   document.body.appendChild(m); const r=btn.getBoundingClientRect(); m.style.left=Math.max(8,Math.min(r.left,innerWidth-m.offsetWidth-8))+'px'; m.style.bottom=(innerHeight-r.top+10)+'px'; btn.setAttribute('aria-expanded','true'); }
-document.addEventListener('click',e=>{ const mb=e.target.closest('[data-menu]'); if(mb){ openDMenu(mb); return; } if(document.getElementById('dmenu')) setTimeout(closeDMenu,0); });
+document.addEventListener('click',e=>{ const mb=e.target.closest('[data-menu]'); if(mb){ openDMenu(mb); return; } if(document.getElementById('dmenu')&&!e.target.closest('#dmenu')) setTimeout(closeDMenu,0); else if(e.target.closest('#dmenu [data-tool]')) setTimeout(closeDMenu,0); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDMenu(); });
 
 /* ---- v0.8.1: everything fits on screen, no scrollbars ---- */
@@ -2389,10 +2488,10 @@ document.addEventListener('change',e=>{ if(e.target.id==='cpName'){ A.phaseKey='
 function goHome(){ try{ if(typeof TOUR!=='undefined'&&TOUR) endTour(); }catch(_){} try{ if(A.attnClose) A.attnClose(); }catch(_){} try{ if(typeof RZ!=='undefined'&&RZ.on) rzEnd(); }catch(_){} try{ if(typeof rmkClose==='function'&&document.getElementById('rmkHost')) rmkClose(); }catch(_){}
   ['classpop','segpop','dmenu'].forEach(id=>{ const el=document.getElementById(id); if(el) el.remove(); });
   const sh=document.getElementById('sheetHost'); if(sh&&sh.innerHTML) closeSetup();
-  A.seatEdit=false; A.jobEdit=false; A.seatSel=null; A.qz=null; A.th=null;
-  if(A.overlay) closeOverlay(); else render(true); }
+  A.seatEdit=false; A.jobEdit=false; A.seatSel=null;
+  navBoard(); }
 document.addEventListener('click',e=>{ if(e.target.closest('#homeBtn')){ audio(); goHome(); } });
-document.addEventListener('keydown',e=>{ if(e.key!=='Escape') return; const tag=(e.target.tagName||'').toLowerCase(); if(tag==='input'||tag==='textarea'||tag==='select') return; if(typeof TOUR!=='undefined'&&TOUR) return; if(document.getElementById('classpop')||document.getElementById('segpop')) return; goHome(); });
+
 setInterval(()=>{ document.body.classList.toggle('at-home',!A.overlay&&!(document.getElementById('sheetHost')||{}).innerHTML); },500);
 
 /* ================= Ticket machine: entry and exit tickets (v0.4.1) ================= */
@@ -2475,7 +2574,7 @@ function ticketHTML(st){ const T=ticketById(st.id)||{t:'',b:''}; return '<div cl
 function machineHTML(st){ return '<div class="tm"><div class="tm-box"><div class="tm-face">'+birdSVG()+'</div><div class="tm-sign"><b>TAKE A<br>TICKET</b><span class="tm-led" id="tmLed">'+String(st.no).padStart(2,'0')+'</span></div><span class="tm-btn" id="tmBtn"></span></div><div class="tm-slot"></div><div class="tm-feed"><div class="tm-paper'+(st.mode==='done'?' out':'')+'" id="tmPaper">'+ticketHTML(st)+'</div></div></div>'; }
 function exitState(P){ if(P&&(P.phase==='exit'||P.phase==='entry')){ const key=P.block.id+'|'+P.phase; if(!A.xp||A.xp.key!==key) A.xp={key,kind:P.phase,id:((P.phase==='exit'?P.block.exitT:P.block.entryT)&&ticketById(P.phase==='exit'?P.block.exitT:P.block.entryT)?(P.phase==='exit'?P.block.exitT:P.block.entryT):pickTicket(P.phase)),no:ticketNo(),mode:'print'}; return A.xp; } return A.xo; }
 function exitScreen(st,full,P){ const live=!!P, K=TK[st.kind];
-  if(full){ setStage('two','<section class="card tmcard">'+machineHTML(st)+'</section><section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">'+esc(K.name)+(live?' · '+esc(P.block.name):'')+'</div>'+(live?'':backBtn())+'</div><h1 class="big">Take a ticket!</h1><p class="lead" style="font-size:clamp(20px,2vw,28px);color:var(--ink)">'+esc(K.hand)+'</p>'+(st.kind==='exit'?'<div class="trays"><span class="hint">Put it in the tray that matches how you went:</span><span style="--tc:#2F8F6B"><i></i>Got it</span><span style="--tc:#F5B700"><i></i>Nearly</span><span style="--tc:#E0524F"><i></i>Need help</span></div>':'')+'<div class="row" style="margin-top:auto;align-items:center"><div style="width:130px;flex:none">'+ringHTML('main','','sm')+'</div><button class="btn gold" type="button" data-act="point">+1 class point</button>'+(live?'<button class="btn" type="button" data-act="exitDone">We’re done</button>':'')+'</div><div class="row"><button class="btn alt" type="button" data-act="tChoose">Choose a ticket</button><button class="btn alt" type="button" data-act="exitAgain">Another ticket</button>'+(st.kind==='exit'?'<button class="btn alt" type="button" data-tool="packup">Pack up &amp; go</button>':'')+'</div></section>');
+  if(full){ setStage('two','<section class="card tmcard">'+machineHTML(st)+'</section><section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">'+esc(K.name)+(live?' · '+esc(P.block.name):'')+'</div>'+(live?'':backBtn('Finish ticket'))+'</div><h1 class="big">Take a ticket!</h1><p class="lead" style="font-size:clamp(20px,2vw,28px);color:var(--ink)">'+esc(K.hand)+'</p>'+(st.kind==='exit'?'<div class="trays"><span class="hint">Put it in the tray that matches how you went:</span><span style="--tc:#2F8F6B"><i></i>Got it</span><span style="--tc:#F5B700"><i></i>Nearly</span><span style="--tc:#E0524F"><i></i>Need help</span></div>':'')+'<div class="row" style="margin-top:auto;align-items:center"><div style="width:130px;flex:none">'+ringHTML('main','','sm')+'</div><button class="btn gold" type="button" data-act="point">+1 class point</button>'+(live?'<button class="btn" type="button" data-act="exitDone">We’re done</button>':'')+'</div><div class="row"><button class="btn alt" type="button" data-act="tChoose">Choose a ticket</button><button class="btn alt" type="button" data-act="exitAgain">Another ticket</button>'+(st.kind==='exit'?'<button class="btn alt" type="button" data-tool="packup">Pack up &amp; go</button>':'')+'</div></section>');
     if(st.mode==='print') runPrint(st); }
   if(live) paintRing('main',(P.to-P.mins)*60,(P.to-P.from)*60); else paintRing('main',MT.remaining(),MT.total); }
 function runPrint(st){ const tok=st.tok=Math.random(); const led=document.getElementById('tmLed'), btn=document.getElementById('tmBtn'); let n=0;
@@ -2493,7 +2592,7 @@ function renderTicketPicker(full){ if(!full) return; const tp=A.tp; if(tp.kind==
   setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Choose a ticket</h1><div class="row"><button class="btn gold" type="button" data-tuse="">Surprise me</button>'+backBtn()+'</div></div><div class="row"><button class="tab" type="button" data-tkind="entry" aria-selected="'+(tp.kind==='entry')+'">Entry tickets</button><button class="tab" type="button" data-tkind="exit" aria-selected="'+(tp.kind==='exit')+'">Exit tickets</button><span class="hint" style="margin-left:auto">Untick any you don’t want in the surprise mix.</span></div><div class="tgrid">'+L.map(x=>'<div class="tcard'+(off.includes(x.id)?' off':'')+'"><b>'+esc(x.t)+'</b><span>'+esc(x.b)+(x.l?' '+esc(x.l.join(' · ')):'')+'</span><div class="row" style="margin-top:auto;justify-content:space-between"><label class="chk" style="font-size:14px"><input type="checkbox" data-toff="'+x.id+'" '+(off.includes(x.id)?'':'checked')+'> In the mix</label><span class="row" style="gap:6px">'+(x.mine?'<button class="btn alt sm" type="button" data-tdel="'+x.id+'" aria-label="Delete">✕</button>':'')+'<button class="btn sm" type="button" data-tuse="'+x.id+'">Use</button></span></div></div>').join('')+'<div class="tcard add">'+(tp.form?'<input type="text" id="tNewT" placeholder="Title, e.g. Summary in a tweet" maxlength="40"><textarea id="tNewB" placeholder="What students do" style="min-height:80px" maxlength="200"></textarea><div class="row"><button class="btn sm" type="button" data-act="tAddSave">Add ticket</button><button class="btn alt sm" type="button" data-act="tAddCancel">Cancel</button></div>':'<button class="btn alt" type="button" data-act="tAdd" style="margin:auto">+ Write your own</button>')+'</div></div></section>'); }
 function useTicket(id){ const tp=A.tp; const kind=tp.kind; const pick=id||pickTicket(kind);
   if(tp.live&&A.P&&(A.P.phase===kind)){ const st=exitState(A.P); st.id=pick; st.no=ticketNo(); st.mode='print'; A.overlay=null; markTools(); A.phaseKey=phaseSig(A.P); render(true); return; }
-  MT.stop(); A.xo={kind,id:pick,no:ticketNo(),mode:'print'}; A.overlay='ticket'; markTools(); MT.start(EXIT_MIN*60,()=>chime(1)); render(true); }
+  if(!navPrepareStart('ticket')) return; MT.stop(); A.xo={kind,id:pick,no:ticketNo(),mode:'print'}; A.overlay='ticket'; markTools(); MT.start(EXIT_MIN*60,()=>chime(1)); render(true); }
 document.addEventListener('click',e=>{ const t=e.target.closest('[data-tuse],[data-tkind],[data-tdel],[data-bpick],[data-bkind]'); if(!t||t.closest('#sheetHost')) return;
   if(t.dataset.tuse!==undefined) return useTicket(t.dataset.tuse);
   if(t.dataset.tkind){ A.tp.kind=t.dataset.tkind; A.tp.form=false; render(true); return; }
@@ -2512,7 +2611,20 @@ const BCATS=[['all','All'],['movement','Move'],['calm','Calm'],['game','Games'],
 function bcatOf(b){ return b.breath?'calm':b.type; }
 function renderBrainPicker(full){ if(!full) return; const off=S.breakOff||[]; const cat=A.bcat||'all'; const L=BREAKS.filter(b=>!b.breath&&(cat==='all'||bcatOf(b)===cat)).map(b=>brainBreakVariant(b));
   const tabs='<div class="row bcats" role="tablist">'+BCATS.filter(([k])=>k==='all'||BREAKS.some(b=>bcatOf(b)===k)).map(([k,l])=>'<button type="button" role="tab" aria-selected="'+(k===cat)+'" class="chip bcat'+(k===cat?' on':'')+'" data-bcat="'+k+'">'+l+' <small>'+(k==='all'?BREAKS.filter(b=>!b.breath).length+1:BREAKS.filter(b=>bcatOf(b)===k&&!b.breath).length+(k==='calm'?1:0))+'</small></button>').join('')+'</div>';
-  setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Brain breaks</h1><div class="row"><button class="btn gold" type="button" data-bpick="">Surprise me</button>'+backBtn()+'</div></div>'+tabs+'<p class="hint" style="margin:0">Untick any you don’t want in the surprise mix.</p><div class="tgrid">'+L.map(b=>'<div class="tcard'+(off.includes(b.id)?' off':'')+'"><span class="chip" style="align-self:flex-start;font-size:13px;padding:3px 10px">'+esc({movement:'Move',calm:'Calm',game:'Game',primer:'Primer',video:'Video'}[b.type]||'Break')+' · '+Math.round(b.secs/60*10)/10+' min</span><b>'+esc(b.name)+'</b><span>'+esc(b.how)+'</span><div class="row" style="margin-top:auto;justify-content:space-between"><label class="chk" style="font-size:14px"><input type="checkbox" data-boff="'+b.id+'" '+(off.includes(b.id)?'':'checked')+'> In the mix</label><button class="btn sm" type="button" data-bpick="'+b.id+'">Start</button></div></div>').join('')+((cat==='all'||cat==='calm')?'<div class="tcard"><span class="chip" style="align-self:flex-start;font-size:13px;padding:3px 10px">Calm · 1 min</span><b>Calm breathing</b><span>Breathe in as the circle grows, out as it shrinks.</span><div class="row" style="margin-top:auto;justify-content:flex-end"><button class="btn sm" type="button" data-tool="calm">Start</button></div></div>':'')+'</div></section>'); }
+  setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Brain breaks</h1><div class="row"><button class="btn gold" type="button" data-bpick="">Surprise me</button>'+backBtn()+'</div></div><details data-brain-settings><summary class="btn alt sm">Brain break settings</summary>'+brainBreakSettingsHTML()+'</details>'+tabs+'<p class="hint" style="margin:0">Untick any you don’t want in the surprise mix.</p><div class="tgrid">'+L.map(b=>'<div class="tcard'+(off.includes(b.id)?' off':'')+'"><span class="chip" style="align-self:flex-start;font-size:13px;padding:3px 10px">'+esc({movement:'Move',calm:'Calm',game:'Game',primer:'Primer',video:'Video'}[b.type]||'Break')+' · '+Math.round(b.secs/60*10)/10+' min</span><b>'+esc(b.name)+'</b><span>'+esc(b.how)+'</span><div class="row" style="margin-top:auto;justify-content:space-between"><label class="chk" style="font-size:14px"><input type="checkbox" data-boff="'+b.id+'" '+(off.includes(b.id)?'':'checked')+'> In the mix</label><button class="btn sm" type="button" data-bpick="'+b.id+'">Start</button></div></div>').join('')+((cat==='all'||cat==='calm')?'<div class="tcard"><span class="chip" style="align-self:flex-start;font-size:13px;padding:3px 10px">Calm · 1 min</span><b>Calm breathing</b><span>Breathe in as the circle grows, out as it shrinks.</span><div class="row" style="margin-top:auto;justify-content:flex-end"><button class="btn sm" type="button" data-tool="calm">Start</button></div></div>':'')+'</div></section>'); }
+
+/* FEATURE_SETTINGS_START */
+document.addEventListener('input',e=>{
+  const el=e.target; if(!el.closest('#stage')||A.overlay!=='rotationSetup') return;
+  if(el.id==='fStations'){ S.stations=el.value; A.groups=[]; save(); }
+  if(el.id==='fRotMin'){ S.rotMin=Math.max(2,Math.min(40,+el.value||12)); save(); }
+  if(el.id==='fStations'||el.id==='fRotMin'){ const summary=document.querySelector('[data-rotation-summary]'); if(summary) summary.textContent=stationsList().length+' stations · '+S.rotMin+' minutes at each'; }
+});
+document.addEventListener('change',e=>{
+  const el=e.target; if(el.id==='fKeepEveryoneInGame'&&el.closest('#stage')){ S.keepEveryoneInGame=el.checked; save(); render(true); const field=document.querySelector('#stage #fKeepEveryoneInGame'); if(field){ field.closest('details').open=true; field.focus({preventScroll:true}); } }
+});
+
+/* FEATURE_SETTINGS_END */
 /* ---- Quick reflections (whole class, no writing) ---- */
 const REFLECT=[
  {id:'fist',name:'Fist to five',blurb:'Show how well you understand, then plan your next step.',steps:[
@@ -2541,15 +2653,15 @@ const REFLECT=[
    ['Send the wave!','Say your word, then the next person goes. Keep it moving!',60],
    ['Which words did we hear most?','Hands up if you heard the same word more than once.',10]]}
 ];
-function startReflect(id){ const off=S.reflectOff||[]; let pool=REFLECT.filter(r=>!off.includes(r.id)); if(!pool.length) pool=REFLECT; const r=(id&&REFLECT.find(x=>x.id===id))||rnd(pool); clearActivity(); A.rf={id:r.id,i:0}; A.overlay='reflect'; markTools(); rfStep(); }
+function startReflect(id){ const off=S.reflectOff||[]; let pool=REFLECT.filter(r=>!off.includes(r.id)); if(!pool.length) pool=REFLECT; const r=(id&&REFLECT.find(x=>x.id===id))||rnd(pool); if(!navPrepareStart('reflect')) return; clearActivity(); A.rf={id:r.id,i:0}; A.overlay='reflect'; markTools(); rfStep(); }
 function rfStep(){ const r=REFLECT.find(x=>x.id===A.rf.id), st=r.steps[A.rf.i]; chime(1); MT.start(st[2],()=>{ if(A.rf.i<r.steps.length-1){ A.rf.i++; rfStep(); } else { A.rf.done=true; MT.stop(); render(true); celebrate('Nice reflecting!','small'); } }); if(A.rf.i===0) Bird.say('Reflection time!'); render(true); }
 function renderReflect(full){ const R=A.rf, r=REFLECT.find(x=>x.id===R.id), st=r.steps[R.i];
-  if(full){ setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Quick reflection · '+esc(r.name)+'</div><div class="row"><button class="btn alt sm" type="button" data-act="rfMenu">All reflections</button>'+backBtn('Stop')+'</div></div>'+(R.done?'<h1 class="big">Nice reflecting!</h1><p class="lead">Thinking about your learning helps it stick.</p>':'<h1 class="big">'+esc(st[0])+'</h1>'+(st[1]?'<p class="lead" style="font-size:clamp(22px,2.2vw,32px);color:var(--ink)">'+esc(st[1])+'</p>':''))+'<div class="rfdots">'+r.steps.map((_,i)=>'<i class="'+(R.done||i<R.i?'done':i===R.i?'cur':'')+'"></i>').join('')+'</div></section><aside class="side"><section class="card sm" style="align-items:center">'+(R.done?'<div class="bigbird" style="width:190px">'+birdSVG()+'</div>':ringHTML('main','this step','md'))+'</section><div class="row">'+(R.done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-act="rfAgain">Another one</button>':'<button class="btn" type="button" data-act="rfNext">Next</button>'+(R.i>0?'<button class="btn alt" type="button" data-act="rfBack">Back</button>':''))+'</div></aside>'); }
+  if(full){ setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Quick reflection · '+esc(r.name)+'</div><div class="row"><button class="btn alt sm" type="button" data-act="rfMenu">All reflections</button>'+backBtn(R.done?'Finish reflection':'Stop reflection')+'</div></div>'+(R.done?'<h1 class="big">Nice reflecting!</h1><p class="lead">Thinking about your learning helps it stick.</p>':'<h1 class="big">'+esc(st[0])+'</h1>'+(st[1]?'<p class="lead" style="font-size:clamp(22px,2.2vw,32px);color:var(--ink)">'+esc(st[1])+'</p>':''))+'<div class="rfdots">'+r.steps.map((_,i)=>'<i class="'+(R.done||i<R.i?'done':i===R.i?'cur':'')+'"></i>').join('')+'</div></section><aside class="side"><section class="card sm" style="align-items:center">'+(R.done?'<div class="bigbird" style="width:190px">'+birdSVG()+'</div>':ringHTML('main','this step','md'))+'</section><div class="row">'+(R.done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-act="rfAgain">Another one</button>':'<button class="btn" type="button" data-act="rfNext">'+(R.i<r.steps.length-1?'Next step':'Finish reflection')+'</button>'+(R.i>0?'<button class="btn alt" type="button" data-act="rfBack">Previous step</button>':''))+'</div></aside>'); }
   if(!R.done) paintRing('main',MT.remaining(),MT.total); }
-function reflectAct(a){ if(a==='rfNext'){ const r=REFLECT.find(x=>x.id===A.rf.id); if(A.rf.i<r.steps.length-1){ A.rf.i++; rfStep(); } else { MT.stop(); A.rf.done=true; render(true); celebrate('Nice reflecting!','small'); } return true; }
+function reflectAct(a){ if(a==='rfNext'){ const r=REFLECT.find(x=>x.id===A.rf.id); if(A.rf.i<r.steps.length-1){ A.rf.i++; rfStep(); } else { MT.stop(); A.rf.done=true; navStopActivity(); celebrate('Nice reflecting!','small'); } return true; }
   if(a==='rfBack'){ if(A.rf.i>0){ A.rf.i--; rfStep(); } return true; }
   if(a==='rfAgain'){ startReflect(null); return true; }
-  if(a==='rfMenu'){ MT.stop(); A.rf=null; openOverlay('rpick'); return true; }
+  if(a==='rfMenu'){ openOverlay('rpick'); return true; }
   return false; }
 document.addEventListener('click',e=>{ const t=e.target.closest('[data-rfstart]'); if(t&&!t.closest('#sheetHost')) startReflect(t.dataset.rfstart||null); });
 document.addEventListener('change',e=>{ const el=e.target; if(el.dataset&&el.dataset.rfoff){ const off=new Set(S.reflectOff||[]); el.checked?off.delete(el.dataset.rfoff):off.add(el.dataset.rfoff); S.reflectOff=[...off]; save(); const c=el.closest('.tcard'); if(c) c.classList.toggle('off',!el.checked); } });
@@ -2601,19 +2713,19 @@ const THINK=[
    ['What changed it?','What made your thinking change?','My thinking changed because…',60]]}
 ];
 const thinkR=id=>THINK.find(x=>x.id===id);
-function startThink(id){ const off=S.thinkOff||[]; let pool=THINK.filter(r=>!off.includes(r.id)); if(!pool.length) pool=THINK; const r=(id&&thinkR(id))||rnd(pool); clearActivity(); A.th={id:r.id,i:0}; A.overlay='think'; markTools(); thStep(); Bird.say('Thinking caps on!'); }
+function startThink(id){ const off=S.thinkOff||[]; let pool=THINK.filter(r=>!off.includes(r.id)); if(!pool.length) pool=THINK; const r=(id&&thinkR(id))||rnd(pool); if(!navPrepareStart('think')) return; clearActivity(); A.th={id:r.id,i:0}; A.overlay='think'; markTools(); thStep(); Bird.say('Thinking caps on!'); }
 function thStep(){ const st=thinkR(A.th.id).steps[A.th.i]; A.th.up=false; chime(1); MT.start(st[3],()=>{ A.th.up=true; chime(2); Bird.say('Time! Ready for the next step?'); render(true); }); render(true); }
-function thNext(){ const r=thinkR(A.th.id); if(A.th.i<r.steps.length-1){ A.th.i++; thStep(); } else { MT.stop(); A.th.done=true; render(true); celebrate('Great thinking!','small'); } }
+function thNext(){ const r=thinkR(A.th.id); if(A.th.i<r.steps.length-1){ A.th.i++; thStep(); } else { MT.stop(); A.th.done=true; navStopActivity(); celebrate('Great thinking!','small'); } }
 function renderThink(full){ const R=A.th, r=thinkR(R.id), st=r.steps[R.i], f=(S.thinkFocus||'').trim();
   if(full){ const chart='<div class="thchart">'+r.steps.map((s,i)=>'<div class="thbox '+(R.done||i<R.i?'done':i===R.i?'cur':'')+'"><b>'+esc(s[0])+'</b>'+(s[2]?'<span>'+esc(s[2])+'</span>':'')+'</div>').join('')+'</div>';
-    setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Thinking routine · '+esc(r.name)+'</div><div class="row"><button class="btn alt sm" type="button" data-act="thMenu">All routines</button>'+backBtn('Stop')+'</div></div>'+(f?'<div class="thfocus"><small>We’re thinking about</small>'+esc(f)+'</div>':'')+(R.done?'<h1 class="big">Great thinking!</h1><p class="lead">Your thinking is on the wall now. Keep it there and come back to it.</p>':'<h1 class="big">'+esc(st[0])+'</h1><p class="lead" style="font-size:clamp(22px,2.2vw,32px);color:var(--ink)">'+esc(st[1])+'</p>'+(st[2]?'<div class="thstem">'+esc(st[2])+'</div>':''))+chart+'</section><aside class="side"><section class="card sm" style="align-items:center">'+(R.done?'<div class="bigbird" style="width:190px">'+birdSVG()+'</div>':ringHTML('main',R.up?'time’s up':'thinking time','md'))+(R.done?'':'<div class="row" style="justify-content:center"><button class="btn alt sm" type="button" data-act="thPause">'+(MT.running?'Pause':'Resume')+'</button><button class="btn alt sm" type="button" data-act="thMore">+1 min</button></div>')+'</section><div class="row">'+(R.done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-act="thMenu">Another routine</button>':'<button class="btn" type="button" data-act="thNext">'+(R.i<r.steps.length-1?'Next step':'Finish')+'</button>'+(R.i>0?'<button class="btn alt" type="button" data-act="thBack">Back</button>':''))+'</div></aside>'); }
+    setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Thinking routine · '+esc(r.name)+'</div><div class="row"><button class="btn alt sm" type="button" data-act="thMenu">All routines</button>'+backBtn('Stop')+'</div></div>'+(f?'<div class="thfocus"><small>We’re thinking about</small>'+esc(f)+'</div>':'')+(R.done?'<h1 class="big">Great thinking!</h1><p class="lead">Your thinking is on the wall now. Keep it there and come back to it.</p>':'<h1 class="big">'+esc(st[0])+'</h1><p class="lead" style="font-size:clamp(22px,2.2vw,32px);color:var(--ink)">'+esc(st[1])+'</p>'+(st[2]?'<div class="thstem">'+esc(st[2])+'</div>':''))+chart+'</section><aside class="side"><section class="card sm" style="align-items:center">'+(R.done?'<div class="bigbird" style="width:190px">'+birdSVG()+'</div>':ringHTML('main',R.up?'time’s up':'thinking time','md'))+(R.done?'':'<div class="row" style="justify-content:center"><button class="btn alt sm" type="button" data-act="thPause">'+(MT.running?'Pause':'Resume')+'</button><button class="btn alt sm" type="button" data-act="thMore">+1 min</button></div>')+'</section><div class="row">'+(R.done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-act="thMenu">Another routine</button>':'<button class="btn" type="button" data-act="thNext">'+(R.i<r.steps.length-1?'Next step':'Finish')+'</button>'+(R.i>0?'<button class="btn alt" type="button" data-act="thBack">Previous step</button>':''))+'</div></aside>'); }
   if(!R.done) paintRing('main',MT.remaining(),MT.total); }
 function thinkAct(a){ if(!A.th&&a!=='thMenu') return false;
   if(a==='thNext'){ thNext(); return true; }
   if(a==='thBack'){ if(A.th.i>0){ A.th.i--; thStep(); } return true; }
   if(a==='thPause'){ MT.running?MT.pause():MT.resume(); render(true); return true; }
   if(a==='thMore'){ MT.add(60); if(A.th.up){ A.th.up=false; MT.onDone=()=>{ A.th.up=true; chime(2); render(true); }; MT.resume(); } render(true); return true; }
-  if(a==='thMenu'){ MT.stop(); A.th=null; openOverlay('thpick'); return true; }
+  if(a==='thMenu'){ openOverlay('thpick'); return true; }
   return false; }
 document.addEventListener('click',e=>{ const t=e.target.closest('[data-thstart]'); if(t&&!t.closest('#sheetHost')) startThink(t.dataset.thstart||null); });
 document.addEventListener('change',e=>{ const el=e.target; if(el.dataset&&el.dataset.thoff){ const off=new Set(S.thinkOff||[]); el.checked?off.delete(el.dataset.thoff):off.add(el.dataset.thoff); S.thinkOff=[...off]; save(); const c=el.closest('.tcard'); if(c) c.classList.toggle('off',!el.checked); } });
@@ -2626,9 +2738,9 @@ const TEAMC=[['Rockets','#F5B700'],['Comets','#2F8F6B'],['Dragons','#2F7FB0'],['
 const tChip=(i,on)=>'<button class="tchip'+(on?' on':'')+'" type="button" data-g="team" data-v="'+i+'" style="--tc:'+TEAMC[i][1]+'"><i></i>'+esc(TEAMC[i][0])+'</button>';
 
 /* Pack up & go: first ready, first out */
-function openPackup(){ clearActivity(); A.pk={out:[],call:''}; A.overlay='packup'; markTools(); MT.start(60,()=>{ chime(1); Music.fadeStop(); Bird.say('Packed up? Stand behind your chair.'); render(true); }); Music.play('move'); Bird.say('Pack up time!'); render(true); }
+function openPackup(){ if(!navPrepareStart('packup')) return; clearActivity(); A.pk={out:[],call:''}; A.overlay='packup'; markTools(); MT.start(60,()=>{ chime(1); Music.fadeStop(); Bird.say('Packed up? Stand behind your chair.'); render(true); }); Music.play('move'); Bird.say('Pack up time!'); render(true); }
 function renderPackup(full){ const n=S.tables||6, P=A.pk;
-  if(full) setStage('two','<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Pack up &amp; go</div>'+backBtn('Done')+'</div><h1 class="mid" style="color:var(--gum-d)">Pack up, then stand behind your chair</h1><ol class="steps pksteps"><li><span class="n">1</span><span>Books and pencils away</span></li><li><span class="n">2</span><span>Rubbish off the floor</span></li><li><span class="n">3</span><span>Chair tucked in, stand behind it</span></li><li><span class="n">4</span><span>Quiet and ready</span></li></ol><div class="row" style="margin-top:auto;align-items:center"><div style="width:130px;flex:none">'+ringHTML('main','pack-up','sm')+'</div><p class="lead" style="margin:0">First ready, first out!</p></div></section><section class="card"><div class="row" style="justify-content:space-between"><h2 class="mid" style="color:var(--gum-d)">Who’s ready?</h2><div class="row"><button class="btn alt sm" type="button" data-g="tables" data-v="-1" aria-label="Fewer tables">−</button><span class="hint">'+n+' tables</span><button class="btn alt sm" type="button" data-g="tables" data-v="1" aria-label="More tables">+</button></div></div><p class="hint" style="margin:0">Tap a table when it’s packed and quiet.</p>'+(P.call?'<div class="call flash" id="pkCall">'+esc(P.call)+'</div>':'')+'<div class="pkgrid">'+Array.from({length:n},(_,i)=>{ const k=P.out.indexOf(i); return '<button class="pkt'+(k>=0?' out':'')+'" type="button" data-g="pkgo" data-v="'+i+'" style="--tc:'+CREWD[i%CREWD.length]+';--tl:'+CREWC[i%CREWC.length]+'"><b>Table '+(i+1)+'</b><span>'+(k>=0?'Out · '+(['1st','2nd','3rd'][k]||(k+1)+'th'):'Waiting')+'</span></button>'; }).join('')+'</div><div class="row" style="margin-top:auto"><button class="btn gold" type="button" data-g="pkall">Everyone else, off you go</button></div></section>');
+  if(full) setStage('two','<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Pack up &amp; go</div>'+backBtn('Finish pack up')+'</div><h1 class="mid" style="color:var(--gum-d)">Pack up, then stand behind your chair</h1><ol class="steps pksteps"><li><span class="n">1</span><span>Books and pencils away</span></li><li><span class="n">2</span><span>Rubbish off the floor</span></li><li><span class="n">3</span><span>Chair tucked in, stand behind it</span></li><li><span class="n">4</span><span>Quiet and ready</span></li></ol><div class="row" style="margin-top:auto;align-items:center"><div style="width:130px;flex:none">'+ringHTML('main','pack-up','sm')+'</div><p class="lead" style="margin:0">First ready, first out!</p></div></section><section class="card"><div class="row" style="justify-content:space-between"><h2 class="mid" style="color:var(--gum-d)">Who’s ready?</h2><div class="row"><button class="btn alt sm" type="button" data-g="tables" data-v="-1" aria-label="Fewer tables">−</button><span class="hint">'+n+' tables</span><button class="btn alt sm" type="button" data-g="tables" data-v="1" aria-label="More tables">+</button></div></div><p class="hint" style="margin:0">Tap a table when it’s packed and quiet.</p>'+(P.call?'<div class="call flash" id="pkCall">'+esc(P.call)+'</div>':'')+'<div class="pkgrid">'+Array.from({length:n},(_,i)=>{ const k=P.out.indexOf(i); return '<button class="pkt'+(k>=0?' out':'')+'" type="button" data-g="pkgo" data-v="'+i+'" style="--tc:'+CREWD[i%CREWD.length]+';--tl:'+CREWC[i%CREWC.length]+'"><b>Table '+(i+1)+'</b><span>'+(k>=0?'Out · '+(['1st','2nd','3rd'][k]||(k+1)+'th'):'Waiting')+'</span></button>'; }).join('')+'</div><div class="row" style="margin-top:auto"><button class="btn gold" type="button" data-g="pkall">Everyone else, off you go</button></div></section>');
   paintRing('main',MT.remaining(),MT.total); }
 
 /* Finished? check first, then choose */
@@ -2728,20 +2840,41 @@ function planExtrasHTML(b){ if(b.kind!=='lesson') return '';
 /* ---- v0.8.2: tap a subject in the day list ---- */
 function segInfo(x){ const b=x.b, L=[]; if(b.materials) L.push('Get out: '+b.materials); if(S.expect[b.exp]) L.push('Expectations: '+S.expect[b.exp].name);
   const R0=b.startR&&routineById(b.startR), R1=b.endR&&routineById(b.endR); if(R0) L.push('Starts with: '+R0.name); if(b.kind==='lesson'){ if(b.entry) L.push('Entry ticket'+(b.entryT&&ticketById(b.entryT)?': '+ticketById(b.entryT).t:'')); const at=v=>v==='start'?'at the start':v==='end'?'at the end':'after '+v+' min'; if(b.bbAt) L.push(cueLabel('brain:'+(b.bbId||'any'))+' '+at(b.bbAt)); if(b.acAt) L.push(cueLabel(b.acW||'think:any')+' '+at(b.acAt)); if(b.exit) L.push('Exit ticket'+(b.exitT&&ticketById(b.exitT)?': '+ticketById(b.exitT).t:'')); } if(R1) L.push('Ends with: '+R1.name); return L; }
-function closeSegPop(){ const p=document.getElementById('segpop'); if(p) p.remove(); }
-function openSegPop(el){ closeSegPop(); const P=A.P||phaseAt(now()); const day=P.day||computeDay(now()); const x=day[+el.dataset.seg]; if(!x) return; A.segX=x;
-  const L=segInfo(x), m=document.createElement('div'); m.id='segpop'; m.className='segpop'; m.setAttribute('role','dialog');
-  m.innerHTML='<small>'+fmtClock(x.st)+' – '+fmtClock(x.en)+'</small><b>'+esc(x.b.name)+'</b>'+(L.length?'<ul>'+L.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'<span class="hint">Nothing planned yet.</span>')+'<div class="row">'+(x.b.startR&&routineById(x.b.startR)?'<button class="btn gold sm" type="button" data-run="'+x.b.startR+'" data-sprun="1">Run '+esc(routineById(x.b.startR).name)+' now</button>':'')+'<button class="btn sm" type="button" data-sp="show">Show on the board</button><button class="btn alt sm" type="button" data-sp="edit">Edit</button></div>';
+let segOpenerIndex=null;
+function closeSegPop(){
+  const popup=document.getElementById('segpop'), restore=popup&&popup.contains(document.activeElement);
+  if(popup) popup.remove();
+  const opener=segOpenerIndex!==null&&document.querySelector('[data-seg="'+segOpenerIndex+'"]');
+  if(opener){ opener.setAttribute('aria-expanded','false'); if(restore) opener.focus({preventScroll:true}); }
+}
+function openSegPop(el){ closeSegPop(); const P=phaseAt(now()); const day=P.day||computeDay(now()); const x=day[+el.dataset.seg]; if(!x) return; A.segSelection=x;
+  const L=segInfo(x), m=document.createElement('div'); m.id='segpop'; m.className='segpop'; m.setAttribute('role','dialog'); m.setAttribute('aria-label','Lesson details'); segOpenerIndex=el.dataset.seg; el.setAttribute('aria-expanded','true');
+  m.innerHTML='<small>'+fmtClock(x.st)+' – '+fmtClock(x.en)+'</small><b>'+esc(x.b.name)+'</b>'+(L.length?'<ul>'+L.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'<span class="hint">Nothing planned yet.</span>')+'<div class="row">'+(x.b.startR&&routineById(x.b.startR)?'<button class="btn gold sm" type="button" data-run="'+x.b.startR+'" data-sprun="1">Run '+esc(routineById(x.b.startR).name)+' now</button>':'')+'<button class="btn sm" type="button" data-sp="show">Preview on board</button><button class="btn alt sm" type="button" data-sp="edit">Edit lesson</button><button class="btn alt sm" type="button" data-sp="close">Close</button></div>';
   document.body.appendChild(m); const r=el.getBoundingClientRect(); const side=document.body.classList.contains('tl-side');
-  if(side){ m.style.left=(r.right+12)+'px'; m.style.top=Math.max(8,Math.min(r.top,innerHeight-m.offsetHeight-8))+'px'; } else { m.style.left=Math.max(8,Math.min(r.left,innerWidth-m.offsetWidth-8))+'px'; m.style.top=(r.bottom+8)+'px'; } }
+  m.style.left=Math.max(8,Math.min(side?r.right+12:r.left,innerWidth-m.offsetWidth-8))+'px';
+  m.style.top=Math.max(8,Math.min(side?r.top:r.bottom+8,innerHeight-m.offsetHeight-8))+'px';
+  const first=m.querySelector('button'); if(first) first.focus({preventScroll:true}); }
+/* TIMETABLE_EDIT_START */
+function timetableEditTarget(days,regularDay,oneOffDay,block){
+  const day=oneOffDay&&Array.isArray(days[oneOffDay])?oneOffDay:regularDay;
+  const index=(days[day]||[]).findIndex(item=>item===block||item.id===block.id);
+  return {day,index};
+}
+function editTimetableBlock(block){
+  const target=timetableEditTarget(S.days,isWeekend(now())?'mon':dayKey(now()),typeof onceKey==='function'?onceKey(now()):null,block);
+  if(target.index<0){ toast('This lesson is no longer in the current day plan. Open Setup to review it.'); return; }
+  editDay=target.day; planOpen=target.index; tab='plan'; openSetup();
+  requestAnimationFrame(()=>{ const row=document.querySelector('.prow[data-i="'+planOpen+'"]'); if(row){ row.scrollIntoView({block:'center'}); const field=row.querySelector('[data-f="name"]'); if(field) field.focus({preventScroll:true}); } });
+}
+/* TIMETABLE_EDIT_END */
 function renderPeek(full){ if(!full) return; const x=A.segX; if(!x) return; const b=x.b, R0=b.startR&&routineById(b.startR), L=segInfo(x).filter(t=>!t.startsWith('Get out')&&!t.startsWith('Expectations')&&!(R0&&t==='Starts with: '+R0.name));
   const when=x.st>(A.P?A.P.mins:0)?'Coming up at '+fmtClock(x.st):fmtClock(x.st)+' – '+fmtClock(x.en);
-  const main='<section class="card" style="align-items:flex-start"><div class="row" style="justify-content:space-between;width:100%"><div class="eyebrow">'+when+'</div><div class="row">'+(R0?'<button class="btn sm" type="button" data-run="'+R0.id+'">Run '+esc(R0.name)+' now</button>':'')+backBtn('Back')+'</div></div><h1 class="big">'+esc(b.name)+'</h1>'+(b.materials?'<div class="task">'+esc(b.materials)+'</div>':'')+(R0?stepsHTML(stepsOf(R0),-1):'')+expHTML(b.exp)+(L.length?'<ul class="flist" style="font-size:clamp(18px,1.7vw,24px)">'+L.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'')+'</section>';
+  const main='<section class="card" style="align-items:flex-start"><div class="row" style="justify-content:space-between;width:100%"><div class="eyebrow">'+when+'</div><div class="row">'+(R0?'<button class="btn sm" type="button" data-run="'+R0.id+'">Run '+esc(R0.name)+' now</button>':'')+backBtn('Back')+'</div></div><h1 class="big">'+esc(b.name)+'</h1>'+(A.returnedLesson?'<p class="hint">The timetable has moved on. This is the lesson you returned to. Home shows your current board.</p>':'')+(b.materials?'<div class="task">'+esc(b.materials)+'</div>':'')+(R0?stepsHTML(stepsOf(R0),-1):'')+expHTML(b.exp)+(L.length?'<ul class="flist" style="font-size:clamp(18px,1.7vw,24px)">'+L.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'')+'</section>';
   if(R0&&R0.checkin) setStage('', main+'<aside class="side"><section class="card sm">'+weatherHTML()+'</section>'+factHTML()+'</aside>');
   else setStage('one', main); }
-document.addEventListener('click',e=>{ const sp=e.target.closest('[data-sp]'); if(sp){ const a=sp.dataset.sp, x=A.segX; closeSegPop(); audio();
-    if(a==='show'){ clearActivity(); A.overlay='peek'; markTools(); render(true); }
-    if(a==='edit'&&x){ editDay=isWeekend(now())?'mon':dayKey(now()); tab='plan'; openSetup(); setTimeout(()=>{ const i=(S.days[editDay]||[]).indexOf(x.b); const row=document.querySelector('.prow[data-i="'+i+'"]'); if(row){ row.scrollIntoView({block:'center'}); row.classList.add('flashrow'); } },120); }
+document.addEventListener('click',e=>{ const sp=e.target.closest('[data-sp]'); if(sp){ const a=sp.dataset.sp, x=A.segSelection; closeSegPop(); audio();
+    if(a==='show'&&x){ if(A.overlay==='peek') navRemember('peek'); A.segX=x; A.returnedLesson=false; openOverlay('peek'); }
+    if(a==='edit'&&x) editTimetableBlock(x.b);
     return; }
   const sg=e.target.closest('[data-seg]'); if(sg){ audio(); openSegPop(sg); return; }
   if(!e.target.closest('#segpop')||e.target.closest('[data-sprun]')) setTimeout(closeSegPop,0); });
@@ -3052,7 +3185,7 @@ const INTENTS=[
  {id:'brain',names:()=>BREAKS.filter(x=>!x.breath).map(x=>x.name),k:[[/ (get up|up and move|get moving|move our bodies|on our feet|stand up and) /,2.2],[/ (a |some )?(breath|breaths|deep breath) /,1.6],[/ something (calm|quiet|calming|active|fun|different|relaxing|to move) /,2.2],[/ (calm|quiet) (down|time|moment|one) /,1.3],[/ brain ?breaks? /,3],[/ (break|breaks) /,1.4],[/ (wiggle|wiggles|stretch|stretching|energi[sz]er|shake (it )?out|get (them|us|everyone|the kids) moving|movement break|move around|dance|dancing) /,1.8],[/ (restless|fidgety|tired|sleepy|flat|zoned out|need (a )?(reset|break|breather)) /,1.4],[/ breathing|breathe|mindful(ness)? /,1.4],[/ (play|do) (a |some )?game /,1.2]],
   run(s){ const b=nFind(s,BREAKS.filter(x=>!x.breath),'name'); goHome(); if(b){ startBrain(null,b.id); return b.name+'!'; } const t=BTYPE(s); startBrain(t); return t==='calm'?'A calm one.':t==='movement'?'Let’s move!':'Brain break time!'; }},
  {id:'timer',k:[[/ timer /,3],[/ \d+ (minutes?|seconds?|hours?) /,2],[/ count ?down /,2.5],[/ (set|start) (a |the )?(clock|time) /,2]],
-  run(s){ if(/ (stop|cancel|clear|turn off|end) (the )?timer /.test(s)){ MT.stop(); render(true); return 'Timer stopped.'; }
+  run(s){ if(/ (stop|cancel|clear|turn off|end) (the )?timer /.test(s)){ navStopActivity(); return 'Timer stopped.'; }
    if(/ (add|more|extra|another|give (them|us) (an )?(extra|more)) /.test(s)&&MT.add){ const d=nDur(s)||60; MT.add(d); render(true); return 'Added '+(d%60?d+' seconds':mm(d/60))+'.'; }
    if(/ (take off|take away|less|minus|remove|knock off) /.test(s)&&MT.add){ const d=nDur(s)||60; MT.add(-d); render(true); return 'Took off '+(d%60?d+' seconds':mm(d/60))+'.'; }
    const d=nDur(s)||300; goHome(); tool('timer'); setTimeout(()=>vclick({'data-timer':d}),60); return (d%60?d+' seconds':mm(d/60))+'. Go!'; }},
@@ -3828,7 +3961,7 @@ document.addEventListener('click',e=>{ if(e.target.closest('[data-wzopen]')){ au
 if(!STUDENT&&/[?&]demo\b/.test(location.search)) setTimeout(()=>{ try{ S.wizDone=true; startDemo(); }catch(_){ } },400);
 
 /* ---- v2.2: teacher phone remote. The board pairs with a phone via QR; commands travel through Roomie's server with a secret key that stays in the link. ---- */
-const RM_CMDS={attention:()=>attention(),reset:()=>resetRoom(),point:()=>act('point'),pick:()=>{ goHome(); act('pick'); },quiet:()=>pickQuiet(),brain:()=>nluRun(' brain break '),checkin:()=>nluRun(' how is everyone feeling '),exit:()=>nluRun(' lets do an exit ticket '),packup:()=>nluRun(' time to pack up '),plus5:()=>act('plus5'),startnow:()=>SCHED.paused||SCHED.pending?switchToTimetable():act('startNow'),home:()=>goHome(),mark:()=>{ if(typeof mirMarkPart==='function') mirMarkPart('toggle'); },timerstop:()=>{ MT.stop(); render(true); },
+const RM_CMDS={attention:()=>attention(),reset:()=>resetRoom(),point:()=>act('point'),pick:()=>{ goHome(); act('pick'); },quiet:()=>pickQuiet(),brain:()=>nluRun(' brain break '),checkin:()=>nluRun(' how is everyone feeling '),exit:()=>nluRun(' lets do an exit ticket '),packup:()=>nluRun(' time to pack up '),plus5:()=>act('plus5'),startnow:()=>SCHED.paused||SCHED.pending?switchToTimetable():act('startNow'),home:()=>goHome(),mark:()=>{ if(typeof mirMarkPart==='function') mirMarkPart('toggle'); },timerstop:()=>navStopActivity(),
   timer:n=>nluRun(' set a timer for '+n+' minutes ')};
 if(REMOTE){ /* ================= PHONE SIDE ================= */
   document.body.classList.add('student','remote');
@@ -4099,7 +4232,7 @@ document.addEventListener('click',e=>{ if(e.target.closest('[data-atnhome]')) go
 /* ---- v2.6 Sound & voice switches ---- */
 { const _mp=Music.play.bind(Music); Music.play=function(){ if(S.autoMusic===false&&!Music._manual){ try{ updateNowPlaying(); }catch(_){} return; } Music._manual=false; return _mp.apply(Music,arguments); }; }
 document.addEventListener('click',e=>{ if(e.target.closest('[data-act="music"]')) Music._manual=true; },true);
-function soundSetupHTML(){ return '<h3>Sound &amp; voice</h3><label class="chk"><input type="checkbox" data-snd="autoMusic" '+(S.autoMusic===false?'':'checked')+'><span>Play music automatically in routines, timers and brain breaks. Off: music only plays when you tap the music button.</span></label><label class="chk"><input type="checkbox" data-snd="readAloud" '+(S.readAloud?'checked':'')+'><span>Roomie reads steps and instructions aloud</span></label><label class="chk"><input type="checkbox" data-snd="sfx" '+(S.sfx===false?'':'checked')+'><span>Little sound effects (chimes, pops, cheers)</span></label>'+(typeof voiceSetupHTML==='function'?voiceSetupHTML():''); }
+function soundSetupHTML(){ return '<h3>Sound &amp; voice</h3><label class="chk"><input type="checkbox" data-snd="autoMusic" '+(S.autoMusic===false?'':'checked')+'><span>Play music automatically in routines, timers and brain breaks. Off: music only plays when you tap the music button.</span></label><label class="chk"><input type="checkbox" data-snd="readAloud" '+(S.readAloud?'checked':'')+'><span>Roomie reads steps and instructions aloud</span></label><label class="chk"><input type="checkbox" data-snd="sfx" '+(S.sfx===false?'':'checked')+'><span>Celebration sounds and little sound effects (chimes, pops, cheers)</span></label>'+(typeof voiceSetupHTML==='function'?voiceSetupHTML():''); }
 document.addEventListener('change',e=>{ const t=e.target; if(!t.matches||!t.matches('[data-snd]')) return; const k=t.dataset.snd;
   if(k==='autoMusic'){ S.autoMusic=t.checked; if(!t.checked&&Music.playing) Music.fadeStop(); }
   if(k==='readAloud'){ S.readAloud=t.checked; if(!t.checked) try{ speechSynthesis.cancel(); }catch(_){} }
@@ -4193,34 +4326,53 @@ function visThinkInject(){ if(A.overlay!=='think'||!S.thinkVis) return; const ca
 { const f=render; render=function(){ const r=f.apply(this,arguments); try{ visThinkInject(); }catch(e){ console.warn(e); } return r; }; }
 
 /* ---- v2.6 Brain breaks you control: tap Next (default) or let Roomie run them, voice on or off ---- */
+/* BRAIN_NAV_START */
+function brainBrowse(category){ A.bcat=category||'all'; openOverlay('brainpick'); }
+function brainFinish(){ navStopActivity(); }
+function brainRefreshSettings(selector){
+  render(true); const details=document.querySelector('#stage [data-brain-settings]'); if(details) details.open=true;
+  const control=document.querySelector(selector); if(control) control.focus({preventScroll:true});
+}
+/* BRAIN_NAV_END */
 function brainPaceTap(){ return S.brainPace!=='auto'; }
 function brainVoiceOn(){ return S.brainVoice!==false; }
 function speakLine(t){ if(!window.speechSynthesis||!t) return; try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(String(t).replace(/[⟵⟶·×]/g,' ')); u.lang=S.lang||'en-AU'; u.rate=S.voiceRate||0.95; u.pitch=S.voicePitch||1; const v=(typeof pickVoice==='function'?pickVoice():null); if(v) u.voice=v; speechSynthesis.speak(u); }catch(_){} }
 function brainSay(t){ if(brainVoiceOn()) { if(typeof ownVoicePlay==='function'&&ownVoicePlay(t)) return; speakLine(t); } }
-function brainShow(i){ const b=A.brain; if(!b||!b.calls) return; A.callIdx=(i+b.calls.length)%b.calls.length; const c=$('#call'); if(c){ c.className='call'; c.textContent=b.calls[A.callIdx]; c.classList.remove('callpop'); void c.offsetWidth; c.classList.add('callpop'); }
-  const n=$('#bstepn'); if(n) n.textContent=(A.callIdx+1)+' / '+b.calls.length; const nx=$('[data-bstep="1"]'); if(nx) nx.textContent=A.callIdx>=b.calls.length-1?'Start again ↻':'Next ▶'; brainSay(b.calls[A.callIdx]); }
-startBrain=function(type,id){ const off=S.breakOff||[]; let pool=BREAKS.filter(b=>!b.breath&&!off.includes(b.id)&&(!type||b.type===type)&&(!A.brain||b.id!==A.brain.id)); if(!pool.length) pool=BREAKS.filter(b=>!b.breath);
+function brainShow(i){ const b=A.brain; if(!b||!b.calls) return; A.callIdx=Math.max(0,i)%b.calls.length; const c=$('#call'); if(c){ c.className='call'; c.textContent=b.calls[A.callIdx]; c.classList.remove('callpop'); void c.offsetWidth; c.classList.add('callpop'); }
+  const n=$('#bstepn'); if(n) n.textContent=(A.callIdx+1)+' / '+b.calls.length; const previous=$('[data-bstep="-1"]'); if(previous) previous.disabled=A.callIdx===0; const nx=$('[data-bstep="1"]'); if(nx) nx.textContent=A.callIdx>=b.calls.length-1?'Start again ↻':'Next prompt ▶'; brainSay(b.calls[A.callIdx]); }
+startBrain=function(type,id){ if(!navPrepareStart('brain')) return; const off=S.breakOff||[]; let pool=BREAKS.filter(b=>!b.breath&&!off.includes(b.id)&&(!type||b.type===type)&&(!A.brain||b.id!==A.brain.id)); if(!pool.length) pool=BREAKS.filter(b=>!b.breath);
   const b=brainBreakVariant((id&&BREAKS.find(x=>x.id===id))||pool[Math.floor(Math.random()*pool.length)]||BREAKS[0]);
   clearActivity(); if(b.gen) b.calls=b.gen(); A.brain=b; A.callIdx=0; A.overlay='brain'; markTools(); if(b.song) Music.play(b.song); else Music.stop();
   if(brainVoiceOn()) speakLine(b.name+'. '+b.how+(b.calls?' '+b.calls[0]:''));
-  MT.start(b.secs,()=>{ chime(2); Music.fadeStop(); clearActivity(); const c=$('#call'); if(c){ c.className='call'; c.textContent=brainPaceTap()?'Time’s up! Tap Finish, or keep going.':'Brain break done. Back to your spot.'; } if(brainVoiceOn()) speakLine(brainPaceTap()?'Time’s up!':'Brain break done. Back to your spot.'); if(!brainPaceTap()) setTimeout(()=>{ if(A.overlay==='brain') closeOverlay(); },4000); });
+  MT.start(b.secs,()=>{ chime(2); Music.fadeStop(); clearActivity(); const c=$('#call'); if(c){ c.className='call'; c.textContent=brainPaceTap()?'Time’s up! Tap Finish break, or keep going.':'Brain break done. Back to your spot.'; } if(brainVoiceOn()) speakLine(brainPaceTap()?'Time’s up!':'Brain break done. Back to your spot.'); if(!brainPaceTap()) actH.push(setTimeout(()=>{ if(NAV.owner==='brain'&&A.brain===b){ if(A.overlay==='brain') brainFinish(); else { const screen=A.overlay; navStopActivity(false); navShow(screen); } } },4000)); });
   if(b.calls&&!brainPaceTap()) actH.push(setInterval(()=>brainShow(A.callIdx+1),(b.every||8)*1000));
   if(b.freeze&&!brainPaceTap()) freezeLoop(); render(true); };
-renderBrain=function(full){ const b=A.brain; if(full){ const tap=brainPaceTap(), many=b.calls&&b.calls.length>1;
-    const ctl='<div class="row bctl">'+(many?'<button class="btn alt" type="button" data-bstep="-1" aria-label="Previous">◀ Back</button><span class="bstepn" id="bstepn">'+(A.callIdx+1)+' / '+b.calls.length+'</span><button class="btn" type="button" data-bstep="1">'+(A.callIdx>=b.calls.length-1?'Start again ↻':'Next ▶')+'</button>':'')+(b.freeze?'<button class="btn gold" type="button" data-bfreeze="1">Freeze now!</button>':'')+'<button class="btn alt" type="button" data-bfinish="1">Finish</button></div>'+
-      '<div class="row bopts"><span class="hint">Pace</span><button type="button" class="chip bopt'+(tap?' on':'')+'" data-bpace="tap">I tap Next</button><button type="button" class="chip bopt'+(!tap?' on':'')+'" data-bpace="auto">Auto</button><span class="hint" style="margin-left:10px">Roomie’s voice</span><button type="button" class="chip bopt'+(brainVoiceOn()?' on':'')+'" data-bvoice="1">'+(brainVoiceOn()?'On':'Off')+'</button></div>';
-    setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Brain break · '+esc({movement:'Move',calm:'Calm',game:'Game',primer:'Positive primer',video:'Roomie video'}[b.type]||b.type)+'</div>'+backBtn('Stop')+'</div><h1 class="big">'+esc(b.name)+'</h1><p class="lead">'+esc(b.how)+'</p><div class="call" id="call">'+esc(b.calls?b.calls[A.callIdx]:(b.freeze?'Dance!':'Go!'))+'</div>'+ctl+'</section><aside class="side"><section class="card sm" style="align-items:center">'+ringHTML('main','left')+'</section>'+(b.song?npHTML():'')+'<div class="row"><button class="btn alt sm" type="button" data-brain="movement">Move</button><button class="btn alt sm" type="button" data-brain="game">Game</button><button class="btn alt sm" type="button" data-brain="calm">Calm</button><button class="btn sm" type="button" data-brain="">Another one</button><button class="btn alt sm" type="button" data-tool="calm">Calm breathing</button></div></aside>'); }
+renderBrain=function(full){ const b=A.brain; if(full){ const many=b.calls&&b.calls.length>1;
+    const ctl='<div class="row bctl">'+(many?'<button class="btn alt" type="button" data-bstep="-1" aria-label="Previous prompt" '+(A.callIdx===0?'disabled':'')+'>◀ Previous prompt</button><span class="bstepn" id="bstepn">'+(A.callIdx+1)+' / '+b.calls.length+'</span><button class="btn" type="button" data-bstep="1">'+(A.callIdx>=b.calls.length-1?'Start again ↻':'Next prompt ▶')+'</button>':'')+(b.freeze?'<button class="btn gold" type="button" data-bfreeze="1">Freeze now!</button>':'')+'<button class="btn alt" type="button" data-bfinish="1">Finish break</button></div>';
+    setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Brain break · '+esc({movement:'Move',calm:'Calm',game:'Game',primer:'Positive primer',video:'Roomie video'}[b.type]||b.type)+'</div><button class="btn alt sm" type="button" data-browsebrain="all">Choose another break</button></div><h1 class="big">'+esc(b.name)+'</h1><p class="lead">'+esc(b.how)+'</p><div class="call" id="call">'+esc(b.calls?b.calls[A.callIdx]:(b.freeze?'Dance!':'Go!'))+'</div>'+ctl+'</section><aside class="side"><section class="card sm" style="align-items:center">'+ringHTML('main','left')+'</section>'+(b.song?npHTML():'')+'<div class="row"><button class="btn alt sm" type="button" data-browsebrain="movement">Move</button><button class="btn alt sm" type="button" data-browsebrain="game">Games</button><button class="btn alt sm" type="button" data-browsebrain="calm">Calm</button></div></aside>'); }
   paintRing('main',MT.remaining(),MT.total); if(full) updateNowPlaying(); };
-function brainFreezeNow(){ Music.pause(); const c=$('#call'); if(c){ c.className='call freeze'; c.textContent='FREEZE!'; } brainSay('Freeze!'); actH.push(setTimeout(()=>{ if(A.overlay!=='brain') return; Music.resume(); const c=$('#call'); if(c){ c.className='call'; c.textContent='Dance!'; } },3000)); }
-function brainNext(d){ const b=A.brain; if(!b) return false; if(b.calls&&b.calls.length>1){ brainShow(A.callIdx+(d||1)); return true; } if(b.freeze){ brainFreezeNow(); return true; } return false; }
-document.addEventListener('click',e=>{ if(A.overlay!=='brain') return; const t=e.target;
-  const s=t.closest('[data-bstep]'); if(s){ audio(); brainNext(+s.dataset.bstep); return; }
+function brainFreezeNow(){ Music.pause(); const c=$('#call'); if(c){ c.className='call freeze'; c.textContent='FREEZE!'; } brainSay('Freeze!'); actH.push(setTimeout(()=>{ if(NAV.owner!=='brain') return; Music.resume(); const c=$('#call'); if(c){ c.className='call'; c.textContent='Dance!'; } },3000)); }
+function brainNext(d){ const b=A.brain; if(!b) return false; if(b.calls&&b.calls.length>1){ if(d<0&&A.callIdx===0) return false; brainShow(A.callIdx+(d||1)); return true; } if(b.freeze){ brainFreezeNow(); return true; } return false; }
+/* BRAIN_CONTROLS_START */
+document.addEventListener('click',e=>{
+  const browse=e.target.closest('[data-browsebrain]'); if(browse){ brainBrowse(browse.dataset.browsebrain); return; }
+  if(A.overlay!=='brain'&&A.overlay!=='brainpick') return; const t=e.target;
+  const step=t.closest('[data-bstep]'); if(step){ audio(); brainNext(+step.dataset.bstep); return; }
   if(t.closest('[data-bfreeze]')){ audio(); brainFreezeNow(); return; }
-  if(t.closest('[data-bfinish]')){ audio(); MT.stop&&MT.stop(); Music.fadeStop(); clearActivity(); closeOverlay(); return; }
-  const p=t.closest('[data-bpace]'); if(p){ audio(); S.brainPace=p.dataset.bpace; save(); const b=A.brain, i=A.callIdx; clearActivity(); if(b.calls&&!brainPaceTap()) actH.push(setInterval(()=>brainShow(A.callIdx+1),(b.every||8)*1000)); if(b.freeze&&!brainPaceTap()) freezeLoop(); A.callIdx=i; render(true); toast(brainPaceTap()?'You’re in charge: tap Next.':'Roomie moves on by itself.'); return; }
-  if(t.closest('[data-bvoice]')){ audio(); S.brainVoice=!brainVoiceOn(); save(); if(!brainVoiceOn()) try{ speechSynthesis.cancel(); }catch(_){} render(true); } });
-document.addEventListener('keydown',e=>{ if(A.overlay!=='brain'||e.target.closest('[role="menu"],[role="dialog"][aria-modal="true"]')) return; const tag=(e.target.tagName||'').toLowerCase(); if(tag==='input'||tag==='textarea') return;
-  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ if(brainNext(1)) e.preventDefault(); } else if(e.key==='ArrowLeft'||e.key==='PageUp'){ if(brainNext(-1)) e.preventDefault(); } });
+  if(t.closest('[data-bfinish]')){ audio(); brainFinish(); return; }
+  const pace=t.closest('[data-bpace]'); if(pace){
+    audio(); S.brainPace=pace.dataset.bpace; save();
+    if(NAV.owner==='brain'&&A.brain){ const b=A.brain; clearActivity(); if(b.calls&&!brainPaceTap()) actH.push(setInterval(()=>brainShow(A.callIdx+1),(b.every||8)*1000)); if(b.freeze&&!brainPaceTap()) freezeLoop(); }
+    brainRefreshSettings('[data-bpace="'+S.brainPace+'"]'); return;
+  }
+  if(t.closest('[data-bvoice]')){ audio(); S.brainVoice=!brainVoiceOn(); save(); if(!brainVoiceOn()) try{ speechSynthesis.cancel(); }catch(_){} brainRefreshSettings('[data-bvoice]'); }
+});
+document.addEventListener('keydown',e=>{
+  if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.altKey||A.overlay!=='brain'||e.target.closest('button,a,input,textarea,select,summary,[contenteditable="true"],[role="menu"],[role="dialog"]')) return;
+  if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){ if(brainNext(1)) e.preventDefault(); }
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){ if(brainNext(-1)) e.preventDefault(); }
+});
+/* BRAIN_CONTROLS_END */
 
 /* ---- v2.5: the floating window shows the actual screen (live copy you can tap), or mini Roomie ---- */
 A.pipView=A.pipView||'screen';
@@ -4436,14 +4588,13 @@ function tourSteps(){ const tools=S.mode==='tools', ex=S.studentsAreExample;
    {sel:'#stage .feel, #stage .side',t:'Feelings check-in',b:'Students tap how they feel on their way in, and after recess and lunch. It only counts, never names, and shows you if anyone would like a chat.'},
    {sel:'section.card.sm:has(.journey), [data-tool="point"]',t:'Class goal',b:'Every +1 point moves Roomie towards your class reward. All-time points also level me up: I earn a medal, a party hat, sunglasses and, one day, a crown!'},
    tools?{sel:'.dacts',t:'Always here',b:'Give a class point, calm the room with Reset, or get everyone’s eyes on you with Attention.'}
-        :{sel:'.dtools',t:'Your tools',b:'Brain breaks, tickets, thinking routines, quiz games, pack up and more. Use them any time. You can hide the ones you don’t use in Look & colours → Your dock.'},
+        :{sel:'.dtools',t:'Your tools',b:'Brain breaks, tickets, thinking routines, quiz games, pack up and more. Use them any time. You can hide the ones you don’t use in Setup → Look, sound & Roomie → Your dock.'},
    ...(tools?[]:[{sel:'.dacts',t:'Always here',b:'Give a class point, calm the room with Reset, or get everyone’s eyes on you with Attention.'}]),
    {sel:'.top [data-tool="remote"]',t:'Your phone is the remote',b:'Scan a code with your phone and walk the room: Attention, timers, points, brain breaks and quiet name picks, right from your pocket.'},
    {sel:'#micBtn',t:'“Hey Roomie”',b:'Turn on voice and say things like “Hey Roomie, time for a brain break” or “Hey Roomie, set a timer for five minutes”. It uses on-device recognition by default; cloud listening is optional.'},
    {sel:'#liveBtn',t:'Student devices',b:'Students can check in, answer tickets, post to a thinking wall and vote from their own devices. No accounts, anonymous by default.'},
    {sel:'.top [data-tool="float"]',t:'Float over your slides',b:'Teaching from slides or a video? Tap Float and I’ll sit in a small window on top with the countdown and your controls.'},
-   {sel:'#lookBtn',t:'Look & colours',b:'Change colours, my colour, where your timetable sits, and which tools are in your dock.'},
-   {sel:'#setupBtn',t:'Setup',b:'Your class, day plan, routines and reminders. “Just tomorrow” changes one day for an assembly or excursion. Coach gives you private lesson feedback. Privacy, backup & move takes your Roomie to another computer with a code.'},
+   {sel:'#setupBtn',t:'Setup',b:'Your class, day plan, routines and reminders. Look, sound & Roomie holds your colours, pictures, mascot, celebration and dock choices. “Just tomorrow” changes one day for an assembly or excursion. Coach gives you private lesson feedback. Privacy, backup & move takes your Roomie to another computer with a code.'},
    {t:'You’re ready!',b:ex?'Let’s make Roomie yours: your class name, your class list and your times. It takes about three minutes. You can take this tour again any time from the ? button.':'That’s everything. You can take this tour again any time from the ? button at the top.',end:true});
   return s; }
 let TOUR=null;
@@ -4651,7 +4802,7 @@ applyDock=function(){
   const box=document.querySelector('#dock .dtools'); if(!box||STUDENT) return;
   const order=dockOrder(), visible=uiDockKeys(order,S.dockHide||[],S.dockPreset), br=box.querySelector('.dbreak');
   let more=box.querySelector('.more-tools');
-  if(!more){ more=document.createElement('button'); more.type='button'; more.className='tool more-tools'; more.dataset.menu='more'; more.textContent='More tools'; more.setAttribute('aria-haspopup','menu'); more.setAttribute('aria-expanded','false'); more.setAttribute('aria-controls','dmenu'); }
+  if(!more){ more=document.createElement('button'); more.type='button'; more.className='tool more-tools'; more.dataset.menu='more'; more.textContent='More tools'; more.setAttribute('aria-haspopup','dialog'); more.setAttribute('aria-expanded','false'); more.setAttribute('aria-controls','dmenu'); }
   const displayOrder=S.dockPreset==='simple'?[...UI_SIMPLE_DOCK,...order.filter(k=>!UI_SIMPLE_DOCK.includes(k))]:order;
   displayOrder.forEach(k=>{ const button=box.querySelector('.tool[data-tool="'+k+'"]'); if(button){ button.hidden=!visible.includes(k); box.appendChild(button); } });
   if(br){ const after=visible[Math.ceil(visible.length/2)-1], button=after&&box.querySelector('.tool[data-tool="'+after+'"]'); if(button&&visible.length>8) button.after(br); else box.appendChild(br); br.hidden=visible.length<=8; }
@@ -4659,7 +4810,7 @@ applyDock=function(){
 };
 dockSetupHTML=function(){
   const hidden=S.dockHide||[], order=dockOrder(), simple=S.dockPreset==='simple';
-  return '<div class="dockset"><h3 style="margin:0">Your dock</h3><p class="hint" style="margin:0">Keep a few everyday tools close by, or choose your own. Every tool is always available in More tools.</p><div class="dock-preset"><div class="row" role="group" aria-label="Dock preset"><button class="btn alt" type="button" data-dock-preset="simple" aria-pressed="'+simple+'">Simple: four everyday tools</button><button class="btn alt" type="button" data-dock-preset="custom" aria-pressed="'+!simple+'">My custom dock</button></div>'+(simple?'<p class="hint" style="margin:0">Routines, Timer, Brain break and Pick a name. Your custom tools and order are kept; switch back any time.</p>':'')+'</div><div class="docklist"'+(simple?' hidden':'')+'>'+order.map((k,i)=>'<div class="dockrow'+(hidden.includes(k)?' off':'')+'"><label class="chk"><input type="checkbox" data-dk="show:'+k+'" '+(hidden.includes(k)?'':'checked')+'><span>'+esc(DOCK_NAMES[k])+'</span></label><span><button type="button" class="btn alt sm" data-dk="up:'+k+'" '+(i?'':'disabled')+' aria-label="Move '+esc(DOCK_NAMES[k])+' earlier">←</button><button type="button" class="btn alt sm" data-dk="down:'+k+'" '+(i<order.length-1?'':'disabled')+' aria-label="Move '+esc(DOCK_NAMES[k])+' later">→</button></span></div>').join('')+'</div><button type="button" class="linkbtn" data-dk="reset:x"'+(simple?' hidden':'')+'>Show all tools in the usual order</button></div>';
+  return '<div class="dockset"><h3 style="margin:0">Your dock</h3><p class="hint" style="margin:0">Keep a few everyday tools close by, or choose your own. Teaching tools are in More tools; class tools are under Students.</p><div class="dock-preset"><div class="row" role="group" aria-label="Dock preset"><button class="btn alt" type="button" data-dock-preset="simple" aria-pressed="'+simple+'">Simple: four everyday tools</button><button class="btn alt" type="button" data-dock-preset="custom" aria-pressed="'+!simple+'">My custom dock</button></div>'+(simple?'<p class="hint" style="margin:0">Routines, Timer, Brain break and Pick a name. Your custom tools and order are kept; switch back any time.</p>':'')+'</div><div class="docklist"'+(simple?' hidden':'')+'>'+order.map((k,i)=>'<div class="dockrow'+(hidden.includes(k)?' off':'')+'"><label class="chk"><input type="checkbox" data-dk="show:'+k+'" '+(hidden.includes(k)?'':'checked')+'><span>'+esc(DOCK_NAMES[k])+'</span></label><span><button type="button" class="btn alt sm" data-dk="up:'+k+'" '+(i?'':'disabled')+' aria-label="Move '+esc(DOCK_NAMES[k])+' earlier">←</button><button type="button" class="btn alt sm" data-dk="down:'+k+'" '+(i<order.length-1?'':'disabled')+' aria-label="Move '+esc(DOCK_NAMES[k])+' later">→</button></span></div>').join('')+'</div><button type="button" class="linkbtn" data-dk="reset:x"'+(simple?' hidden':'')+'>Show all tools in the usual order</button></div>';
 };
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-dock-preset]'); if(!b) return; S.dockPreset=b.dataset.dockPreset; save(); applyDock(); renderSetup(); });
 let uiDMenuOpener=null;
@@ -4668,17 +4819,71 @@ closeDMenu=function(){ const menu=document.getElementById('dmenu'), hadFocus=men
 openDMenu=function(button){
   const result=uiOpenDMenuBase.apply(this,arguments), menu=document.getElementById('dmenu'); if(!menu) return result;
   uiDMenuOpener=button;
+  if(button.dataset.menu==='more') uiBuildToolFinder(menu);
   const r=button.getBoundingClientRect(); menu.style.bottom='auto'; menu.style.top=Math.max(12,Math.min(r.top-menu.offsetHeight-10,innerHeight-menu.offsetHeight-12))+'px';
-  uiFocusFirst(menu);
+  uiFocusFirst(menu,button.dataset.menu==='more'?'#toolSearch':null);
   return result;
 };
 document.addEventListener('keydown',e=>{
   const menu=document.getElementById('dmenu'); if(!menu||!menu.contains(e.target)) return;
   if(e.key==='Escape'){ e.preventDefault(); e.stopImmediatePropagation(); closeDMenu(); return; }
+  if(menu.dataset.for==='more'){ uiToolFinderKey(e,menu); return; }
   const items=uiFocusables(menu), i=items.indexOf(document.activeElement);
   if(['ArrowDown','ArrowUp','Home','End'].includes(e.key)&&items.length){ const n=e.key==='Home'?0:e.key==='End'?items.length-1:(i+(e.key==='ArrowDown'?1:-1)+items.length)%items.length; e.preventDefault(); e.stopImmediatePropagation(); items[n].focus(); }
   if(e.key==='Tab'){ closeDMenu(); }
 },true);
+
+/* TOOL_FINDER_START: shared catalogue and pure search are covered by navigation tests. */
+const UI_TOOL_GROUPS=[
+  ['Teaching',[
+    ['timer','Timer','Quick countdowns','countdown minutes seconds'],
+    ['exit','Tickets','Entry and exit prompts','entry exit ticket assessment'],
+    ['think','Thinking','Prompts for deeper thinking','thinking routines'],
+    ['reflect','Reflect','Pause and review learning','reflection review'],
+    ['quiz','Quiz games','Practise through play','quiz questions games'],
+    ['poll','Poll','Hear from the whole class','vote voting survey'],
+    ['finish','Finished?','Ideas for early finishers','finished early finishers']]],
+  ['Routines',[
+    ['routines','Routines','Run or practise a routine','routine transitions'],
+    ['packup','Pack up','Get ready to leave','pack up home time'],
+    ['reteach','Practise expectations','Revisit classroom expectations','behaviour behavior expectations']]],
+  ['Wellbeing',[
+    ['brain','Brain break','Move, play or reset','movement active break'],
+    ['calm','Calm breathing','Take a quiet minute','breathe breathing calm quiet'],
+    ['checkin','Check-in','See how everyone feels','feelings mood wellbeing check in']]]
+];
+function uiFindTools(query){
+  const words=String(query||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().split(/\s+/).filter(Boolean);
+  return UI_TOOL_GROUPS.map(([label,tools])=>[label,tools.filter(tool=>{
+    const text=tool.slice(1).join(' ').toLowerCase().replace(/[^a-z0-9]+/g,' ');
+    return words.every(word=>text.includes(word));
+  })]).filter(([,tools])=>tools.length);
+}
+/* TOOL_FINDER_END */
+function uiToolResults(menu,query){
+  const groups=uiFindTools(query), count=groups.reduce((n,[,tools])=>n+tools.length,0);
+  menu.querySelector('#toolResults').innerHTML=groups.map(([label,tools],i)=>'<section class="tool-group" aria-labelledby="toolGroup'+i+'"><h3 id="toolGroup'+i+'">'+esc(label)+'</h3><div class="tool-grid">'+tools.map(([key,label,detail])=>'<button class="tool finder-tool" type="button" data-tool="'+key+'"><b>'+esc(label)+'</b><span>'+esc(detail)+'</span></button>').join('')+'</div></section>').join('');
+  menu.querySelector('#toolResultCount').textContent=count?count+' tool'+(count===1?'':'s'):'No matching tools. Try “timer”, “brain break” or “tickets”.';
+}
+function uiBuildToolFinder(menu){
+  closeClassPop();
+  menu.setAttribute('role','dialog'); menu.setAttribute('aria-label','Find a classroom tool');
+  menu.innerHTML='<div class="finder-head"><h2>Find a tool</h2><button type="button" class="btn alt sm" data-finder-close aria-label="Close tool finder">Close</button></div><label class="finder-label" for="toolSearch">Search tools</label><input id="toolSearch" type="search" placeholder="Try timer, brain break or exit ticket" autocomplete="off" aria-controls="toolResults"><p id="toolResultCount" class="hint" role="status" aria-live="polite"></p><div id="toolResults"></div>';
+  uiToolResults(menu,'');
+}
+function uiToolFinderKey(e,menu){
+  if(e.key==='Tab') return; // Normal tab order through the non-modal finder.
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+    const items=[...menu.querySelectorAll('#toolResults [data-tool]')], i=items.indexOf(document.activeElement);
+    if(items.length){ e.preventDefault(); items[i<0?(e.key==='ArrowDown'?0:items.length-1):(i+(e.key==='ArrowDown'?1:-1)+items.length)%items.length].focus(); }
+  }else if(e.key==='Enter'&&e.target.id==='toolSearch'){
+    e.preventDefault(); const items=menu.querySelectorAll('#toolResults [data-tool]'); if(items.length===1) items[0].click(); else if(items.length) items[0].focus();
+  }
+  e.stopImmediatePropagation(); // Typing must not invoke classroom hotkeys.
+}
+document.addEventListener('input',e=>{ if(e.target.id==='toolSearch'){ const menu=e.target.closest('#dmenu'); if(menu) uiToolResults(menu,e.target.value); } });
+document.addEventListener('click',e=>{ if(e.target.closest('[data-finder-close]')) closeDMenu(); });
+document.addEventListener('focusin',e=>{ const menu=document.getElementById('dmenu'); if(menu&&menu.dataset.for==='more'&&!menu.contains(e.target)&&e.target!==uiDMenuOpener) closeDMenu(); });
 
 /* ================= Multiple classes: inactive snapshots, one active class ================= */
 /* PROFILE_MODEL_START: pure transitions are exercised by the profile regression tests. */
@@ -4755,6 +4960,7 @@ rmkAddMedia=function(){ return profileTrack('write',profileRmkAddMediaBase,this,
 picImportFile=function(){ return profileTrack('write',profilePicImportBase,this,arguments); };
 visImportFile=function(){ return profileTrack('write',profileVisImportBase,this,arguments); };
 function classProfileBlockReason(){
+  if(typeof navHasActivity==='function'&&navHasActivity()) return 'Stop the current activity before changing classes.';
   return profileGuardMessage({student:STUDENT,demo:DEMO.active,live:!!(S.liveOn||A.live.busy||A.live.syncing),remote:!!(S.remote||RM.busy||PROFILE_PENDING.remote),coach:!!(M.on||SL.on||PROFILE_PENDING.coach||Object.values(AIX).some(state=>state.busy)),voice:!!(V.on||PROFILE_PENDING.voice),write:PROFILE_PENDING.write>0,media:PROFILE_PENDING.media>0});
 }
 /* PROFILE_SAVE_START: S changes only if the complete, non-recursive backup saves. */
@@ -4778,6 +4984,7 @@ idbPut=function(key,value){ return profileTrack('write',profileIdbPutBase,this,[
    stopped first: classProfileBlockReason() gives the instruction to the teacher. */
 function clearClassRuntime(){
   PROFILE_EPOCH++;
+  if(typeof NAV!=='undefined'){ NAV.owner=null; NAV.origin=null; NAV.trail=[]; }
   MT.stop(); clearActivity();
   if(A.attnClose) try{ A.attnClose(); }catch(_){}
   clearInterval(RS.h); RS.on=false; clearInterval(RZ.h); clearTimeout(RZ.auto); RZ.on=false;
@@ -4831,14 +5038,14 @@ function profileSwitch(targetId){
   }catch(error){ profileStatus(committed?'The class change was saved, but the screen could not refresh. Reload Roomie to continue.':error.message||'The class could not be changed. Your current class is unchanged.',true); return committed; }
 }
 function profileHasActivity(){ return !!(A.overlay||A.attnClose||RZ.on||RS.on||(MT.total>0&&(MT.running||MT.remaining()>0))); }
-function profileSwitchLabel(room){ return (profileHasActivity()?'End activity and switch':'Switch class')+(room?' · '+room:''); }
+function profileSwitchLabel(room){ return (!classProfileBlockReason()&&profileHasActivity()?'End activity and switch':'Switch class')+(room?' · '+room:''); }
 function profileManagerHTML(){
   const records=profileRecords(S), blocked=classProfileBlockReason();
   return '<section class="profile-manager" aria-labelledby="profilesTitle"><h2 id="profilesTitle" tabindex="-1">Your classes</h2><p class="hint" style="margin:0">Each class keeps its own list, timetable, routines, settings and history. Your backup includes every class. Use <b>Class name</b> below to rename the class you are using.</p><div class="profile-list"><div class="profile-row"><div><b data-profile-current-name>'+esc(S.room)+'</b><small data-profile-current-count>'+names().length+' students'+(S.studentsAreExample?' · example class':'')+'</small></div><span aria-current="true">Current class</span></div>'+records.map(record=>'<div class="profile-row"><div><b>'+esc(record.data.room||'Class')+'</b><small>'+((record.data.students||[]).length)+' students'+(record.data.studentsAreExample?' · example class':'')+'</small></div><button type="button" class="btn alt sm" data-profile-switch="'+esc(record.id)+'">'+esc(profileSwitchLabel())+'</button></div>').join('')+'</div><p class="profile-status'+(blocked?' warnbox':'')+'" data-profile-status role="status">'+esc(blocked)+'</p><details><summary>Add another class</summary><p class="hint">Start with an empty class list, zero points and a blank timetable. You can use the toolkit straight away. Creating the class ends the current local activity after saving.</p><form class="profile-new" id="profileNewForm"><label>Class name<input id="profileNewRoom" name="room" maxlength="40" required placeholder="e.g. Year 7 Blue"></label><label>Teacher name (optional)<input id="profileNewTeacher" name="teacher" maxlength="40" value="'+esc(S.teacher||'')+'"></label><label>Age band<select id="profileNewBand" name="band">'+[['early','Pre-primary to Year 2'],['primary','Years 3 to 6'],['middle','Years 7 and 8']].map(([value,label])=>opt(value,label,S.band||'primary')).join('')+'</select></label><div class="row wide"><button class="btn" type="submit">Create and switch to class</button></div></form></details></section>';
 }
 function profileQuickHTML(){
-  const records=profileRecords(S), current=S.classProfileId||'';
-  return '<div class="profile-quick"><label for="profileQuickSelect">Switch class</label><div class="row"><select id="profileQuickSelect"><option value="'+esc(current)+'">'+esc(S.room)+' (current)</option>'+records.map(record=>'<option value="'+esc(record.id)+'">'+esc(record.data.room||'Class')+'</option>').join('')+'</select><button class="btn sm" type="button" data-profile-quick disabled>'+esc(profileSwitchLabel())+'</button><button class="btn alt sm" type="button" data-profile-manage>Manage classes</button></div><p class="profile-status" data-profile-status role="status"></p></div>';
+  const records=profileRecords(S), current=S.classProfileId||'', blocked=classProfileBlockReason();
+  return '<div class="profile-quick"><label for="profileQuickSelect">Switch class</label><div class="row"><select id="profileQuickSelect"><option value="'+esc(current)+'">'+esc(S.room)+' (current)</option>'+records.map(record=>'<option value="'+esc(record.id)+'">'+esc(record.data.room||'Class')+'</option>').join('')+'</select><button class="btn sm" type="button" data-profile-quick disabled>'+esc(profileSwitchLabel())+'</button><button class="btn alt sm" type="button" data-profile-manage>Manage classes</button></div><p class="profile-status" data-profile-status role="status">'+esc(blocked)+'</p></div>';
 }
 const profileRenderSetupBase=renderSetup;
 renderSetup=function(){
@@ -4859,7 +5066,7 @@ openClassPop=function(){
 };
 closeClassPop=function(){ const popup=document.getElementById('classpop'), focused=popup&&popup.contains(document.activeElement), result=profileCloseClassPopBase.apply(this,arguments); if(focused){ const button=document.getElementById('classBtn'); if(button&&!button.closest('[inert]')) button.focus({preventScroll:true}); } return result; };
 document.getElementById('classBtn').setAttribute('aria-haspopup','dialog');
-document.addEventListener('change',e=>{ if(e.target.id!=='profileQuickSelect') return; const button=document.querySelector('[data-profile-quick]'); if(button){ button.disabled=!e.target.value||e.target.value===S.classProfileId; button.textContent=profileSwitchLabel(); } });
+document.addEventListener('change',e=>{ if(e.target.id!=='profileQuickSelect') return; const button=document.querySelector('[data-profile-quick]'); if(button){ button.disabled=!e.target.value||e.target.value===S.classProfileId||!!classProfileBlockReason(); button.textContent=profileSwitchLabel(); } });
 document.addEventListener('click',e=>{
   const button=e.target.closest('[data-profile-manage],[data-profile-quick],[data-profile-switch]'); if(!button) return;
   if(button.hasAttribute('data-profile-manage')){ closeClassPop(); tab='class'; openSetup(); const title=document.getElementById('profilesTitle'); if(title) title.focus(); return; }
@@ -4882,6 +5089,20 @@ $('#ver').textContent=VERSION;
 if(!firstRun) $('#bandPick').hidden=true;
 else { const b=document.querySelector('[data-band="'+S.band+'"]'); if(b) b.className='btn'; }
 markMode();
+
+/* NAVIGATION_EVENTS_START */
+document.addEventListener('click',e=>{ if(e.target.closest('[data-nav-return]')&&NAV.owner){ navRemember(A.overlay); navShow(NAV.owner); } });
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape') return;
+  if(document.getElementById('dmenu')){ e.preventDefault(); e.stopImmediatePropagation(); closeDMenu(); return; }
+  if(document.getElementById('classpop')){ e.preventDefault(); e.stopImmediatePropagation(); closeClassPop(); return; }
+  if(document.getElementById('segpop')){ e.preventDefault(); e.stopImmediatePropagation(); closeSegPop(); return; }
+  if(typeof TOUR!=='undefined'&&TOUR) return;
+  if(e.target.closest('input,textarea,select,[contenteditable="true"],[role="dialog"]')||document.getElementById('sheetHost').innerHTML) return;
+  if(A.overlay){ e.preventDefault(); e.stopImmediatePropagation(); navBack(); }
+},true);
+/* NAVIGATION_EVENTS_END */
+
 Bird.init(); skyInit();
 refreshLabels(); tick(true);
 setInterval(()=>tick(false),250);
