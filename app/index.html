@@ -1249,6 +1249,8 @@ body.scrap .lesson-content .exp>div{font-size:clamp(25px,2.3vw,34px)}
 .choice-picker.routines-picker .rbtn{min-height:210px}.routines-picker .mymusic{max-height:140px;overflow:auto}
 @media(max-width:760px){.brain-settings-pop .brain-settings-panel{position:fixed;top:140px;left:16px;right:16px;width:auto;max-height:60vh}.picker-content #pickName{padding:16px;min-height:180px}}
 
+/* Lift the check-in tape clear of its heading. */
+body.scrap .side>.card:has(.feel)::before{top:-16px}
 /* Toolkit space: preserve the established colours, artwork and mascot. */
 .stage.toolkit-home{grid-template-columns:minmax(0,1fr) minmax(230px,290px);gap:18px}
 .stage.toolkit-home.one{grid-template-columns:minmax(0,1fr)}
