@@ -1304,6 +1304,7 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
 .signal-option{display:flex;gap:12px;align-items:start;border:2px solid #EAD8B9;border-radius:18px;background:#FFFDF3;padding:16px;cursor:pointer}
 .signal-option input{margin-top:6px;accent-color:#E2558F}.signal-option small{display:block;font-size:16px;line-height:1.5;margin-top:6px}
 .atn-t{max-width:92vw}.atn-steps{flex-wrap:wrap}.atn-steps span{max-width:85vw}
+.signal-builder{margin:16px 0;padding:20px;border-radius:20px;background:#FCE2ED;border:2px solid #EAC7D8}.signal-reset-step{padding:12px 0;border-top:1px solid #DCB7C8}.signal-builder input[type=text],.signal-builder input:not([type]),.signal-builder textarea{width:100%}.atn-t .pl{white-space:normal;overflow-wrap:anywhere}.rz-steps{flex-wrap:wrap}.rz-steps span{overflow-wrap:anywhere}.rz-main.rz-check .rz-t{overflow-wrap:anywhere}
 </style>
 
 <svg class="land" viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60 C 260 10 520 40 760 70 S 1200 100 1440 50 L1440 150 L0 150 Z" fill="#7CC79A" id="hill1"></path><path d="M0 110 C 300 80 600 105 900 120 S 1260 130 1440 100 L1440 150 L0 150 Z" fill="#2F8F6B"></path></svg>
@@ -1351,7 +1352,6 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
     <button class="tool" type="button" data-tool="reteach">Practise expectations</button>
     <button class="tool" type="button" data-tool="calm">Calm breathing</button>
     <button class="tool" type="button" data-tool="wellbeing">Wellbeing moments</button>
-    <button class="tool" type="button" data-tool="resets">Reset room</button>
     </div>
     <div class="dacts">
     <button class="tool pt" type="button" data-tool="point">+1 point</button>
@@ -1406,7 +1406,7 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.8.1 · 15 Nov 2026';
+const VERSION='Roomie v2.8.2 · 15 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1822,7 +1822,7 @@ function renderOff(P,full){ if(!full) return;
   setStage('one','<section class="card"><div class="eyebrow">'+esc(isWeekend(now())?'Weekend · showing Monday’s plan':DAYNAME[dayKey(now())])+'</div><h1 class="big">'+esc(greeting())+', '+esc(S.room)+'</h1><p class="lead">'+esc(msg)+'</p>'+(P.phase==='after'&&typeof todayHTML==='function'&&!S.studentsAreExample?todayHTML():'')+(S.studentsAreExample?'<div class="okbox row" style="justify-content:space-between;align-items:center"><span>You’re seeing an example class. Make Roomie yours in about three minutes.</span><button class="btn sm" type="button" data-wzopen="1">Set up my class</button></div>':'')+'<div class="row" style="margin-top:auto">'+demoEntryHTML()+'<button class="btn alt" type="button" data-tool="routines">Run a routine now</button><button class="btn alt" type="button" data-act="setup">Set up my day</button></div></section>'); }
 const HOME_TILES=[['routines','Routines','Morning jobs, line up, pack up'],['timer','Timer','Countdown with music'],['brain','Brain break','Move, play or calm down'],['checkin','Check-in','How are you feeling?'],['exit','Tickets','Entry and exit tickets'],['reflect','Reflect','Quick reflections'],['think','Thinking routines','Visible thinking routines'],['quiz','Quiz games','Drop Four, Mystery Stars…'],['poll','Poll','Class votes from their devices'],['pick','Pick a name','Fair and random'],['groups','Groups','Random groups in a tap'],['seats','Seating plan','Where everyone sits'],['jobs','Helpers','Classroom jobs this week'],['packup','Pack up','First ready, first out'],['finish','Finished?','Early-finisher checklist'],['reteach','Practise expectations','Model, practise and reflect together']];
 const TOOLKIT_CLASS_KEYS=['pick','groups','seats','jobs'];
-function toolkitTiles(){ return HOME_TILES.filter(([key])=>!TOOLKIT_CLASS_KEYS.includes(key)).concat([['calm','Calm breathing','Take a quiet minute'],['wellbeing','Wellbeing moments','Settle, reconnect or lift energy'],['resets','Reset room','Run our saved class reset']]); }
+function toolkitTiles(){ return HOME_TILES.filter(([key])=>!TOOLKIT_CLASS_KEYS.includes(key)).concat([['calm','Calm breathing','Take a quiet minute'],['wellbeing','Wellbeing moments','Settle, reconnect or lift energy']]); }
 function toolkitOrder(){ const all=toolkitTiles().map(([key])=>key), order=[...new Set((S.toolkitOrder||[]).filter(key=>all.includes(key)))]; return order.concat(all.filter(key=>!order.includes(key))); }
 function toolkitVisible(){ return toolkitOrder().filter(key=>!(S.toolkitHide||[]).includes(key)); }
 function toolkitPanelOn(key){ const saved=S.toolkitPanels&&S.toolkitPanels[key]; return typeof saved==='boolean'?saved:key!=='checkin'; }
@@ -2293,19 +2293,27 @@ const ATTENTION_PRESETS=[
  {id:'holy-moly',name:'Holy moly',call:'Holy moly!',response:'Guacamole!',sound:false},
  {id:'hand',name:'Raise a hand',call:'Our quiet signal',response:'Notice the raised hand · Pause · Listen',sound:false},
  {id:'chime',name:'Gentle chime',call:'Pause and listen',response:'Equipment down · Ready to listen',sound:true},
- {id:'class',name:'Class, class',call:'Class, class!',response:'Yes, yes!',sound:false}
+ {id:'class',name:'Class, class',call:'Class, class!',response:'Yes, yes!',sound:false},
+ {id:'custom',name:'Create my own attention signal',call:'Your words',response:'Your class response',sound:false}
 ];
 const RESET_PRESETS=[
  {id:'original',name:'Roomie reset',detail:'Countdown → Breathe with Roomie → Ready → Begin'},
  {id:'calm',name:'Pause, breathe, begin',detail:'Pause → Comfortable breath → Ready → Begin',steps:[['Pause','Put your task down. Let your voice rest.'],['Breathe','Take a comfortable breath, or simply pause.'],['Ready','Find a comfortable position. Listen for the next step.'],['Begin','One small step. Let’s begin again.']]},
  {id:'space',name:'Clear space, fresh start',detail:'Pause → Clear your space → Ready → Begin',steps:[['Pause','Pause your task. Voice off.'],['Clear your space','Keep out what you need. Put the rest safely aside.'],['Ready','Settle in your learning space. Listen for the next step.'],['Fresh start','Start the first small step together.']]},
- {id:'stretch',name:'Stretch, settle, start',detail:'Pause → Gentle stretch → Settle → Begin',steps:[['Pause','Pause your task. Make a little safe space.'],['Gentle stretch','Seated or standing, stretch gently in a way that feels comfortable. Watching is welcome.'],['Settle','Let your body rest. Ready to listen.'],['Start','Listen for one clear step. Let’s begin.']]}
+ {id:'stretch',name:'Stretch, settle, start',detail:'Pause → Gentle stretch → Settle → Begin',steps:[['Pause','Pause your task. Make a little safe space.'],['Gentle stretch','Seated or standing, stretch gently in a way that feels comfortable. Watching is welcome.'],['Settle','Let your body rest. Ready to listen.'],['Start','Listen for one clear step. Let’s begin.']]},
+ {id:'custom',name:'Create my own reset',detail:'Write four familiar steps for your class'}
 ];
-function attentionPreset(){return ATTENTION_PRESETS.find(x=>x.id===S.attentionPreset)||ATTENTION_PRESETS[0];}
-function resetPreset(){return RESET_PRESETS.find(x=>x.id===S.resetPreset)||RESET_PRESETS[0];}
-function signalSettingsHTML(){return '<h2>Our class signals</h2><p class="lead">Choose once, teach and practise together. Attention and Reset room open your saved choice straight away.</p><h3>Attention signal</h3><div class="signal-options">'+ATTENTION_PRESETS.map(x=>'<label class="signal-option"><input type="radio" name="attentionPreset" data-signal="attentionPreset" value="'+x.id+'" '+(attentionPreset().id===x.id?'checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+esc(x.call)+' → '+esc(x.response)+'</small></span></label>').join('')+'</div><h3>Class reset</h3><div class="signal-options">'+RESET_PRESETS.map(x=>'<label class="signal-option"><input type="radio" name="resetPreset" data-signal="resetPreset" value="'+x.id+'" '+(resetPreset().id===x.id?'checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+esc(x.detail)+'</small></span></label>').join('')+'</div><p class="hint">Model the signal, practise the response and wait before giving instructions. Use the same routine consistently, with adjustments for students’ needs. The teacher moves each new reset step on when the class is ready.</p>';}
-document.addEventListener('change',e=>{const t=e.target;if(!t.matches('[data-signal]'))return;const list=t.dataset.signal==='attentionPreset'?ATTENTION_PRESETS:RESET_PRESETS;if(!list.some(x=>x.id===t.value))return;S[t.dataset.signal]=t.value;save();});
-function rzPresetDraw(){const m=document.getElementById('rzMain');if(!m)return;const x=resetPreset(),step=x.steps[RZ.step];if(!step)return;if(RZ.last===RZ.step)return;RZ.last=RZ.step;document.querySelectorAll('.rz-steps span').forEach((el,i)=>el.className=i<RZ.step?'done':i===RZ.step?'cur':'');m.className='rz-main rz-check';m.innerHTML='<h1 class="rz-t"><span class="pl" style="--pc:#FFD84D;--pr:-2deg">'+esc(step[0])+'</span></h1><div class="rz-roo" style="height:140px">'+birdSVG()+'</div><p class="rz-praise">'+esc(step[1])+'</p><button class="rz-btn gold big" type="button" data-rz="'+(RZ.step===3?'end':'preset-next')+'">'+(RZ.step===3?'Back to it':'Next step')+'</button>';}
+function attentionPreset(){if(S.attentionPreset==='custom'){const x=S.customAttention||{};return {id:'custom',name:'Our attention signal',call:signalText(x.call,45,'Our quiet signal'),response:signalText(x.response,90,'Pause · Ready to listen'),sound:x.sound===true};}return ATTENTION_PRESETS.find(x=>x.id===S.attentionPreset)||ATTENTION_PRESETS[0];}
+function signalText(value,max,fallback){return typeof value==='string'&&value.trim()?value.trim().slice(0,max):fallback;}
+function resetPreset(){if(S.resetPreset==='custom'){const x=Array.isArray(S.customReset)?S.customReset:[],base=RESET_PRESETS[1].steps;return {id:'custom',name:'Our class reset',steps:base.map((step,i)=>[signalText(x[i]?.[0],30,step[0]),signalText(x[i]?.[1],160,step[1])])};}return RESET_PRESETS.find(x=>x.id===S.resetPreset)||RESET_PRESETS[0];}
+function signalSettingsHTML(){return '<h2>Our class signals</h2><p class="lead">Choose once, teach and practise together. Attention and Reset room open your saved choice straight away.</p><h3>Attention signal</h3><div class="signal-options">'+ATTENTION_PRESETS.map(x=>'<label class="signal-option"><input type="radio" name="attentionPreset" data-signal="attentionPreset" value="'+x.id+'" '+(attentionPreset().id===x.id?'checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+esc(x.call)+' → '+esc(x.response)+'</small></span></label>').join('')+'</div>'+customAttentionHTML()+'<h3>Class reset</h3><div class="signal-options">'+RESET_PRESETS.map(x=>'<label class="signal-option"><input type="radio" name="resetPreset" data-signal="resetPreset" value="'+x.id+'" '+(resetPreset().id===x.id?'checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+esc(x.detail)+'</small></span></label>').join('')+'</div>'+customResetHTML()+'<p class="hint">Model the signal, practise the response and wait before giving instructions. Use the same routine consistently, with adjustments for students’ needs. The teacher moves each new reset step on when the class is ready.</p>';}
+document.addEventListener('change',e=>{const t=e.target;if(!t.matches('[data-signal]'))return;const list=t.dataset.signal==='attentionPreset'?ATTENTION_PRESETS:RESET_PRESETS;if(!list.some(x=>x.id===t.value))return;S[t.dataset.signal]=t.value;save();if(typeof renderSetup==='function')renderSetup();});
+
+function customAttentionHTML(){if(S.attentionPreset!=='custom')return '';const x=S.customAttention||{};return '<div class="signal-builder"><h4>Your attention signal</h4><div class="fld"><label for="customAttentionCall">Teacher’s call or signal</label><input id="customAttentionCall" data-custom-attention="call" maxlength="45" value="'+esc(x.call||'')+'" placeholder="e.g. Hocus pocus!"></div><div class="fld"><label for="customAttentionResponse">Class response or action</label><input id="customAttentionResponse" data-custom-attention="response" maxlength="90" value="'+esc(x.response||'')+'" placeholder="e.g. Everybody focus!"></div><label class="chk"><input type="checkbox" data-custom-attention="sound" '+(x.sound===true?'checked':'')+'>Play a gentle chime with this signal</label><p class="hint">Your words appear on the full-screen Attention display. Blank fields use “Our quiet signal” and “Pause · Ready to listen”.</p></div>';}
+function customResetHTML(){if(S.resetPreset!=='custom')return '';const steps=resetPreset().steps;return '<div class="signal-builder"><h4>Your four reset steps</h4><p class="hint">Keep the words familiar and brief. Tap Next step when the class is ready. Blank fields use the Pause, breathe, begin wording.</p>'+steps.map((step,i)=>'<div class="signal-reset-step"><h4>Step '+(i+1)+'</h4><div class="fld"><label for="customResetTitle'+i+'">Step heading</label><input id="customResetTitle'+i+'" data-custom-reset="'+i+':0" maxlength="30" value="'+esc(step[0])+'"></div><div class="fld"><label for="customResetWords'+i+'">What the class does</label><textarea id="customResetWords'+i+'" data-custom-reset="'+i+':1" maxlength="160" rows="2">'+esc(step[1])+'</textarea></div></div>').join('')+'</div>';}
+document.addEventListener('input',e=>{const t=e.target;if(t.matches('[data-custom-attention]')){const key=t.dataset.customAttention;if(!['call','response','sound'].includes(key))return;S.customAttention=S.customAttention&&typeof S.customAttention==='object'?S.customAttention:{};S.customAttention[key]=key==='sound'?t.checked:t.value.slice(0,key==='call'?45:90);save();}if(t.matches('[data-custom-reset]')){const [i,k]=t.dataset.customReset.split(':').map(Number);if(!Number.isInteger(i)||i<0||i>3||![0,1].includes(k))return;const steps=resetPreset().steps.map(x=>x.slice());steps[i][k]=t.value.slice(0,k?160:30);S.customReset=steps;save();}});
+
+function rzPresetDraw(){const m=document.getElementById('rzMain');if(!m)return;const x=resetPreset(),step=x.steps[RZ.step];if(!step)return;if(RZ.last===RZ.step)return;RZ.last=RZ.step;document.querySelectorAll('.rz-steps span').forEach((el,i)=>{el.className=i<RZ.step?'done':i===RZ.step?'cur':'';el.innerHTML='<b>'+(i+1)+'</b>'+esc(x.steps[i][0]);});m.className='rz-main rz-check';m.innerHTML='<h1 class="rz-t"><span class="pl" style="--pc:#FFD84D;--pr:-2deg">'+esc(step[0])+'</span></h1><div class="rz-roo" style="height:140px">'+birdSVG()+'</div><p class="rz-praise">'+esc(step[1])+'</p><button class="rz-btn gold big" type="button" data-rz="'+(RZ.step===3?'end':'preset-next')+'">'+(RZ.step===3?'Back to it':'Next step')+'</button>';}
 document.addEventListener('click',e=>{if(e.target.closest('[data-rz="preset-next"]')&&RZ.on)rzGo(Math.min(3,RZ.step+1));});
 
 function opt(v,l,cur){ return '<option value="'+esc(v)+'"'+(v===cur?' selected':'')+'>'+esc(l)+'</option>'; }
@@ -4299,7 +4307,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-gidea]');
 document.addEventListener('change',e=>{ if(e.target.id==='growOff'){ S.growOff=e.target.checked; save(); try{ redrawMascot(); }catch(_){ } render(true); } });
 
 /* ---- v2.2: choose your dock. Every tool stays available; teachers hide the ones they never use and put favourites first. ---- */
-const DOCK_NAMES={routines:'Routines',timer:'Timer',brain:'Brain break',checkin:'Check-in',exit:'Tickets',reflect:'Reflect',think:'Thinking routines',quiz:'Quiz games',poll:'Poll',pick:'Pick a name',finish:'Finished?',packup:'Pack up',reteach:'Practise expectations',calm:'Calm breathing',wellbeing:'Wellbeing moments',resets:'Reset room'};
+const DOCK_NAMES={routines:'Routines',timer:'Timer',brain:'Brain break',checkin:'Check-in',exit:'Tickets',reflect:'Reflect',think:'Thinking routines',quiz:'Quiz games',poll:'Poll',pick:'Pick a name',finish:'Finished?',packup:'Pack up',reteach:'Practise expectations',calm:'Calm breathing',wellbeing:'Wellbeing moments'};
 function dockOrder(){ const all=Object.keys(DOCK_NAMES), o=(S.dockOrder||[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!o.includes(k)) o.push(k); }); return o; }
 function applyDock(){ const box=document.querySelector('#dock .dtools'); if(!box||STUDENT) return; const hide=S.dockHide||[], o=dockOrder(); const br=box.querySelector('.dbreak');
   const vis=o.filter(k=>!hide.includes(k)); o.forEach(k=>{ const b=box.querySelector('.tool[data-tool="'+k+'"]'); if(b){ b.hidden=hide.includes(k); box.appendChild(b); } });
@@ -5098,8 +5106,7 @@ const UI_TOOL_GROUPS=[
   ['Classroom management',[
     ['routines','Routines','Run or practise a routine','routine transitions'],
     ['packup','Pack up','Get ready to leave','pack up home time'],
-    ['reteach','Practise expectations','Revisit classroom expectations','behaviour behavior expectations'],
-    ['resets','Reset room','Run our saved class reset','attention settle reset focus']]],
+    ['reteach','Practise expectations','Revisit classroom expectations','behaviour behavior expectations']]],
   ['Wellbeing',[
     ['brain','Brain break','Move, play or reset','movement active break'],
     ['calm','Calm breathing','Take a quiet minute','breathe breathing calm quiet'],
