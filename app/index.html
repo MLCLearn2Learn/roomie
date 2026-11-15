@@ -1292,7 +1292,8 @@ body.scrap .lesson-content .exp>div{font-size:clamp(25px,2.3vw,34px)}
     <button class="tool" type="button" data-tool="pick">Pick a name</button>
     <button class="tool" type="button" data-tool="finish">Finished?</button>
     <button class="tool" type="button" data-tool="packup">Pack up</button>
-    <button class="tool" type="button" data-tool="reteach">Practise expectations</button>
+    <button class="tool" type="button" data-tool="reteach">Practise Expectations</button>
+    <button class="tool" type="button" data-tool="calm">Calm breathing</button>
     </div>
     <div class="dacts">
     <button class="tool pt" type="button" data-tool="point">+1 point</button>
@@ -1347,7 +1348,7 @@ body.scrap .lesson-content .exp>div{font-size:clamp(25px,2.3vw,34px)}
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.7.7 · 15 Nov 2026';
+const VERSION='Roomie v2.7.8 · 15 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1761,7 +1762,7 @@ function renderOff(P,full){ if(!full) return;
   const msg=P.phase==='before'?('First up: '+P.next.b.name+' at '+fmtClock(P.next.st)):P.phase==='gap'?('Next: '+P.next.b.name+' at '+fmtClock(P.next.st)):P.phase==='after'?'School’s out. See you tomorrow!':'Add today’s plan in Setup.';
   if(P.phase==='gap'){ setStage('one','<section class="card" style="align-items:flex-start"><div class="eyebrow">Up next at '+fmtClock(P.next.st)+'</div><h1 class="big">Ready for '+esc(P.next.b.name)+'</h1>'+(P.next.b.materials?'<div class="task">'+esc(P.next.b.materials)+'</div>':'')+expHTML(P.next.b.exp)+'</section>'); return; }
   setStage('one','<section class="card"><div class="eyebrow">'+esc(isWeekend(now())?'Weekend · showing Monday’s plan':DAYNAME[dayKey(now())])+'</div><h1 class="big">'+esc(greeting())+', '+esc(S.room)+'</h1><p class="lead">'+esc(msg)+'</p>'+(P.phase==='after'&&typeof todayHTML==='function'&&!S.studentsAreExample?todayHTML():'')+(S.studentsAreExample?'<div class="okbox row" style="justify-content:space-between;align-items:center"><span>You’re seeing an example class. Make Roomie yours in about three minutes.</span><button class="btn sm" type="button" data-wzopen="1">Set up my class</button></div>':'')+'<div class="row" style="margin-top:auto">'+demoEntryHTML()+'<button class="btn alt" type="button" data-tool="routines">Run a routine now</button><button class="btn alt" type="button" data-act="setup">Set up my day</button></div></section>'); }
-const HOME_TILES=[['routines','Routines','Morning jobs, line up, pack up'],['timer','Timer','Countdown with music'],['brain','Brain break','Move, play or calm down'],['checkin','Check-in','How is everyone feeling?'],['exit','Tickets','Entry and exit tickets'],['reflect','Reflect','Quick reflections'],['think','Thinking Routines','Visible thinking routines'],['quiz','Quiz games','Drop Four, Mystery Stars…'],['poll','Poll','Class votes from their devices'],['pick','Pick a name','Fair and random'],['groups','Groups','Random groups in a tap'],['seats','Seating plan','Where everyone sits'],['jobs','Helpers','Classroom jobs this week'],['packup','Pack up','First ready, first out'],['finish','Finished?','Early-finisher checklist'],['reteach','Practise expectations','Model, practise and reflect together']];
+const HOME_TILES=[['routines','Routines','Morning jobs, line up, pack up'],['timer','Timer','Countdown with music'],['brain','Brain break','Move, play or calm down'],['checkin','Check-in','How is everyone feeling?'],['exit','Tickets','Entry and exit tickets'],['reflect','Reflect','Quick reflections'],['think','Thinking Routines','Visible thinking routines'],['quiz','Quiz games','Drop Four, Mystery Stars…'],['poll','Poll','Class votes from their devices'],['pick','Pick a name','Fair and random'],['groups','Groups','Random groups in a tap'],['seats','Seating plan','Where everyone sits'],['jobs','Helpers','Classroom jobs this week'],['packup','Pack up','First ready, first out'],['finish','Finished?','Early-finisher checklist'],['reteach','Practise Expectations','Model, practise and reflect together']];
 function renderHome(P,full){ if(!full) return;
   setStage('','<section class="card"><div class="eyebrow">'+esc(DAYNAME[dayKey(now())]||'')+'</div><h1 class="big" style="font-size:clamp(40px,4.4vw,72px)">Hello, '+esc(S.room)+'!</h1><p class="lead" style="margin:0">What do you need?</p><div class="tiles">'+HOME_TILES.map(([t,n,d])=>'<button class="tile" type="button" data-tool="'+t+'"><b>'+esc(n)+'</b><span>'+esc(d)+'</span></button>').join('')+'</div></section><aside class="side"><section class="card sm">'+weatherHTML()+'</section>'+goalHTML()+factHTML()+'</aside>'); }
 function greeting(){ const h=now().getHours(); return h<12?'Good morning':(h<17?'Good afternoon':'Good evening'); }
@@ -2454,7 +2455,7 @@ const Focus={kind:'',h:null,bus:null,nodes:[],paused:false,
 };
 function focusRow(){ const k=Focus.kind; return '<div class="focusrow"><span class="hint" style="color:var(--gum-d)">'+icon('music',18,'#1F6E52')+' Focus sound:</span>'+[['','Off'],['rain','Rain'],['piano','Soft piano'],['birds','Birdsong']].map(([v,l])=>'<button type="button" data-focus="'+v+'" aria-pressed="'+(k===v)+'">'+l+'</button>').join('')+'</div>'; }
 
-/* ---- Quick reteach cards ---- */
+/* ---- Practise Expectations cards ---- */
 const RETEACH=[
  {id:'callout',name:'Hands up, then speak',why:'So everyone gets time to think.',steps:['Think of your answer','Hand up, mouth closed','Wait until you hear your name'],show:'I’ll ask a question. Show me silent hands.'},
  {id:'listen',name:'Listening together',why:'So everyone can follow and join in.',steps:['Pause side conversations','Listen in a way that works for you','Ask for a repeat when needed'],show:'Practise listening in a way that works for you for 20 seconds.'},
@@ -2470,9 +2471,9 @@ const RETEACH=[
  {id:'oops',name:'Oops, try again',why:'Mistakes help our brains grow.',steps:['Notice it','Fix it or say sorry','Keep going'],show:'Tell your partner about a mistake that helped you learn.'}
 ];
 function renderReteach(full){ const r=A.rt&&RETEACH.find(x=>x.id===A.rt.id);
-  if(!r){ if(full) setStage('one','<section class="card choice-picker reteach-picker"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Quick reteach</h1>'+backBtn()+'</div><p class="lead">Two-minute resets for the behaviours that wobble. Pick one, practise it, celebrate it.</p><div class="rlist choice-scroll" role="region" aria-label="Quick reteach choices" tabindex="0">'+RETEACH.map(x=>'<button type="button" class="rbtn tcard" data-rt="'+x.id+'"><b>'+esc(x.name)+'</b><span>'+esc(x.why)+'</span></button>').join('')+'</div></section>'); return; }
+  if(!r){ if(full) setStage('one','<section class="card choice-picker reteach-picker"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Practise Expectations</h1>'+backBtn()+'</div><p class="lead">Two-minute resets for the behaviours that wobble. Pick one, practise it, celebrate it.</p><div class="rlist choice-scroll" role="region" aria-label="Practise Expectations choices" tabindex="0">'+RETEACH.map(x=>'<button type="button" class="rbtn tcard" data-rt="'+x.id+'"><b>'+esc(x.name)+'</b><span>'+esc(x.why)+'</span></button>').join('')+'</div></section>'); return; }
   if(full){ const show=A.rt.mode==='show', done=A.rt.mode==='done';
-    setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Quick reteach</div><div class="row"><button class="btn alt sm" type="button" data-rt="">All cards</button>'+backBtn()+'</div></div><h1 class="big">'+esc(r.name)+'</h1><p class="lead">Why? '+esc(r.why)+'</p>'+stepsHTML(r.steps,-1,'',true)+(show||done?'<div class="rt-show">Show me! '+esc(r.show)+'</div>':'')+'<div class="row" style="margin-top:auto">'+(done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-rtgo="show">Practise again</button>':(show?'<button class="btn gold" type="button" data-rtgo="done">Nailed it!</button>':'<button class="btn" type="button" data-rtgo="show">Practise: show me!</button>'))+'</div></section><aside class="side"><section class="card sm" style="align-items:center">'+(show?ringHTML('main','to show me','md'):'<div class="bigbird" style="width:180px">'+birdSVG()+'</div>')+'</section></aside>'); }
+    setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Practise Expectations</div><div class="row"><button class="btn alt sm" type="button" data-rt="">All cards</button>'+backBtn()+'</div></div><h1 class="big">'+esc(r.name)+'</h1><p class="lead">Why? '+esc(r.why)+'</p>'+stepsHTML(r.steps,-1,'',true)+(show||done?'<div class="rt-show">Show me! '+esc(r.show)+'</div>':'')+'<div class="row" style="margin-top:auto">'+(done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-rtgo="show">Practise again</button>':(show?'<button class="btn gold" type="button" data-rtgo="done">Nailed it!</button>':'<button class="btn" type="button" data-rtgo="show">Practise: show me!</button>'))+'</div></section><aside class="side"><section class="card sm" style="align-items:center">'+(show?ringHTML('main','to show me','md'):'<div class="bigbird" style="width:180px">'+birdSVG()+'</div>')+'</section></aside>'); }
   if(A.rt.mode==='show') paintRing('main',MT.remaining(),MT.total); }
 function rtGo(mode){ if(mode==='show'){ if(!navPrepareStart('reteach')) return; A.rt.mode='show'; chime(1); MT.start(20,()=>{ chime(1); }); render(true); Bird.say('Show me!'); } else if(mode==='done'){ A.rt.mode='done'; MT.stop(); render(true); celebrate('Nailed it!','big',null,rnd(['NAILED IT!','BOOM!','YES!'])); } }
 
@@ -4136,7 +4137,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-gidea]');
 document.addEventListener('change',e=>{ if(e.target.id==='growOff'){ S.growOff=e.target.checked; save(); try{ redrawMascot(); }catch(_){ } render(true); } });
 
 /* ---- v2.2: choose your dock. Every tool stays available; teachers hide the ones they never use and put favourites first. ---- */
-const DOCK_NAMES={routines:'Routines',timer:'Timer',brain:'Brain break',checkin:'Check-in',exit:'Tickets',reflect:'Reflect',think:'Thinking Routines',quiz:'Quiz games',poll:'Poll',pick:'Pick a name',finish:'Finished?',packup:'Pack up',reteach:'Practise expectations'};
+const DOCK_NAMES={routines:'Routines',timer:'Timer',brain:'Brain break',checkin:'Check-in',exit:'Tickets',reflect:'Reflect',think:'Thinking Routines',quiz:'Quiz games',poll:'Poll',pick:'Pick a name',finish:'Finished?',packup:'Pack up',reteach:'Practise Expectations',calm:'Calm breathing'};
 function dockOrder(){ const all=Object.keys(DOCK_NAMES), o=(S.dockOrder||[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!o.includes(k)) o.push(k); }); return o; }
 function applyDock(){ const box=document.querySelector('#dock .dtools'); if(!box||STUDENT) return; const hide=S.dockHide||[], o=dockOrder(); const br=box.querySelector('.dbreak');
   const vis=o.filter(k=>!hide.includes(k)); o.forEach(k=>{ const b=box.querySelector('.tool[data-tool="'+k+'"]'); if(b){ b.hidden=hide.includes(k); box.appendChild(b); } });
@@ -4929,7 +4930,7 @@ const UI_TOOL_GROUPS=[
   ['Classroom management',[
     ['routines','Routines','Run or practise a routine','routine transitions'],
     ['packup','Pack up','Get ready to leave','pack up home time'],
-    ['reteach','Practise expectations','Revisit classroom expectations','behaviour behavior expectations']]],
+    ['reteach','Practise Expectations','Revisit classroom expectations','behaviour behavior expectations']]],
   ['Wellbeing',[
     ['brain','Brain break','Move, play or reset','movement active break'],
     ['calm','Calm breathing','Take a quiet minute','breathe breathing calm quiet'],
