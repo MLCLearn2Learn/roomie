@@ -1348,7 +1348,7 @@ body.scrap .lesson-content .exp>div{font-size:clamp(25px,2.3vw,34px)}
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.7.10 · 15 Nov 2026';
+const VERSION='Roomie v2.7.11 · 15 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1823,7 +1823,7 @@ function paintBreath(){ if(bH) return; let i=0; const run=()=>{ const d=document
 function openOverlay(name,data){ if(A.overlay!==name) navRemember(A.overlay); A.overlay=name; Object.assign(A,data||{}); markTools(); markHero(); render(true); }
 function closeOverlay(){ if(NAV.owner==='brain'&&A.overlay==='brain') brainFinish(); else if(NAV.owner&&NAV.owner===A.overlay) navStopActivity(); else navBack(); }
 const NAV={trail:[],owner:null,origin:null};
-const NAV_LABELS={timer:'timer',brain:'brain break',calm:'calm breathing',manualRoutine:'routine',practise:'routine practice',rotate:'rotations',ticket:'ticket',reflect:'reflection',think:'thinking activity',packup:'pack up',reteach:'expectation practice'};
+const NAV_LABELS={timer:'timer',brain:'brain break',calm:'calm breathing',manualRoutine:'routine',practise:'routine practice',rotate:'rotations',ticket:'ticket',reflect:'reflection',think:'thinking activity',packup:'pack up',reteach:'expectation practice',quiz:'quiz game'};
 const NAV_CHOOSERS=['brainpick','tpick','rpick','thpick','routines','rotationSetup'];
 function navCapture(key){ return {key:key||null,phase:!key?A.P:null,segX:key==='peek'?A.segX:null,returnedLesson:key==='peek'&&!!A.returnedLesson}; }
 function navRemember(key){
@@ -1838,6 +1838,7 @@ function navActivityOrigin(key){
 }
 function navHasActivity(){
   if(!NAV.owner) return MT.total>0&&MT.remaining()>0;
+  if(NAV.owner==='quiz') return !!A.qz;
   if(NAV.owner==='practise') return !!A.pr&&!A.pr.done;
   if(NAV.owner==='brain') return !!A.brain; // Tap-paced breaks remain active until Finish.
   if(NAV.owner==='think') return !!A.th&&!A.th.done;
@@ -1863,7 +1864,7 @@ function navStopActivity(redraw){
   if(was==='brain'&&typeof speechSynthesis!=='undefined') try{ speechSynthesis.cancel(); }catch(_){}
   if(['brain','calm','manualRoutine','practise','party','rotate','packup'].includes(was)) Music.fadeStop();
   if(was==='hero'&&A.heroStage==='shown') A.heroStage='';
-  NAV.owner=null; NAV.origin=null; NAV.trail=[]; A.rot=null; A.overlay=null;
+  NAV.owner=null; NAV.origin=null; NAV.trail=[]; A.rot=null; A.qz=null; A.overlay=null;
   if(redraw!==false) navShow(destination);
 }
 function navPrepareStart(key){
@@ -2745,7 +2746,7 @@ document.addEventListener('click',e=>{ const t=e.target.closest('[data-rfstart]'
 document.addEventListener('change',e=>{ const el=e.target; if(el.dataset&&el.dataset.rfoff){ const off=new Set(S.reflectOff||[]); el.checked?off.delete(el.dataset.rfoff):off.add(el.dataset.rfoff); S.reflectOff=[...off]; save(); const c=el.closest('.tcard'); if(c) c.classList.toggle('off',!el.checked); } });
 
 function renderReflectPicker(){ const off=S.reflectOff||[];
-  setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Quick reflections</h1><div class="row"><button class="btn gold" type="button" data-rfstart="">Surprise me</button>'+backBtn()+'</div></div><div class="row"><span class="hint">Whole class, 1 to 2 minutes, no writing. Roomie runs each step.</span></div><div class="tgrid">'+REFLECT.map(r=>{ const secs=r.steps.reduce((a,s)=>a+s[2],0); return '<div class="tcard'+(off.includes(r.id)?' off':'')+'"><span class="chip" style="align-self:flex-start;font-size:13px;padding:3px 10px">'+r.steps.length+' steps · '+(Math.round(secs/30)/2)+' min</span><b>'+esc(r.name)+'</b><span>'+esc(r.blurb)+'</span><div class="row" style="margin-top:auto;justify-content:space-between"><label class="chk" style="font-size:14px"><input type="checkbox" data-rfoff="'+r.id+'" '+(off.includes(r.id)?'':'checked')+'> In the mix</label><button class="btn sm" type="button" data-rfstart="'+r.id+'">Start</button></div></div>'; }).join('')+'</div></section>'); }
+  setStage('one','<section class="card choice-picker"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Quick reflections</h1><div class="row"><button class="btn gold" type="button" data-rfstart="">Surprise me</button>'+backBtn()+'</div></div><div class="row"><span class="hint">Whole class, 1 to 2 minutes, no writing. Roomie runs each step.</span></div><div class="tgrid choice-scroll" role="region" aria-label="Quick reflections choices" tabindex="0">'+REFLECT.map(r=>{ const secs=r.steps.reduce((a,s)=>a+s[2],0); return '<div class="tcard'+(off.includes(r.id)?' off':'')+'"><span class="chip" style="align-self:flex-start;font-size:13px;padding:3px 10px">'+r.steps.length+' steps · '+(Math.round(secs/30)/2)+' min</span><b>'+esc(r.name)+'</b><span>'+esc(r.blurb)+'</span><div class="row" style="margin-top:auto;justify-content:space-between"><label class="chk" style="font-size:14px"><input type="checkbox" data-rfoff="'+r.id+'" '+(off.includes(r.id)?'':'checked')+'> In the mix</label><button class="btn sm" type="button" data-rfstart="'+r.id+'">Start</button></div></div>'; }).join('')+'</div></section>'); }
 
 document.addEventListener('click',e=>{ const t=e.target.closest('[data-bcat]'); if(!t) return; audio(); A.bcat=t.dataset.bcat; render(true); });
 
@@ -2833,8 +2834,8 @@ const QGAMES=[
  {id:'stars',name:'Mystery Stars',blurb:'Right answer? Grab a star. Some are worth a lot, some cost points. Nobody knows until the reveal!',teams:[2,4]},
  {id:'float',name:'Stay Afloat',blurb:'Two teams. Right answer? Sink a player from the other team or rescue one of yours. Wrong? Lose one.',teams:[2,2]}];
 function renderQuizPick(){ const n=S.qTeams||2;
-  setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Quiz games</h1>'+backBtn()+'</div><p class="hint" style="margin:0">Use your own revision questions. Ask them out loud; Roomie keeps the board and the score.</p><div class="row"><span class="hint">Teams:</span>'+[2,3,4].map(k=>'<button class="btn sm '+(k===n?'':'alt')+'" type="button" data-g="qteams" data-v="'+k+'">'+k+'</button>').join('')+'</div><div class="tgrid">'+QGAMES.map(g=>'<div class="tcard"><span class="chip" style="align-self:flex-start;font-size:13px;padding:3px 10px">'+(g.teams[1]===2?'2 teams':n+' teams')+'</span><b>'+esc(g.name)+'</b><span>'+esc(g.blurb)+'</span><div class="row" style="margin-top:auto;justify-content:flex-end"><button class="btn sm" type="button" data-g="qstart" data-v="'+g.id+'">Start</button></div></div>').join('')+'</div></section>'); }
-function startQuiz(id){ const n=id==='float'?2:(S.qTeams||2); const Q={id,n,cur:0,win:-1};
+  setStage('one','<section class="card choice-picker"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Quiz games</h1>'+backBtn()+'</div><p class="hint" style="margin:0">Use your own revision questions. Ask them out loud; Roomie keeps the board and the score.</p><div class="row"><span class="hint">Teams:</span>'+[2,3,4].map(k=>'<button class="btn sm '+(k===n?'':'alt')+'" type="button" data-g="qteams" data-v="'+k+'">'+k+'</button>').join('')+'</div><div class="tgrid choice-scroll" role="region" aria-label="Quiz games choices" tabindex="0">'+QGAMES.map(g=>'<div class="tcard"><span class="chip" style="align-self:flex-start;font-size:13px;padding:3px 10px">'+(g.teams[1]===2?'2 teams':n+' teams')+'</span><b>'+esc(g.name)+'</b><span>'+esc(g.blurb)+'</span><div class="row" style="margin-top:auto;justify-content:flex-end"><button class="btn sm" type="button" data-g="qstart" data-v="'+g.id+'">Start</button></div></div>').join('')+'</div></section>'); }
+function startQuiz(id){ if(NAV.owner!=='quiz'&&!navPrepareStart('quiz')) return; const n=id==='float'?2:(S.qTeams||2); const Q={id,n,cur:0,win:-1};
   if(id==='drop') Q.cells=Array.from({length:6},()=>Array(7).fill(-1));
   if(id==='stars'){ const vals=[5,4,3,3,2,2,2,1,1,1,1,2,3,-1,-1,-2,-2,4,1,-3]; Q.stars=vals.sort(()=>Math.random()-.5).map(v=>({v,o:-1})); Q.shown=false; }
   if(id==='float'){ Q.size=S.qSize||10; Q.left=[Q.size,Q.size]; }
