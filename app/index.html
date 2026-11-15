@@ -1248,6 +1248,23 @@ body.scrap .lesson-content .exp>div{font-size:clamp(25px,2.3vw,34px)}
 .picker-content #pickLeft{font-size:clamp(22px,2vw,30px);margin:8px 0}
 .choice-picker.routines-picker .rbtn{min-height:210px}.routines-picker .mymusic{max-height:140px;overflow:auto}
 @media(max-width:760px){.brain-settings-pop .brain-settings-panel{position:fixed;top:140px;left:16px;right:16px;width:auto;max-height:60vh}.picker-content #pickName{padding:16px;min-height:180px}}
+
+/* Toolkit space: preserve the established colours, artwork and mascot. */
+.stage.toolkit-home{grid-template-columns:minmax(0,1fr) minmax(230px,290px);gap:18px}
+.stage.toolkit-home.one{grid-template-columns:minmax(0,1fr)}
+.toolkit-main{gap:12px;overflow:auto!important}
+.toolkit-main>.toolkit-heading,.toolkit-main>.lead{flex-shrink:0}
+.toolkit-main .toolkit-heading h1{font-size:clamp(30px,3vw,46px)!important;line-height:1.15;margin:0;min-width:0}
+.toolkit-heading{align-items:center;flex-wrap:wrap;gap:10px}
+body.mode-tools .toolkit-main .tiles{flex:1;min-height:0;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:14px;align-content:start}
+body.mode-tools .toolkit-main .tile{min-height:126px;padding:18px;gap:8px;overflow-wrap:anywhere}
+.toolkit-main .tile b{font-size:clamp(24px,2vw,30px);line-height:1.15}
+.toolkit-main .tile span{font-size:17px;line-height:1.35}
+body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));align-content:stretch;grid-auto-rows:minmax(170px,1fr)}
+.toolkit-main .toolkit-few .tile b{font-size:clamp(28px,2.6vw,38px)}
+.toolkit-panels .card{padding:18px}
+@media(max-width:1199px){.stage.toolkit-home{grid-template-columns:minmax(0,1fr)}.toolkit-main .tiles{flex:none!important}.toolkit-panels{grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))}}
+
 </style>
 
 <svg class="land" viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60 C 260 10 520 40 760 70 S 1200 100 1440 50 L1440 150 L0 150 Z" fill="#7CC79A" id="hill1"></path><path d="M0 110 C 300 80 600 105 900 120 S 1260 130 1440 100 L1440 150 L0 150 Z" fill="#2F8F6B"></path></svg>
@@ -1348,7 +1365,7 @@ body.scrap .lesson-content .exp>div{font-size:clamp(25px,2.3vw,34px)}
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.7.12 · 15 Nov 2026';
+const VERSION='Roomie v2.7.13 · 15 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1767,9 +1784,10 @@ const TOOLKIT_CLASS_KEYS=['pick','groups','seats','jobs'];
 function toolkitTiles(){ return HOME_TILES.filter(([key])=>!TOOLKIT_CLASS_KEYS.includes(key)).concat([['calm','Calm breathing','Take a quiet minute']]); }
 function toolkitOrder(){ const all=toolkitTiles().map(([key])=>key), order=[...new Set((S.toolkitOrder||[]).filter(key=>all.includes(key)))]; return order.concat(all.filter(key=>!order.includes(key))); }
 function toolkitVisible(){ return toolkitOrder().filter(key=>!(S.toolkitHide||[]).includes(key)); }
+function toolkitPanelOn(key){ return !S.toolkitPanels||S.toolkitPanels[key]!==false; }
 function toolkitSetupHTML(){
  const tiles=Object.fromEntries(toolkitTiles().map(tile=>[tile[0],tile])), order=toolkitOrder(), hidden=S.toolkitHide||[];
- return '<div class="dockset"><h3>Customise my toolkit</h3><p class="hint">Tick your favourites and put them in the order you use them. Unticked teaching tools stay in More tools. Name picker, seating, groups and helpers are under Students. Your Whole day bottom bar stays separate.</p><div class="docklist">'+order.map((key,i)=>'<div class="dockrow'+(hidden.includes(key)?' off':'')+'"><label class="chk"><input type="checkbox" data-tk="show:'+key+'" '+(hidden.includes(key)?'':'checked')+'><span>'+esc(tiles[key][1])+'</span></label><span><button class="btn alt sm" type="button" data-tk="up:'+key+'" '+(i?'':'disabled')+' aria-label="Move '+esc(tiles[key][1])+' earlier">←</button><button class="btn alt sm" type="button" data-tk="down:'+key+'" '+(i<order.length-1?'':'disabled')+' aria-label="Move '+esc(tiles[key][1])+' later">→</button></span></div>').join('')+'</div><button class="btn alt sm" type="button" data-tk="reset">Show all tools in the usual order</button></div>';
+ return '<div class="dockset"><h3>Customise my toolkit</h3><p class="hint">Tick your favourites and put them in the order you use them. Unticked teaching tools stay in More tools. Name picker, seating, groups and helpers are under Students. Your Whole day bottom bar stays separate.</p><div class="docklist">'+order.map((key,i)=>'<div class="dockrow'+(hidden.includes(key)?' off':'')+'"><label class="chk"><input type="checkbox" data-tk="show:'+key+'" '+(hidden.includes(key)?'':'checked')+'><span>'+esc(tiles[key][1])+'</span></label><span><button class="btn alt sm" type="button" data-tk="up:'+key+'" '+(i?'':'disabled')+' aria-label="Move '+esc(tiles[key][1])+' earlier">←</button><button class="btn alt sm" type="button" data-tk="down:'+key+'" '+(i<order.length-1?'':'disabled')+' aria-label="Move '+esc(tiles[key][1])+' later">→</button></span></div>').join('')+'</div><button class="btn alt sm" type="button" data-tk="reset">Show all tools in the usual order</button><h3>Extra panels</h3><p class="hint">Choose what sits beside your tools. Turn all three off to give your tools the full width. These choices only affect Toolkit mode.</p><div class="docklist">'+[['checkin','Show check-in panel'],['goal','Show class goal panel'],['fact','Show fun fact panel']].map(([key,label])=>'<label class="chk dockrow"><input type="checkbox" data-tk-panel="'+key+'" '+(toolkitPanelOn(key)?'checked':'')+'><span>'+label+'</span></label>').join('')+'</div></div>';
 }
 document.addEventListener('click',e=>{
  if(e.target.closest('[data-toolkit-edit]')){ tab='dock';openSetup();return; }
@@ -1780,8 +1798,12 @@ document.addEventListener('click',e=>{
  save();applyDock();render(true);renderSetup();
 });
 document.addEventListener('change',e=>{const t=e.target;if(!t.matches('input[data-tk]'))return;const key=t.dataset.tk.split(':')[1],hidden=new Set(S.toolkitHide||[]);if(t.checked)hidden.delete(key);else hidden.add(key);S.toolkitHide=[...hidden];save();applyDock();render(true);t.closest('.dockrow').classList.toggle('off',!t.checked);});
+document.addEventListener('change',e=>{const t=e.target;if(!t.matches('input[data-tk-panel]'))return;S.toolkitPanels=Object.assign({},S.toolkitPanels,{[t.dataset.tkPanel]:t.checked});save();render(true);});
 function renderHome(P,full){ if(!full) return;
-  setStage('','<section class="card"><div class="eyebrow">'+esc(DAYNAME[dayKey(now())]||'')+'</div><h1 class="big" style="font-size:clamp(40px,4.4vw,72px)">Hello, '+esc(S.room)+'!</h1><div class="row" style="justify-content:space-between"><p class="lead" style="margin:0">What do you need?</p><button class="btn alt sm" type="button" data-toolkit-edit>Customise my toolkit</button></div><div class="tiles">'+toolkitOrder().filter(key=>toolkitVisible().includes(key)).map(key=>toolkitTiles().find(tile=>tile[0]===key)).map(([t,n,d])=>'<button class="tile" type="button" data-tool="'+t+'"><b>'+esc(n)+'</b><span>'+esc(d)+'</span></button>').join('')+'</div></section><aside class="side"><section class="card sm">'+weatherHTML()+'</section>'+goalHTML()+factHTML()+'</aside>'); }
+ const visible=toolkitVisible(),panels=(toolkitPanelOn('checkin')?'<section class="card sm">'+weatherHTML()+'</section>':'')+(toolkitPanelOn('goal')?goalHTML():'')+(toolkitPanelOn('fact')?factHTML():'');
+ const tiles=toolkitOrder().filter(key=>visible.includes(key)).map(key=>toolkitTiles().find(tile=>tile[0]===key));
+ setStage('toolkit-home'+(panels?'':' one'),'<section class="card toolkit-main"><div class="row toolkit-heading" style="justify-content:space-between"><h1 class="big">Hello, '+esc(S.room)+'!</h1><button class="btn alt sm" type="button" data-toolkit-edit>Customise my toolkit</button></div><p class="lead" style="margin:0">What do you need?</p><div class="tiles'+(visible.length<=6?' toolkit-few':'')+'">'+tiles.map(([t,n,d])=>'<button class="tile" type="button" data-tool="'+t+'"><b>'+esc(n)+'</b><span>'+esc(d)+'</span></button>').join('')+'</div>'+(!tiles.length?'<p class="hint">Your tools are in More tools. Choose favourites in Customise my toolkit to show them here.</p>':'')+'</section>'+(panels?'<aside class="side toolkit-panels">'+panels+'</aside>':'')); }
+
 function greeting(){ const h=now().getHours(); return h<12?'Good morning':(h<17?'Good afternoon':'Good evening'); }
 function renderLesson(P,full){
   const b=P.block, left=(P.to-P.mins)*60, total=(P.to-P.from)*60;
@@ -2560,7 +2582,7 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeDMenu(); });
 function fitApp(){ const a=document.getElementById('app'); if(!a) return;
   if(innerWidth<1200){ a.style.zoom=''; a.style.width=''; a.style.height=''; document.body.classList.remove('fitted'); document.querySelectorAll('#stage .card,#strip').forEach(box=>{ delete box._fitSig; [...box.children].forEach(k=>k.style.zoom=''); }); return; }
   const cs=getComputedStyle(document.body), pw=innerWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight); const z=Math.min(pw/1408,innerHeight/860); a.style.zoom=z; a.style.width=(pw/z)+'px'; a.style.height=(innerHeight/z)+'px'; document.body.classList.add('fitted'); fitCards(); }
-function fitBox(box,lo){ if(box.classList.contains('hasvis')||box.classList.contains('choice-picker')||box.classList.contains('timer-content')||box.classList.contains('picker-content')) return; lo=lo||0.55; const sig=box.clientWidth+'x'+box.clientHeight+':'+box.children.length+':'+box.innerHTML.length; if(box._fitSig===sig) return; box._fitSig=sig; const kids=[...box.children].filter(k=>!k.classList.contains('scn-band')&&!k.classList.contains('scn-art')&&!k.classList.contains('scn-hdr')); kids.forEach(k=>k.style.zoom=''); if(box.scrollHeight<=box.clientHeight) return; let f=1;
+function fitBox(box,lo){ if(box.classList.contains('toolkit-main')||box.classList.contains('hasvis')||box.classList.contains('choice-picker')||box.classList.contains('timer-content')||box.classList.contains('picker-content')) return; lo=lo||0.55; const sig=box.clientWidth+'x'+box.clientHeight+':'+box.children.length+':'+box.innerHTML.length; if(box._fitSig===sig) return; box._fitSig=sig; const kids=[...box.children].filter(k=>!k.classList.contains('scn-band')&&!k.classList.contains('scn-art')&&!k.classList.contains('scn-hdr')); kids.forEach(k=>k.style.zoom=''); if(box.scrollHeight<=box.clientHeight) return; let f=1;
   for(let i=0;i<4&&box.scrollHeight>box.clientHeight&&f>lo;i++){ f=Math.max(lo,f*Math.min(0.97,(box.clientHeight-6)/box.scrollHeight)); kids.forEach(k=>k.style.zoom=f); } }
 function fitCards(){ if(innerWidth<1200) return; document.querySelectorAll('#stage .card').forEach(b=>fitBox(b)); const st=document.getElementById('strip'); if(st) fitBox(st,0.4); }
 let fitQ=0; const fitSoon=()=>{ cancelAnimationFrame(fitQ); fitQ=requestAnimationFrame(()=>requestAnimationFrame(fitCards)); };
