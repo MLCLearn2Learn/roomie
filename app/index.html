@@ -1285,7 +1285,7 @@ body.scrap .lesson-content .exp>div{font-size:clamp(25px,2.3vw,34px)}
     <button class="tool" type="button" data-tool="checkin">Check-in</button>
     <button class="tool" type="button" data-tool="exit">Tickets</button>
     <button class="tool" type="button" data-tool="reflect">Reflect</button>
-    <button class="tool" type="button" data-tool="think">Thinking</button>
+    <button class="tool" type="button" data-tool="think">Thinking Routines</button>
     <button class="tool" type="button" data-tool="quiz">Quiz games</button>
     <button class="tool" type="button" data-tool="poll">Poll</button>
     <i class="dbreak"></i>
@@ -1347,7 +1347,7 @@ body.scrap .lesson-content .exp>div{font-size:clamp(25px,2.3vw,34px)}
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.7.5 · 15 Nov 2026';
+const VERSION='Roomie v2.7.6 · 15 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1761,7 +1761,7 @@ function renderOff(P,full){ if(!full) return;
   const msg=P.phase==='before'?('First up: '+P.next.b.name+' at '+fmtClock(P.next.st)):P.phase==='gap'?('Next: '+P.next.b.name+' at '+fmtClock(P.next.st)):P.phase==='after'?'School’s out. See you tomorrow!':'Add today’s plan in Setup.';
   if(P.phase==='gap'){ setStage('one','<section class="card" style="align-items:flex-start"><div class="eyebrow">Up next at '+fmtClock(P.next.st)+'</div><h1 class="big">Ready for '+esc(P.next.b.name)+'</h1>'+(P.next.b.materials?'<div class="task">'+esc(P.next.b.materials)+'</div>':'')+expHTML(P.next.b.exp)+'</section>'); return; }
   setStage('one','<section class="card"><div class="eyebrow">'+esc(isWeekend(now())?'Weekend · showing Monday’s plan':DAYNAME[dayKey(now())])+'</div><h1 class="big">'+esc(greeting())+', '+esc(S.room)+'</h1><p class="lead">'+esc(msg)+'</p>'+(P.phase==='after'&&typeof todayHTML==='function'&&!S.studentsAreExample?todayHTML():'')+(S.studentsAreExample?'<div class="okbox row" style="justify-content:space-between;align-items:center"><span>You’re seeing an example class. Make Roomie yours in about three minutes.</span><button class="btn sm" type="button" data-wzopen="1">Set up my class</button></div>':'')+'<div class="row" style="margin-top:auto">'+demoEntryHTML()+'<button class="btn alt" type="button" data-tool="routines">Run a routine now</button><button class="btn alt" type="button" data-act="setup">Set up my day</button></div></section>'); }
-const HOME_TILES=[['routines','Routines','Morning jobs, line up, pack up'],['timer','Timer','Countdown with music'],['brain','Brain break','Move, play or calm down'],['checkin','Check-in','How is everyone feeling?'],['exit','Tickets','Entry and exit tickets'],['reflect','Reflect','Quick reflections'],['think','Thinking','Visible thinking routines'],['quiz','Quiz games','Drop Four, Mystery Stars…'],['poll','Poll','Class votes from their devices'],['pick','Pick a name','Fair and random'],['groups','Groups','Random groups in a tap'],['seats','Seating plan','Where everyone sits'],['jobs','Helpers','Classroom jobs this week'],['packup','Pack up','First ready, first out'],['finish','Finished?','Early-finisher checklist'],['reteach','Practise expectations','Model, practise and reflect together']];
+const HOME_TILES=[['routines','Routines','Morning jobs, line up, pack up'],['timer','Timer','Countdown with music'],['brain','Brain break','Move, play or calm down'],['checkin','Check-in','How is everyone feeling?'],['exit','Tickets','Entry and exit tickets'],['reflect','Reflect','Quick reflections'],['think','Thinking Routines','Visible thinking routines'],['quiz','Quiz games','Drop Four, Mystery Stars…'],['poll','Poll','Class votes from their devices'],['pick','Pick a name','Fair and random'],['groups','Groups','Random groups in a tap'],['seats','Seating plan','Where everyone sits'],['jobs','Helpers','Classroom jobs this week'],['packup','Pack up','First ready, first out'],['finish','Finished?','Early-finisher checklist'],['reteach','Practise expectations','Model, practise and reflect together']];
 function renderHome(P,full){ if(!full) return;
   setStage('','<section class="card"><div class="eyebrow">'+esc(DAYNAME[dayKey(now())]||'')+'</div><h1 class="big" style="font-size:clamp(40px,4.4vw,72px)">Hello, '+esc(S.room)+'!</h1><p class="lead" style="margin:0">What do you need?</p><div class="tiles">'+HOME_TILES.map(([t,n,d])=>'<button class="tile" type="button" data-tool="'+t+'"><b>'+esc(n)+'</b><span>'+esc(d)+'</span></button>').join('')+'</div></section><aside class="side"><section class="card sm">'+weatherHTML()+'</section>'+goalHTML()+factHTML()+'</aside>'); }
 function greeting(){ const h=now().getHours(); return h<12?'Good morning':(h<17?'Good afternoon':'Good evening'); }
@@ -1889,7 +1889,7 @@ function backBtn(label){ const stop=!!label&&/^(Stop|Finish)/.test(label); retur
 function renderOverlay(full){
   const o=A.overlay, P=A.P;
   if(renderFunOverlay(o,full)) return;
-  if(o==='routines'){ if(!full) return; setStage('one','<section class="card choice-picker routines-picker"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Routines</h1>'+backBtn()+'</div><p class="lead">Run one now, or practise it: the class times itself and tries to beat its best.</p><div class="rlist choice-scroll" role="region" aria-label="Routine choices" tabindex="0">'+S.routines.map(r=>'<div class="rbtn tcard"><b>'+esc(r.name)+'</b><span>'+stepsOf(r).length+' steps · '+r.minutes+' min'+(r.best?' · best '+fmtLeft(r.best):'')+'</span><div class="row" style="margin-top:6px"><button class="btn sm" type="button" data-run="'+esc(r.id)+'">Run</button><button class="btn alt sm" type="button" data-practise="'+esc(r.id)+'">Practise</button></div></div>').join('')+'</div></section>'); return; }
+  if(o==='routines'){ if(!full) return; setStage('one','<section class="card choice-picker routines-picker"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Classroom Routines</h1>'+backBtn()+'</div><p class="lead">Run one now, or practise it: the class times itself and tries to beat its best.</p><div class="rlist choice-scroll" role="region" aria-label="Routine choices" tabindex="0">'+S.routines.map(r=>'<div class="rbtn tcard"><b>'+esc(r.name)+'</b><span>'+stepsOf(r).length+' steps · '+r.minutes+' min'+(r.best?' · best '+fmtLeft(r.best):'')+'</span><div class="row" style="margin-top:6px"><button class="btn sm" type="button" data-run="'+esc(r.id)+'">Run</button><button class="btn alt sm" type="button" data-practise="'+esc(r.id)+'">Practise</button></div></div>').join('')+'</div></section>'); return; }
   if(o==='manualRoutine'){ const R=routineById(A.mr.id); const st=stepsOf(R); const cur=A.mr.step;
     if(full||A.mr.drawn!==cur){ A.mr.drawn=cur; setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Routine</div>'+backBtn('Stop')+'</div><h1 class="big">'+esc(R.name)+'</h1>'+stepsHTML(st,cur)+'<div class="row" style="margin-top:auto"><button class="btn" type="button" data-act="mrNext">'+(cur>=st.length-1?'Finish':'Next step')+'</button><button class="btn alt" type="button" data-act="mrBack">Previous step</button></div></section><aside class="side">'+(R.checkin?'<section class="card sm">'+weatherHTML()+'</section>':'')+'<section class="card sm" style="align-items:center">'+(R.checkin?'<div style="width:150px">'+ringHTML('main','left','sm')+'</div>':ringHTML('main','left'))+'</section>'+npHTML()+'</aside>'); updateNowPlaying(); }
     paintRing('main',MT.remaining(),MT.total); return; }
@@ -2807,7 +2807,7 @@ document.addEventListener('click',e=>{ const t=e.target.closest('[data-thstart]'
 document.addEventListener('change',e=>{ const el=e.target; if(el.dataset&&el.dataset.thoff){ const off=new Set(S.thinkOff||[]); el.checked?off.delete(el.dataset.thoff):off.add(el.dataset.thoff); S.thinkOff=[...off]; save(); const c=el.closest('.tcard'); if(c) c.classList.toggle('off',!el.checked); } });
 document.addEventListener('input',e=>{ if(e.target.id==='thFocus'){ S.thinkFocus=e.target.value; save(); } });
 function renderThinkPicker(){ const off=S.thinkOff||[];
-  setStage('one','<section class="card choice-picker"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Thinking routines</h1><div class="row"><button class="btn gold" type="button" data-thstart="">Surprise me</button>'+backBtn()+'</div></div><label class="thin"><span>What are we thinking about? <em>(optional, shows on every step)</em></span><input id="thFocus" type="text" maxlength="90" placeholder="e.g. the photo on the board, the poem on page 12, plastic bags" value="'+esc(S.thinkFocus||'')+'"></label><div class="thvis"><span><b>Something to look at</b> <em>(optional)</em>: a picture, a PDF, a slides link or a question. It shows beside every step.</span>'+visPickerHTML(S.thinkVis,'think')+'</div><div class="tgrid choice-scroll" role="region" aria-label="Thinking routine choices" tabindex="0">'+THINK.map(r=>'<div class="tcard'+(off.includes(r.id)?' off':'')+'"><span class="chip" style="align-self:flex-start;font-size:13px;padding:3px 10px">'+esc(r.when)+' · '+r.steps.length+' steps</span><b>'+esc(r.name)+'</b><span>'+esc(r.blurb)+'</span><span class="thsteps">'+r.steps.map(s=>esc(s[0])).join(' → ')+'</span><div class="row" style="margin-top:auto;justify-content:space-between"><label class="chk" style="font-size:14px"><input type="checkbox" data-thoff="'+r.id+'" '+(off.includes(r.id)?'':'checked')+'> In the mix</label><button class="btn sm" type="button" data-thstart="'+r.id+'">Start</button></div></div>').join('')+'</div><p class="hint" style="margin:0">Based on the Visible Thinking routines from Project Zero, Harvard Graduate School of Education.</p></section>'); }
+  setStage('one','<section class="card choice-picker"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Thinking Routines</h1><div class="row"><button class="btn gold" type="button" data-thstart="">Surprise me</button>'+backBtn()+'</div></div><label class="thin"><span>What are we thinking about? <em>(optional, shows on every step)</em></span><input id="thFocus" type="text" maxlength="90" placeholder="e.g. the photo on the board, the poem on page 12, plastic bags" value="'+esc(S.thinkFocus||'')+'"></label><div class="thvis"><span><b>Something to look at</b> <em>(optional)</em>: a picture, a PDF, a slides link or a question. It shows beside every step.</span>'+visPickerHTML(S.thinkVis,'think')+'</div><div class="tgrid choice-scroll" role="region" aria-label="Thinking routine choices" tabindex="0">'+THINK.map(r=>'<div class="tcard'+(off.includes(r.id)?' off':'')+'"><span class="chip" style="align-self:flex-start;font-size:13px;padding:3px 10px">'+esc(r.when)+' · '+r.steps.length+' steps</span><b>'+esc(r.name)+'</b><span>'+esc(r.blurb)+'</span><span class="thsteps">'+r.steps.map(s=>esc(s[0])).join(' → ')+'</span><div class="row" style="margin-top:auto;justify-content:space-between"><label class="chk" style="font-size:14px"><input type="checkbox" data-thoff="'+r.id+'" '+(off.includes(r.id)?'':'checked')+'> In the mix</label><button class="btn sm" type="button" data-thstart="'+r.id+'">Start</button></div></div>').join('')+'</div><p class="hint" style="margin:0">Based on the Visible Thinking routines from Project Zero, Harvard Graduate School of Education.</p></section>'); }
 
 /* ---- v0.5: Pack up & go, Finished?, Quiz games ---- */
 const TEAMC=[['Rockets','#F5B700'],['Comets','#2F8F6B'],['Dragons','#2F7FB0'],['Pandas','#F2785C']];
@@ -4136,7 +4136,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-gidea]');
 document.addEventListener('change',e=>{ if(e.target.id==='growOff'){ S.growOff=e.target.checked; save(); try{ redrawMascot(); }catch(_){ } render(true); } });
 
 /* ---- v2.2: choose your dock. Every tool stays available; teachers hide the ones they never use and put favourites first. ---- */
-const DOCK_NAMES={routines:'Routines',timer:'Timer',brain:'Brain break',checkin:'Check-in',exit:'Tickets',reflect:'Reflect',think:'Thinking',quiz:'Quiz games',poll:'Poll',pick:'Pick a name',finish:'Finished?',packup:'Pack up',reteach:'Practise expectations'};
+const DOCK_NAMES={routines:'Routines',timer:'Timer',brain:'Brain break',checkin:'Check-in',exit:'Tickets',reflect:'Reflect',think:'Thinking Routines',quiz:'Quiz games',poll:'Poll',pick:'Pick a name',finish:'Finished?',packup:'Pack up',reteach:'Practise expectations'};
 function dockOrder(){ const all=Object.keys(DOCK_NAMES), o=(S.dockOrder||[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!o.includes(k)) o.push(k); }); return o; }
 function applyDock(){ const box=document.querySelector('#dock .dtools'); if(!box||STUDENT) return; const hide=S.dockHide||[], o=dockOrder(); const br=box.querySelector('.dbreak');
   const vis=o.filter(k=>!hide.includes(k)); o.forEach(k=>{ const b=box.querySelector('.tool[data-tool="'+k+'"]'); if(b){ b.hidden=hide.includes(k); box.appendChild(b); } });
@@ -4893,7 +4893,7 @@ applyDock=function(){
 };
 dockSetupHTML=function(){
   const hidden=S.dockHide||[], order=dockOrder(), simple=S.dockPreset==='simple';
-  return '<div class="dockset"><h3 style="margin:0">Your dock</h3><p class="hint" style="margin:0">Keep a few everyday tools close by, or choose your own. Teaching tools are in More tools; class tools are under Students.</p><div class="dock-preset"><div class="row" role="group" aria-label="Dock preset"><button class="btn alt" type="button" data-dock-preset="simple" aria-pressed="'+simple+'">Simple: four everyday tools</button><button class="btn alt" type="button" data-dock-preset="custom" aria-pressed="'+!simple+'">My custom dock</button></div>'+(simple?'<p class="hint" style="margin:0">Routines, Timer, Brain break and Pick a name. Your custom tools and order are kept; switch back any time.</p>':'')+'</div><div class="docklist"'+(simple?' hidden':'')+'>'+order.map((k,i)=>'<div class="dockrow'+(hidden.includes(k)?' off':'')+'"><label class="chk"><input type="checkbox" data-dk="show:'+k+'" '+(hidden.includes(k)?'':'checked')+'><span>'+esc(DOCK_NAMES[k])+'</span></label><span><button type="button" class="btn alt sm" data-dk="up:'+k+'" '+(i?'':'disabled')+' aria-label="Move '+esc(DOCK_NAMES[k])+' earlier">←</button><button type="button" class="btn alt sm" data-dk="down:'+k+'" '+(i<order.length-1?'':'disabled')+' aria-label="Move '+esc(DOCK_NAMES[k])+' later">→</button></span></div>').join('')+'</div><button type="button" class="linkbtn" data-dk="reset:x"'+(simple?' hidden':'')+'>Show all tools in the usual order</button></div>';
+  return '<div class="dockset"><h3 style="margin:0">Your dock</h3><p class="hint" style="margin:0">Keep a few everyday tools close by, or choose your own. Tools not on your bottom bar are in More tools; class tools are under Students.</p><div class="dock-preset"><div class="row" role="group" aria-label="Dock preset"><button class="btn alt" type="button" data-dock-preset="simple" aria-pressed="'+simple+'">Simple: four everyday tools</button><button class="btn alt" type="button" data-dock-preset="custom" aria-pressed="'+!simple+'">My custom dock</button></div>'+(simple?'<p class="hint" style="margin:0">Routines, Timer, Brain break and Pick a name. Your custom tools and order are kept; switch back any time.</p>':'')+'</div><div class="docklist"'+(simple?' hidden':'')+'>'+order.map((k,i)=>'<div class="dockrow'+(hidden.includes(k)?' off':'')+'"><label class="chk"><input type="checkbox" data-dk="show:'+k+'" '+(hidden.includes(k)?'':'checked')+'><span>'+esc(DOCK_NAMES[k])+'</span></label><span><button type="button" class="btn alt sm" data-dk="up:'+k+'" '+(i?'':'disabled')+' aria-label="Move '+esc(DOCK_NAMES[k])+' earlier">←</button><button type="button" class="btn alt sm" data-dk="down:'+k+'" '+(i<order.length-1?'':'disabled')+' aria-label="Move '+esc(DOCK_NAMES[k])+' later">→</button></span></div>').join('')+'</div><button type="button" class="linkbtn" data-dk="reset:x"'+(simple?' hidden':'')+'>Show all tools in the usual order</button></div>';
 };
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-dock-preset]'); if(!b) return; S.dockPreset=b.dataset.dockPreset; save(); applyDock(); renderSetup(); });
 let uiDMenuOpener=null;
@@ -4921,12 +4921,12 @@ const UI_TOOL_GROUPS=[
   ['Teaching',[
     ['timer','Timer','Quick countdowns','countdown minutes seconds'],
     ['exit','Tickets','Entry and exit prompts','entry exit ticket assessment'],
-    ['think','Thinking','Prompts for deeper thinking','thinking routines'],
+    ['think','Thinking Routines','Prompts for deeper thinking','thinking routines'],
     ['reflect','Reflect','Pause and review learning','reflection review'],
     ['quiz','Quiz games','Practise through play','quiz questions games'],
     ['poll','Poll','Hear from the whole class','vote voting survey'],
     ['finish','Finished?','Ideas for early finishers','finished early finishers']]],
-  ['Routines',[
+  ['Classroom management',[
     ['routines','Routines','Run or practise a routine','routine transitions'],
     ['packup','Pack up','Get ready to leave','pack up home time'],
     ['reteach','Practise expectations','Revisit classroom expectations','behaviour behavior expectations']]],
@@ -4935,16 +4935,16 @@ const UI_TOOL_GROUPS=[
     ['calm','Calm breathing','Take a quiet minute','breathe breathing calm quiet'],
     ['checkin','Check-in','See how everyone feels','feelings mood wellbeing check in']]]
 ];
-function uiFindTools(query){
+function uiFindTools(query,excluded=[]){
   const words=String(query||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().split(/\s+/).filter(Boolean);
   return UI_TOOL_GROUPS.map(([label,tools])=>[label,tools.filter(tool=>{
     const text=tool.slice(1).join(' ').toLowerCase().replace(/[^a-z0-9]+/g,' ');
-    return words.every(word=>text.includes(word));
+    return !excluded.includes(tool[0])&&words.every(word=>text.includes(word));
   })]).filter(([,tools])=>tools.length);
 }
 /* TOOL_FINDER_END */
 function uiToolResults(menu,query){
-  const groups=uiFindTools(query), count=groups.reduce((n,[,tools])=>n+tools.length,0);
+  const groups=uiFindTools(query,uiDockKeys(dockOrder(),S.dockHide||[],S.dockPreset)), count=groups.reduce((n,[,tools])=>n+tools.length,0);
   menu.querySelector('#toolResults').innerHTML=groups.map(([label,tools],i)=>'<section class="tool-group" aria-labelledby="toolGroup'+i+'"><h3 id="toolGroup'+i+'">'+esc(label)+'</h3><div class="tool-grid">'+tools.map(([key,label,detail])=>'<button class="tool finder-tool" type="button" data-tool="'+key+'"><b>'+esc(label)+'</b><span>'+esc(detail)+'</span></button>').join('')+'</div></section>').join('');
   menu.querySelector('#toolResultCount').textContent=count?count+' tool'+(count===1?'':'s'):'No matching tools. Try “timer”, “brain break” or “tickets”.';
 }
