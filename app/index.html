@@ -1347,7 +1347,7 @@ body.scrap .lesson-content .exp>div{font-size:clamp(25px,2.3vw,34px)}
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.7.6 · 15 Nov 2026';
+const VERSION='Roomie v2.7.7 · 15 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -2470,7 +2470,7 @@ const RETEACH=[
  {id:'oops',name:'Oops, try again',why:'Mistakes help our brains grow.',steps:['Notice it','Fix it or say sorry','Keep going'],show:'Tell your partner about a mistake that helped you learn.'}
 ];
 function renderReteach(full){ const r=A.rt&&RETEACH.find(x=>x.id===A.rt.id);
-  if(!r){ if(full) setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Quick reteach</h1>'+backBtn()+'</div><p class="lead">Two-minute resets for the behaviours that wobble. Pick one, practise it, celebrate it.</p><div class="rlist">'+RETEACH.map(x=>'<button type="button" class="rbtn" data-rt="'+x.id+'"><b>'+esc(x.name)+'</b><span>'+esc(x.why)+'</span></button>').join('')+'</div></section>'); return; }
+  if(!r){ if(full) setStage('one','<section class="card choice-picker reteach-picker"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Quick reteach</h1>'+backBtn()+'</div><p class="lead">Two-minute resets for the behaviours that wobble. Pick one, practise it, celebrate it.</p><div class="rlist choice-scroll" role="region" aria-label="Quick reteach choices" tabindex="0">'+RETEACH.map(x=>'<button type="button" class="rbtn tcard" data-rt="'+x.id+'"><b>'+esc(x.name)+'</b><span>'+esc(x.why)+'</span></button>').join('')+'</div></section>'); return; }
   if(full){ const show=A.rt.mode==='show', done=A.rt.mode==='done';
     setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Quick reteach</div><div class="row"><button class="btn alt sm" type="button" data-rt="">All cards</button>'+backBtn()+'</div></div><h1 class="big">'+esc(r.name)+'</h1><p class="lead">Why? '+esc(r.why)+'</p>'+stepsHTML(r.steps,-1,'',true)+(show||done?'<div class="rt-show">Show me! '+esc(r.show)+'</div>':'')+'<div class="row" style="margin-top:auto">'+(done?'<button class="btn gold" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-rtgo="show">Practise again</button>':(show?'<button class="btn gold" type="button" data-rtgo="done">Nailed it!</button>':'<button class="btn" type="button" data-rtgo="show">Practise: show me!</button>'))+'</div></section><aside class="side"><section class="card sm" style="align-items:center">'+(show?ringHTML('main','to show me','md'):'<div class="bigbird" style="width:180px">'+birdSVG()+'</div>')+'</section></aside>'); }
   if(A.rt.mode==='show') paintRing('main',MT.remaining(),MT.total); }
