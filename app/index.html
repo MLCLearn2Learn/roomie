@@ -1256,10 +1256,13 @@ body.scrap .lesson-content .exp>div{font-size:clamp(25px,2.3vw,34px)}
 .toolkit-main>.toolkit-heading,.toolkit-main>.lead{flex-shrink:0}
 .toolkit-main .toolkit-heading h1{font-size:clamp(30px,3vw,46px)!important;line-height:1.15;margin:0;min-width:0}
 .toolkit-heading{align-items:center;flex-wrap:wrap;gap:10px}
-body.mode-tools .toolkit-main .tiles{flex:1;min-height:0;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:14px;align-content:start}
+body.mode-tools .toolkit-main .tiles{flex:1;min-height:0;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:14px;align-content:start;grid-auto-rows:minmax(126px,max-content);flex:0 0 auto}
 body.mode-tools .toolkit-main .tile{min-height:126px;padding:18px;gap:8px;overflow-wrap:anywhere}
 .toolkit-main .tile b{font-size:clamp(24px,2vw,30px);line-height:1.15}
 .toolkit-main .tile span{font-size:17px;line-height:1.35}
+.toolkit-main .tile>*{flex-shrink:0;min-width:0;max-width:100%}
+body.mode-tools .toolkit-main .tile{height:auto;min-height:max-content}
+body.mode-tools .toolkit-main .tiles.toolkit-few{flex:1 0 auto}
 body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));align-content:stretch;grid-auto-rows:minmax(170px,1fr)}
 .toolkit-main .toolkit-few .tile b{font-size:clamp(28px,2.6vw,38px)}
 .toolkit-panels .card{padding:18px}
@@ -1365,7 +1368,7 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.7.13 · 15 Nov 2026';
+const VERSION='Roomie v2.7.14 · 15 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1779,7 +1782,7 @@ function renderOff(P,full){ if(!full) return;
   const msg=P.phase==='before'?('First up: '+P.next.b.name+' at '+fmtClock(P.next.st)):P.phase==='gap'?('Next: '+P.next.b.name+' at '+fmtClock(P.next.st)):P.phase==='after'?'School’s out. See you tomorrow!':'Add today’s plan in Setup.';
   if(P.phase==='gap'){ setStage('one','<section class="card" style="align-items:flex-start"><div class="eyebrow">Up next at '+fmtClock(P.next.st)+'</div><h1 class="big">Ready for '+esc(P.next.b.name)+'</h1>'+(P.next.b.materials?'<div class="task">'+esc(P.next.b.materials)+'</div>':'')+expHTML(P.next.b.exp)+'</section>'); return; }
   setStage('one','<section class="card"><div class="eyebrow">'+esc(isWeekend(now())?'Weekend · showing Monday’s plan':DAYNAME[dayKey(now())])+'</div><h1 class="big">'+esc(greeting())+', '+esc(S.room)+'</h1><p class="lead">'+esc(msg)+'</p>'+(P.phase==='after'&&typeof todayHTML==='function'&&!S.studentsAreExample?todayHTML():'')+(S.studentsAreExample?'<div class="okbox row" style="justify-content:space-between;align-items:center"><span>You’re seeing an example class. Make Roomie yours in about three minutes.</span><button class="btn sm" type="button" data-wzopen="1">Set up my class</button></div>':'')+'<div class="row" style="margin-top:auto">'+demoEntryHTML()+'<button class="btn alt" type="button" data-tool="routines">Run a routine now</button><button class="btn alt" type="button" data-act="setup">Set up my day</button></div></section>'); }
-const HOME_TILES=[['routines','Routines','Morning jobs, line up, pack up'],['timer','Timer','Countdown with music'],['brain','Brain break','Move, play or calm down'],['checkin','Check-in','How is everyone feeling?'],['exit','Tickets','Entry and exit tickets'],['reflect','Reflect','Quick reflections'],['think','Thinking routines','Visible thinking routines'],['quiz','Quiz games','Drop Four, Mystery Stars…'],['poll','Poll','Class votes from their devices'],['pick','Pick a name','Fair and random'],['groups','Groups','Random groups in a tap'],['seats','Seating plan','Where everyone sits'],['jobs','Helpers','Classroom jobs this week'],['packup','Pack up','First ready, first out'],['finish','Finished?','Early-finisher checklist'],['reteach','Practise expectations','Model, practise and reflect together']];
+const HOME_TILES=[['routines','Routines','Morning jobs, line up, pack up'],['timer','Timer','Countdown with music'],['brain','Brain break','Move, play or calm down'],['checkin','Check-in','How are you feeling?'],['exit','Tickets','Entry and exit tickets'],['reflect','Reflect','Quick reflections'],['think','Thinking routines','Visible thinking routines'],['quiz','Quiz games','Drop Four, Mystery Stars…'],['poll','Poll','Class votes from their devices'],['pick','Pick a name','Fair and random'],['groups','Groups','Random groups in a tap'],['seats','Seating plan','Where everyone sits'],['jobs','Helpers','Classroom jobs this week'],['packup','Pack up','First ready, first out'],['finish','Finished?','Early-finisher checklist'],['reteach','Practise expectations','Model, practise and reflect together']];
 const TOOLKIT_CLASS_KEYS=['pick','groups','seats','jobs'];
 function toolkitTiles(){ return HOME_TILES.filter(([key])=>!TOOLKIT_CLASS_KEYS.includes(key)).concat([['calm','Calm breathing','Take a quiet minute']]); }
 function toolkitOrder(){ const all=toolkitTiles().map(([key])=>key), order=[...new Set((S.toolkitOrder||[]).filter(key=>all.includes(key)))]; return order.concat(all.filter(key=>!order.includes(key))); }
@@ -1852,7 +1855,7 @@ function feelFace(k){ const K='#1B1340'; const eyes='<circle cx="17" cy="20" r="
   return '<svg width="44" height="44" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" fill="#fff" stroke="'+K+'" stroke-width="3"/>'+eyes+m[k]+'</svg>'; }
 function feelTotal(){ A.feel=feelBucket(); return Object.values(A.feel).reduce((a,b)=>a+b,0); }
 function weatherHTML(){ const lf=liveFeel(feelSlot()), tot=feelTotal()+Object.values(lf).reduce((x,y)=>x+y,0), v=A.feelView;
-  return '<div class="row" style="justify-content:space-between"><h2 style="font-size:24px">How are you feeling?<small class="fslot">'+esc(FSLOT[feelSlot()])+'</small></h2><button type="button" class="btn alt sm" data-feelview="1" style="padding:4px 12px;min-height:32px;font-size:14px">'+(v?'Hide':'Teacher view')+'</button></div><div class="feel">'+FEELS.map(([k,n,c])=>'<button type="button" data-wx="'+k+'" style="background:'+c+'">'+feelFace(k)+'<span>'+esc(n)+(v?' · '+(A.feel[k]+liveFeel(feelSlot())[k]):'')+'</span></button>').join('')+'</div><span class="hint" id="feelNote">'+(tot?tot+' checked in. ':'Tap how you feel. ')+'No names are attached. Class totals are included in the local day summary.'+(v&&(A.feel.chat+lf.chat)?' <b style="color:var(--coral)">'+(A.feel.chat+lf.chat)+' would like a chat: ask quietly who.</b>':'')+'</span>'; }
+  return '<div class="row" style="justify-content:space-between"><h2 style="font-size:24px">How are you feeling?</h2><button type="button" class="btn alt sm" data-feelview="1" style="padding:4px 12px;min-height:32px;font-size:14px">'+(v?'Hide':'Teacher view')+'</button></div><div class="feel">'+FEELS.map(([k,n,c])=>'<button type="button" data-wx="'+k+'" style="background:'+c+'">'+feelFace(k)+'<span>'+esc(n)+(v?' · '+(A.feel[k]+liveFeel(feelSlot())[k]):'')+'</span></button>').join('')+'</div><span class="hint" id="feelNote">'+(tot?tot+' checked in. ':'Tap how you feel. ')+'No names are attached. Class totals are included in the local day summary.'+(v&&(A.feel.chat+lf.chat)?' <b style="color:var(--coral)">'+(A.feel.chat+lf.chat)+' would like a chat: ask quietly who.</b>':'')+'</span>'; }
 
 /* breathing animation for settle/calm */
 let bH=null; const BR=[['Breathe in',4],['Slowly out',6]];
@@ -3005,9 +3008,9 @@ function feelSlot(){ const d=now(), mins=d.getHours()*60+d.getMinutes(); const d
   if(br) return /lunch/i.test(br.b.name)?'lunch':'recess'; if(day.some(x=>x.b.kind==='break')) return 'arrival'; return mins<10*60+50?'arrival':mins<13*60?'recess':'lunch'; }
 function feelBucket(k){ k=k||feelSlot(); return A.feelDay[k]||(A.feelDay[k]={great:0,good:0,okay:0,low:0,chat:0}); }
 function renderCheckin(full){ if(!full) return; const k=feelSlot(), B=feelBucket(k), tot=Object.values(B).reduce((a,b)=>a+b,0);
-  const welcome=k==='arrival'?greeting()+', '+S.room+'!':k==='recess'?'Welcome back from recess':'Welcome back from lunch';
+  const welcome='How are you feeling?';
   const tv=A.ciView?'<div class="citable"><div class="cih"><span></span>'+FEELS.map(([f,n,c])=>'<span style="--c:'+c+'">'+esc(n)+'</span>').join('')+'</div>'+Object.keys(FSLOT).map(s=>{ const b0=A.feelDay[s], lv=(typeof liveFeel==='function')?liveFeel(s):null; const b=(b0||(lv&&Object.values(lv).some(x=>x)))?Object.fromEntries(FEELS.map(([f])=>[f,((b0||{})[f]||0)+((lv||{})[f]||0)])):null; return '<div class="cir'+(s===k?' now':'')+'"><b>'+esc(FSLOT[s])+'</b>'+FEELS.map(([f,,c])=>'<span><i style="background:'+c+';width:'+(b&&b[f]?Math.min(100,12+b[f]*8):0)+'%"></i>'+(b?b[f]:'–')+'</span>').join('')+'</div>'; }).join('')+'</div>'+((B.chat+((typeof liveFeel==='function')?liveFeel(k).chat:0))?'<p class="lead" style="margin:0;color:var(--coral)">'+(B.chat+((typeof liveFeel==='function')?liveFeel(k).chat:0))+' would like a chat. Ask quietly who.</p>':'')+'<p class="hint" style="margin:0">Counts only, no names. Local day summaries keep these totals for up to 30 school days.</p>':'';
-  setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Feelings check-in · '+esc(FSLOT[k])+'</div><div class="row"><button class="btn alt sm" type="button" data-civ="1">'+(A.ciView?'Hide teacher view':'Teacher view')+'</button>'+backBtn('Done')+'</div></div>'+(A.ciView?tv:'<h1 class="big" style="font-size:clamp(40px,4.4vw,70px)">'+esc(welcome)+'</h1><p class="lead" style="margin:0;font-size:clamp(22px,2.2vw,32px);color:var(--ink)">How are you feeling? Tap one on your way past.</p><div class="feel big">'+FEELS.map(([f,n,c])=>'<button type="button" data-wx="'+f+'" style="background:'+c+'">'+feelFace(f)+'<span>'+esc(n)+'</span></button>').join('')+'</div><p class="hint" style="margin:0">'+(tot?tot+' checked in. ':'')+'Anonymous. Only numbers, never names.</p>')+'</section>'); }
+  setStage('one','<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Feelings check-in</div><div class="row"><button class="btn alt sm" type="button" data-civ="1">'+(A.ciView?'Hide teacher view':'Teacher view')+'</button>'+backBtn('Done')+'</div></div>'+(A.ciView?tv:'<h1 class="big" style="font-size:clamp(40px,4.4vw,70px)">'+esc(welcome)+'</h1><p class="lead" style="margin:0;font-size:clamp(22px,2.2vw,32px);color:var(--ink)">Tap the feeling that matches how you feel right now.</p><div class="feel big">'+FEELS.map(([f,n,c])=>'<button type="button" data-wx="'+f+'" style="background:'+c+'">'+feelFace(f)+'<span>'+esc(n)+'</span></button>').join('')+'</div><p class="hint" style="margin:0">'+(tot?tot+' checked in. ':'')+'Anonymous. Only numbers, never names.</p>')+'</section>'); }
 document.addEventListener('click',e=>{ const v=e.target.closest('[data-civ]'); if(v){ A.ciView=!A.ciView; render(true); return; } });
 document.addEventListener('change',e=>{ const c=e.target.dataset&&e.target.dataset.ci; if(c){ S[c]=e.target.checked; save(); } });
 A.ciDone={}; /* v1.0.3: no automatic pop-up after breaks; teacher uses the Check-in button */
@@ -3323,7 +3326,7 @@ const INTENTS=[
  {id:'reflect',names:()=>REFLECT.map(x=>x.name),k:[[/ reflect(ion|ions|ing)? /,3],[/ (fist to five|thumbs up|stand up if|two stars and a wish|3 2 1) /,1.6]],
   run(s){ const r=nFind(s,REFLECT,'name'); goHome(); startReflect(r?r.id:null); return 'Time to reflect.'; }},
  {id:'checkin',k:[[/ check ?in /,3.5],[/ feel(ing|ings)? /,1.8],[/ how('s| is| are) (everyone|everybody|the class|we|you all|you guys|the kids)( going| doing| feeling| travelling)? /,3],[/ (mood|well ?being|emotions) /,1.6]],
-  run(){ goHome(); tool('checkin'); return 'How is everyone feeling?'; }},
+  run(){ goHome(); tool('checkin'); return 'How are you feeling?'; }},
  {id:'quiz',k:[[/ quiz(zes)? /,3],[/ (revision|review|trivia) (game|quiz) /,3],[/ (drop (four|4)|connect (four|4)|mystery stars?|stay afloat) /,4]],
   run(s){ goHome(); tool('quiz'); const id=/ (drop|connect) (four|4) /.test(s)?'drop':/ mystery stars? /.test(s)?'stars':/ afloat /.test(s)?'float':''; if(id) setTimeout(()=>startQuiz(id),80); return id?'Game on!':'Pick a quiz game.'; }},
  {id:'poll',k:[[/ poll /,3.5],[/ (vote|voting) /,2.5],[/ (yes or no|true or false|multiple choice|a b c d|abcd|thumbs poll|confidence) /,1.5]],
@@ -3387,7 +3390,7 @@ const VCMDS=[
  [/\bsee,? think,? wonder\b/, ()=>{ goHome(); startThink('stw'); return null; }],
  [/\bthinking routine|\bthink(ing)? time\b|\bvisible thinking\b/, ()=>{ goHome(); startThink(null); return null; }],
  [/\breflect(ion)?\b/, ()=>{ goHome(); startReflect(null); return 'Time to reflect.'; }],
- [/\bcheck[- ]?in\b|\bhow (is everyone|are we|are you all) feeling\b|\bfeelings\b/, ()=>{ goHome(); tool('checkin'); return 'How is everyone feeling?'; }],
+ [/\bcheck[- ]?in\b|\bhow (is everyone|are we|are you all) feeling\b|\bfeelings\b/, ()=>{ goHome(); tool('checkin'); return 'How are you feeling?'; }],
  [/\bquiz\b/, ()=>{ goHome(); tool('quiz'); return 'Pick a quiz game.'; }],
  [/\bpoll\b|\bvote\b/, ()=>{ goHome(); tool('poll'); return 'Poll time.'; }],
  [/\bpack ?up\b|\btidy up\b|\bclean ?up\b/, ()=>{ goHome(); tool('packup'); return null; }],
