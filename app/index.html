@@ -1409,7 +1409,7 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.8.5 · 15 Nov 2026';
+const VERSION='Roomie v2.8.6 · 15 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -4017,7 +4017,8 @@ function renderMirror(full){ if(!full) return; const r=(S.mirrors||[]).find(x=>x
 document.addEventListener('input',e=>{ if(e.target.id==='mirNote'){ const r=(S.mirrors||[]).find(x=>x.id===A.mirId)||(S.mirrors||[])[0]; if(r){ r.note=e.target.value; save(); } } });
 /* Setup → Coach tab */
 async function coachTabHTML(){ return ''; }
-function coachTab(){ const C=S.coach||{};
+function coachTab(){return '<section class="okbox"><h2 style="margin-top:0">Roomie Coach · early access</h2><p>A private space to choose a focus, review lesson evidence, practise a teaching move and plan your next lesson.</p><p><a class="btn" href="../coach/" target="_blank" rel="noopener">Open Roomie Coach</a></p><p class="hint">Opens in a separate tab. Try it with your own notes or supported on-device listening. Feedback prompts link to research; live AI and automatic slide reading are not connected. Reflections stay in this browser.</p></section><details style="margin-top:20px"><summary>Earlier lesson mirror and previous reports</summary>'+legacyCoachTab()+'</details>';}
+function legacyCoachTab(){ const C=S.coach||{};
   if(!C.unlocked) return '<div class="okbox" style="font-size:16px;line-height:1.6"><b>Lesson mirror (early access)</b><br>Roomie estimates talk time, questions and pauses from sound levels and recognised speech. It cannot reliably identify speakers or judge learning. Reports and recognised text are saved in this browser. No audio recording is saved by Roomie; optional cloud speech recognition sends audio to the browser’s speech service. Review transcripts before sharing them.</div><div class="row"><input id="coachCode" type="text" placeholder="Early access code" style="max-width:240px"><button class="btn" type="button" data-cx="unlock">Unlock</button></div>';
   const M2=(S.mirrors||[]);
   return goalTabHTML()+'<div class="row" style="justify-content:space-between;align-items:center"><div><h2 style="margin:0">Lesson mirror</h2><p class="hint" style="margin:0">Early access. Talk-time and speaker estimates may be inaccurate. Reports and recognised text are saved in this browser.</p></div>'+(M.on?'<button class="btn" type="button" data-cx="stop">Stop and see my mirror</button>':'<button class="btn gold" type="button" data-cx="start">Start listening to this lesson</button>')+'</div>'+
