@@ -1368,7 +1368,7 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.7.14 · 15 Nov 2026';
+const VERSION='Roomie v2.7.15 · 15 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1787,7 +1787,7 @@ const TOOLKIT_CLASS_KEYS=['pick','groups','seats','jobs'];
 function toolkitTiles(){ return HOME_TILES.filter(([key])=>!TOOLKIT_CLASS_KEYS.includes(key)).concat([['calm','Calm breathing','Take a quiet minute']]); }
 function toolkitOrder(){ const all=toolkitTiles().map(([key])=>key), order=[...new Set((S.toolkitOrder||[]).filter(key=>all.includes(key)))]; return order.concat(all.filter(key=>!order.includes(key))); }
 function toolkitVisible(){ return toolkitOrder().filter(key=>!(S.toolkitHide||[]).includes(key)); }
-function toolkitPanelOn(key){ return !S.toolkitPanels||S.toolkitPanels[key]!==false; }
+function toolkitPanelOn(key){ const saved=S.toolkitPanels&&S.toolkitPanels[key]; return typeof saved==='boolean'?saved:key!=='checkin'; }
 function toolkitSetupHTML(){
  const tiles=Object.fromEntries(toolkitTiles().map(tile=>[tile[0],tile])), order=toolkitOrder(), hidden=S.toolkitHide||[];
  return '<div class="dockset"><h3>Customise my toolkit</h3><p class="hint">Tick your favourites and put them in the order you use them. Unticked teaching tools stay in More tools. Name picker, seating, groups and helpers are under Students. Your Whole day bottom bar stays separate.</p><div class="docklist">'+order.map((key,i)=>'<div class="dockrow'+(hidden.includes(key)?' off':'')+'"><label class="chk"><input type="checkbox" data-tk="show:'+key+'" '+(hidden.includes(key)?'':'checked')+'><span>'+esc(tiles[key][1])+'</span></label><span><button class="btn alt sm" type="button" data-tk="up:'+key+'" '+(i?'':'disabled')+' aria-label="Move '+esc(tiles[key][1])+' earlier">←</button><button class="btn alt sm" type="button" data-tk="down:'+key+'" '+(i<order.length-1?'':'disabled')+' aria-label="Move '+esc(tiles[key][1])+' later">→</button></span></div>').join('')+'</div><button class="btn alt sm" type="button" data-tk="reset">Show all tools in the usual order</button><h3>Extra panels</h3><p class="hint">Choose what sits beside your tools. Turn all three off to give your tools the full width. These choices only affect Toolkit mode.</p><div class="docklist">'+[['checkin','Show check-in panel'],['goal','Show class goal panel'],['fact','Show fun fact panel']].map(([key,label])=>'<label class="chk dockrow"><input type="checkbox" data-tk-panel="'+key+'" '+(toolkitPanelOn(key)?'checked':'')+'><span>'+label+'</span></label>').join('')+'</div></div>';
