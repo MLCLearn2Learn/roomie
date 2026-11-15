@@ -1305,6 +1305,7 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
 .signal-option input{margin-top:6px;accent-color:#E2558F}.signal-option small{display:block;font-size:16px;line-height:1.5;margin-top:6px}
 .atn-t{max-width:92vw}.atn-steps{flex-wrap:wrap}.atn-steps span{max-width:85vw}
 .signal-builder{margin:16px 0;padding:20px;border-radius:20px;background:#FCE2ED;border:2px solid #EAC7D8}.signal-reset-step{padding:12px 0;border-top:1px solid #DCB7C8}.signal-builder input[type=text],.signal-builder input:not([type]),.signal-builder textarea{width:100%}.atn-t .pl{white-space:normal;overflow-wrap:anywhere}.rz-steps{flex-wrap:wrap}.rz-steps span{overflow-wrap:anywhere}.rz-main.rz-check .rz-t{overflow-wrap:anywhere}
+.calm-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;flex-shrink:0}.calm-choice{display:flex;align-items:center;gap:10px;text-align:left;font-size:clamp(18px,1.7vw,24px);padding:10px!important}.calm-choice svg{width:48px;height:48px;flex-shrink:0}.calm-choice[aria-pressed=true]{background:#FAD3E5;border-color:#B5306A}.calm-options>.lead{font-size:clamp(22px,2vw,28px)}.calm-guide h2{font-size:clamp(26px,2.5vw,38px);margin:0}.breathe[data-calm-art]:not([data-calm-art=circle]) em{background:transparent;inset:8%;}.breathe em svg{width:100%;height:100%;opacity:.9}.breathe[data-calm-art]:not([data-calm-art=circle]) b{color:#1B1340;background:#FFFDF3eF;border-radius:16px;text-shadow:none;padding:8px 16px;align-self:end;margin-bottom:10px;font-size:clamp(22px,2.2vw,32px)}.calm-options .hint,.calm-guide .hint{font-size:18px}.calm-options{overflow-y:auto}.calm-guide{gap:12px}.calm-layout .breathe{width:min(100%,35vh,360px);flex-shrink:0}
 </style>
 
 <svg class="land" viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60 C 260 10 520 40 760 70 S 1200 100 1440 50 L1440 150 L0 150 Z" fill="#7CC79A" id="hill1"></path><path d="M0 110 C 300 80 600 105 900 120 S 1260 130 1440 100 L1440 150 L0 150 Z" fill="#2F8F6B"></path></svg>
@@ -1351,7 +1352,7 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
     <button class="tool" type="button" data-tool="packup">Pack up</button>
     <button class="tool" type="button" data-tool="reteach">Practise expectations</button>
     <button class="tool" type="button" data-tool="calm">Calm breathing</button>
-    <button class="tool" type="button" data-tool="wellbeing">Wellbeing moments</button>
+    <button class="tool" type="button" data-tool="wellbeing">Wellbeing</button>
     </div>
     <div class="dacts">
     <button class="tool pt" type="button" data-tool="point">+1 point</button>
@@ -1406,7 +1407,7 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.8.2 · 15 Nov 2026';
+const VERSION='Roomie v2.8.3 · 15 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1822,7 +1823,7 @@ function renderOff(P,full){ if(!full) return;
   setStage('one','<section class="card"><div class="eyebrow">'+esc(isWeekend(now())?'Weekend · showing Monday’s plan':DAYNAME[dayKey(now())])+'</div><h1 class="big">'+esc(greeting())+', '+esc(S.room)+'</h1><p class="lead">'+esc(msg)+'</p>'+(P.phase==='after'&&typeof todayHTML==='function'&&!S.studentsAreExample?todayHTML():'')+(S.studentsAreExample?'<div class="okbox row" style="justify-content:space-between;align-items:center"><span>You’re seeing an example class. Make Roomie yours in about three minutes.</span><button class="btn sm" type="button" data-wzopen="1">Set up my class</button></div>':'')+'<div class="row" style="margin-top:auto">'+demoEntryHTML()+'<button class="btn alt" type="button" data-tool="routines">Run a routine now</button><button class="btn alt" type="button" data-act="setup">Set up my day</button></div></section>'); }
 const HOME_TILES=[['routines','Routines','Morning jobs, line up, pack up'],['timer','Timer','Countdown with music'],['brain','Brain break','Move, play or calm down'],['checkin','Check-in','How are you feeling?'],['exit','Tickets','Entry and exit tickets'],['reflect','Reflect','Quick reflections'],['think','Thinking routines','Visible thinking routines'],['quiz','Quiz games','Drop Four, Mystery Stars…'],['poll','Poll','Class votes from their devices'],['pick','Pick a name','Fair and random'],['groups','Groups','Random groups in a tap'],['seats','Seating plan','Where everyone sits'],['jobs','Helpers','Classroom jobs this week'],['packup','Pack up','First ready, first out'],['finish','Finished?','Early-finisher checklist'],['reteach','Practise expectations','Model, practise and reflect together']];
 const TOOLKIT_CLASS_KEYS=['pick','groups','seats','jobs'];
-function toolkitTiles(){ return HOME_TILES.filter(([key])=>!TOOLKIT_CLASS_KEYS.includes(key)).concat([['calm','Calm breathing','Take a quiet minute'],['wellbeing','Wellbeing moments','Settle, reconnect or lift energy']]); }
+function toolkitTiles(){ return HOME_TILES.filter(([key])=>!TOOLKIT_CLASS_KEYS.includes(key)).concat([['calm','Calm breathing','Take a quiet minute'],['wellbeing','Wellbeing','Settle, reconnect or lift energy']]); }
 function toolkitOrder(){ const all=toolkitTiles().map(([key])=>key), order=[...new Set((S.toolkitOrder||[]).filter(key=>all.includes(key)))]; return order.concat(all.filter(key=>!order.includes(key))); }
 function toolkitVisible(){ return toolkitOrder().filter(key=>!(S.toolkitHide||[]).includes(key)); }
 function toolkitPanelOn(key){ const saved=S.toolkitPanels&&S.toolkitPanels[key]; return typeof saved==='boolean'?saved:key!=='checkin'; }
@@ -1897,7 +1898,7 @@ function weatherHTML(){ const lf=liveFeel(feelSlot()), tot=feelTotal()+Object.va
 
 /* breathing animation for settle/calm */
 let bH=null; const BR=[['Breathe in',4],['Slowly out',6]];
-function paintBreath(){ if(bH) return; let i=0; const run=()=>{ const d=document.getElementById('bdot'), t=document.getElementById('btxt'); if(!d||!t){ clearTimeout(bH); bH=null; return; } const [l,s]=BR[i%2]; t.textContent=l; d.style.transitionDuration=s+'s'; d.style.transform=i%2?'scale(.55)':'scale(1)'; i++; bH=setTimeout(run,s*1000); }; bH=setTimeout(run,50); }
+function paintBreath(){ if(bH) return; let i=0; const run=()=>{ const d=document.getElementById('bdot'), t=document.getElementById('btxt'); if(!d||!t){ clearTimeout(bH); bH=null; return; } const [l,s]=A.overlay==='calm'?calmChoice().cues[i%2]:BR[i%2]; t.textContent=l; d.style.transitionDuration=s+'s'; d.style.transform=i%2?'scale(.55)':'scale(1)'; i++; bH=setTimeout(run,s*1000); }; bH=setTimeout(run,50); }
 
 /* ================= Overlays (teacher tools) ================= */
 function openOverlay(name,data){ if(A.overlay!==name) navRemember(A.overlay); A.overlay=name; Object.assign(A,data||{}); markTools(); markHero(); render(true); }
@@ -1942,6 +1943,7 @@ function navBoard(){ NAV.trail=[]; navShow(null); }
 function navStopActivity(redraw){
   const was=NAV.owner||A.overlay, supportReturn=A.support&&A.support.returnView, supportTrail=A.support&&A.support.returnTrail, destination=supportReturn||NAV.origin;
   MT.stop(); clearActivity();
+  if(was==='calm'){clearTimeout(bH);bH=null;}
   if(was==='brain'&&typeof speechSynthesis!=='undefined') try{ speechSynthesis.cancel(); }catch(_){}
   if(['brain','calm','manualRoutine','practise','party','rotate','packup'].includes(was)) Music.fadeStop();
   if(was==='hero'&&A.heroStage==='shown') A.heroStage='';
@@ -1989,9 +1991,22 @@ function renderOverlay(full){
     else setStage('one',lateCard(b,true));
     return; }
   if(o==='brain'){ renderBrain(full); return; }
-  if(o==='calm'){ if(full){ setStage('two','<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Calm</div>'+backBtn()+'</div><h1 class="big">Let’s breathe together</h1><p class="lead">Breathe in as the circle grows. Breathe out slowly as it shrinks. Let your shoulders drop.</p></section><section class="card" style="align-items:center;justify-content:center"><div class="breathe"><i></i><em id="bdot"></em><b id="btxt">Get comfy</b></div><div style="width:140px">'+ringHTML('main','','sm')+'</div></section>'); paintBreath(); }
-    paintRing('main',MT.remaining(),MT.total); return; }
+  if(o==='calm'){renderCalm(full);return;}
 }
+
+const CALM_CHOICES=[
+ {id:'circle',name:'Breathing circle',detail:'Follow the growing and shrinking circle.',cues:[['Breathe in',4],['Gently out',6]],art:'circle'},
+ {id:'balloon',name:'Balloon breathing',detail:'Imagine a small balloon gently filling, then softening.',cues:[['Gently fill',3],['Let it soften',4]],art:'balloon'},
+ {id:'flower',name:'Flower and candle',detail:'Imagine smelling a flower, then gently making a candle flicker.',cues:[['Smell the flower',3],['Gentle candle breath',4]],art:'flower'},
+ {id:'wave',name:'Ocean waves',detail:'Let your breath come in and flow out like a gentle wave.',cues:[['Wave comes in',4],['Wave flows out',4]],art:'wave'},
+ {id:'hand',name:'Five-finger breathing',detail:'Trace up a finger as you breathe in, down as you breathe out. Use your hand or imagine one.',cues:[['Trace up · in',3],['Trace down · out',3]],art:'hand'}
+];
+function calmChoice(){return CALM_CHOICES.find(x=>x.id===S.calmChoice)||CALM_CHOICES[0];}
+function calmArt(id){const paths={balloon:'<ellipse cx="80" cy="65" rx="42" ry="50" fill="#FFD84D"/><path d="m76 113 4-6 5 7m-5 1q-14 16 1 29" fill="none"/>',flower:'<g fill="#FF8CC6"><circle cx="80" cy="40" r="23"/><circle cx="107" cy="61" r="23"/><circle cx="97" cy="92" r="23"/><circle cx="63" cy="92" r="23"/><circle cx="53" cy="61" r="23"/></g><circle cx="80" cy="68" r="20" fill="#FFD84D"/><path d="M80 110v35"/>',wave:'<path d="M12 83q20-38 44 0t48 0t44 0v50H12Z" fill="#7EC3FF"/><path d="M12 106q20-25 44 0t48 0t44 0" fill="none"/>',hand:'<path d="M42 125 22 82q-6-17 8-18l19 25V35q0-20 14-12l3 48V20q4-20 17-3l2 53 5-43q7-16 17-1l-2 49 8-28q11-12 16 1l-10 65q-7 31-39 31-26 0-38-19Z" fill="#FFD84D"/>',circle:'<circle cx="80" cy="80" r="55" fill="#C9B6FF"/><circle cx="80" cy="80" r="28" fill="#FF8CC6"/>'};return '<svg viewBox="0 0 160 160" aria-hidden="true"><g stroke="#1B1340" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">'+(paths[id]||paths.circle)+'</g></svg>';}
+function startCalm(id){const choice=CALM_CHOICES.find(x=>x.id===id);if(!choice)return false;S.calmChoice=id;save();clearTimeout(bH);bH=null;MT.stop();MT.start(60,()=>{clearTimeout(bH);bH=null;chime(1);Music.fadeStop();render(true);});render(true);return true;}
+function renderCalm(full){const c=calmChoice(),done=MT.remaining()<=0;if(full){clearTimeout(bH);bH=null;setStage('two calm-layout','<section class="card calm-options"><div class="row" style="justify-content:space-between"><h1 class="mid">Calm breathing</h1>'+backBtn('Finish')+'</div><p class="lead">Choose a way to breathe together.</p><div class="calm-choices" role="group" aria-label="Breathing choices">'+CALM_CHOICES.map(x=>'<button class="btn alt calm-choice" data-calm-choice="'+x.id+'" type="button" aria-pressed="'+(c.id===x.id)+'">'+calmArt(x.art)+'<span>'+esc(x.name)+'</span></button>').join('')+'</div><p class="lead">'+esc(c.detail)+'</p><p class="hint">Breathe comfortably at your own pace. No holding or forcing. Watching or passing is welcome.</p></section><section class="card calm-guide" style="align-items:center;justify-content:center"><h2>'+esc(c.name)+'</h2><div class="breathe" data-calm-art="'+c.art+'"><i></i><em id="bdot">'+(c.id==='circle'?'':calmArt(c.art))+'</em><b id="btxt">'+(done?'Well done. Breathe normally.':'Get comfy')+'</b></div><div style="width:140px">'+ringHTML('main','','sm')+'</div>'+(done?'<button class="btn" type="button" data-calm-choice="'+c.id+'">Another minute</button>':'<p class="hint">One quiet minute. Follow your own comfortable rhythm.</p>')+'</section>');if(!done)paintBreath();}paintRing('main',MT.remaining(),MT.total);}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-calm-choice]');if(b&&A.overlay==='calm')startCalm(b.dataset.calmChoice);});
+
 function lateCard(b,solo){ return '<section class="card"><div class="row" style="justify-content:space-between"><h2 class="mid" style="color:var(--gum-d)">Just arrived? Welcome!</h2>'+(solo?backBtn('Done'):'')+'</div><ol class="steps"><li><span class="n">'+icon('bag',22,'currentColor')+'</span><span>Bag on your hook, note in the tray</span></li><li><span class="n">'+icon('pencil',22,'currentColor')+'</span><span>'+esc(b&&b.materials?b.materials:'Get out what you need for '+(b?b.name:'this lesson'))+'</span></li><li><span class="n">'+icon('people',22,'currentColor')+'</span><span>Ask your partner where we’re up to</span></li></ol></section>'; }
 
 /* brain breaks */
@@ -2245,7 +2260,7 @@ document.addEventListener('click',e=>{
     if(tool==='reteach'){ A.rt=null; return openOverlay('reteach'); }
     if(tool==='timer'){ return openOverlay('timer'); }
     if(tool==='brain') return openOverlay('brainpick');
-    if(tool==='calm'){ if(!navPrepareStart('calm')) return; clearActivity(); MT.start(60,()=>{ chime(1); Music.fadeStop(); }); Music.play('still'); return openOverlay('calm'); }
+    if(tool==='calm'){if(!navPrepareStart('calm'))return;clearActivity();Music.play('still');A.overlay='calm';return startCalm(S.calmChoice||'circle');}
     if(tool==='pick') return openOverlay('pick');
     if(tool==='groups') return A.groups.length?openOverlay('groups'):makeGroups({size:4});
     if(tool==='door'||tool==='late') return openOverlay(tool);
@@ -2848,7 +2863,7 @@ const ROOMIE_SUPPORT=[
 function energyBattery(level){return '<svg class="energy-battery" viewBox="0 0 160 100" aria-hidden="true"><rect x="8" y="18" width="132" height="64" rx="12" fill="#fff" stroke="#1B1340" stroke-width="5"/><rect x="142" y="38" width="10" height="24" rx="3" fill="#1B1340"/>'+Array.from({length:5},(_,i)=>'<rect x="'+(18+i*23)+'" y="28" width="17" height="44" rx="4" fill="'+(i<level?'#6FD6A0':'#EFE6CC')+'"/>').join('')+'</svg>';}
 function supportArt(key){if(key==='energy')return energyBattery(3);const art=SC_ART[key]||SC_ART.calm;return '<svg viewBox="0 0 160 140" aria-hidden="true"><g stroke="#1B1340" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">'+art()+'</g></svg>';}
 function supportPick(group,filter){return ROOMIE_SUPPORT.filter(x=>((group==='all'&&x.group!=='wellbeing')||x.group===group)&&(!filter||filter==='favourites'?(filter!=='favourites'||(S.supportFav||[]).includes(x.id)):x.tags.includes(filter)));}
-function renderSupportPicker(full){if(!full)return;const group=A.overlay==='wellbeing'?'wellbeing':(A.supportGroup||'all'),filter=A.supportFilter||'',rows=supportPick(group,filter),title=group==='wellbeing'?'Wellbeing moments':'Attention & resets';
+function renderSupportPicker(full){if(!full)return;const group=A.overlay==='wellbeing'?'wellbeing':(A.supportGroup||'all'),filter=A.supportFilter||'',rows=supportPick(group,filter),title=group==='wellbeing'?'Wellbeing':'Attention & resets';
  setStage('one','<section class="card choice-picker support-picker"><div class="row" style="justify-content:space-between"><h1 class="mid">'+title+'</h1>'+backBtn()+'</div><p class="lead">Choose what the class needs. Short moments with Roomie. Join seated, watch or pass.</p>'+(group==='wellbeing'?'':'<div class="row bcats">'+[['all','All'],['attention','Attention'],['reset','Resets']].map(([k,l])=>'<button class="chip bcat'+(group===k?' on':'')+'" data-support-group="'+k+'" type="button">'+l+'</button>').join('')+'</div>')+'<div class="row support-needs" role="group" aria-label="Help me choose">'+[['','All choices'],['calm','Settle'],['energy','Energise'],['connect','Connect'],['favourites','Favourites']].map(([k,l])=>'<button class="btn alt sm" type="button" data-support-filter="'+k+'" aria-pressed="'+(filter===k)+'">'+l+'</button>').join('')+'</div><div class="tgrid choice-scroll" role="region" aria-label="'+title+' choices" tabindex="0">'+rows.map(x=>'<article class="tcard support-card"><div class="support-picture">'+supportArt(x.art)+'</div><span class="chip">'+({attention:'Attention',reset:'Reset',wellbeing:'Wellbeing'}[x.group])+' · '+Math.round(x.steps.reduce((a,s)=>a+s[2],0)/60*10)/10+' min</span><b>'+esc(x.name)+'</b><span>'+esc(x.detail)+'</span><div class="row" style="justify-content:space-between;margin-top:auto"><button class="btn alt sm" type="button" data-support-fav="'+x.id+'" aria-pressed="'+(S.supportFav||[]).includes(x.id)+'" aria-label="Favourite '+esc(x.name)+'">'+((S.supportFav||[]).includes(x.id)?'★ Saved':'☆ Save')+'</button><button class="btn sm" type="button" data-support-start="'+x.id+'">Start</button></div></article>').join('')+(!rows.length?'<p class="lead">No choices in this filter yet. Try All choices or save a favourite.</p>':'')+'</div></section>');}
 function startSupport(id){const activity=ROOMIE_SUPPORT.find(x=>x.id===id);if(!activity||!navPrepareStart('support'))return false;A.support={id,step:0,returnView:navCapture('wellbeing'),returnTrail:NAV.trail.filter(v=>v&&v.key!=='wellbeing')};A.overlay='support';supportStep();return true;}
 function supportStep(){const a=ROOMIE_SUPPORT.find(x=>x.id===A.support.id),s=a.steps[A.support.step];MT.stop();MT.start(s[2],()=>{chime(1);render(true);});render(true);}
@@ -4307,7 +4322,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-gidea]');
 document.addEventListener('change',e=>{ if(e.target.id==='growOff'){ S.growOff=e.target.checked; save(); try{ redrawMascot(); }catch(_){ } render(true); } });
 
 /* ---- v2.2: choose your dock. Every tool stays available; teachers hide the ones they never use and put favourites first. ---- */
-const DOCK_NAMES={routines:'Routines',timer:'Timer',brain:'Brain break',checkin:'Check-in',exit:'Tickets',reflect:'Reflect',think:'Thinking routines',quiz:'Quiz games',poll:'Poll',pick:'Pick a name',finish:'Finished?',packup:'Pack up',reteach:'Practise expectations',calm:'Calm breathing',wellbeing:'Wellbeing moments'};
+const DOCK_NAMES={routines:'Routines',timer:'Timer',brain:'Brain break',checkin:'Check-in',exit:'Tickets',reflect:'Reflect',think:'Thinking routines',quiz:'Quiz games',poll:'Poll',pick:'Pick a name',finish:'Finished?',packup:'Pack up',reteach:'Practise expectations',calm:'Calm breathing',wellbeing:'Wellbeing'};
 function dockOrder(){ const all=Object.keys(DOCK_NAMES), o=(S.dockOrder||[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!o.includes(k)) o.push(k); }); return o; }
 function applyDock(){ const box=document.querySelector('#dock .dtools'); if(!box||STUDENT) return; const hide=S.dockHide||[], o=dockOrder(); const br=box.querySelector('.dbreak');
   const vis=o.filter(k=>!hide.includes(k)); o.forEach(k=>{ const b=box.querySelector('.tool[data-tool="'+k+'"]'); if(b){ b.hidden=hide.includes(k); box.appendChild(b); } });
@@ -5110,7 +5125,7 @@ const UI_TOOL_GROUPS=[
   ['Wellbeing',[
     ['brain','Brain break','Move, play or reset','movement active break'],
     ['calm','Calm breathing','Take a quiet minute','breathe breathing calm quiet'],
-    ['wellbeing','Wellbeing moments','Settle, reconnect or lift energy','wellbeing calm energy kindness'] ,
+    ['wellbeing','Wellbeing','Settle, reconnect or lift energy','wellbeing calm energy kindness'] ,
     ['checkin','Check-in','See how everyone feels','feelings mood wellbeing check in']]]
 ];
 function uiFindTools(query,excluded=[]){
