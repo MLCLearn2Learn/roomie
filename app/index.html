@@ -1225,6 +1225,17 @@ body.scrap .lesson-content .exp>div{font-size:clamp(25px,2.3vw,34px)}
 .timer-display{flex:1 1 0;min-height:80px;min-width:0;overflow:hidden;padding:8px;display:grid;place-items:center}
 .timer-layout .timer-display .ring{width:var(--timer-diameter,160px);height:var(--timer-diameter,160px);max-width:none;aspect-ratio:1;margin:0}
 .timer-layout .timer-display .rt b{font-size:var(--timer-number,64px)}
+/* Give the classroom countdown the main display area; controls sit alongside it. */
+@media(min-width:900px){
+ .timer-content{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(210px,260px);grid-template-rows:auto minmax(0,1fr) auto;column-gap:24px;row-gap:12px}
+ .timer-content>.scn-hdr{grid-column:1/-1;grid-row:1}
+ .timer-content>.timer-display{grid-column:1;grid-row:2/4;align-self:stretch;min-height:0}
+ .timer-content>.timer-presets{grid-column:2;grid-row:2;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:center;gap:10px}
+ .timer-content>.timer-presets .btn{width:100%;padding:12px 8px}
+ .timer-content>.timer-adjust{grid-column:2;grid-row:3;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-self:end}
+ .timer-adjust #mtPause{grid-column:1/-1}
+}
+
 /* Brain break settings open above the choices instead of reducing their space. */
 .card.scene.choice-picker>.scn-hdr{z-index:5}
 .choice-picker .brain-settings-pop{position:relative;margin:0;flex:none}
@@ -1336,7 +1347,7 @@ body.scrap .lesson-content .exp>div{font-size:clamp(25px,2.3vw,34px)}
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.7.4 · 15 Nov 2026';
+const VERSION='Roomie v2.7.5 · 15 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -5165,12 +5176,12 @@ markMode();
 
 /* FIT_TEACHING_SPACE_START */
 let timerLayoutObserver=null,timerLayoutNode=null;
-function timerRingSize(width,height){ return Math.max(1,Math.min(width,height,480)); }
+function timerRingSize(width,height){ return Math.max(1,Math.min(width,height,760)); }
 function fitTimerLayout(){
  const area=document.querySelector('.timer-display');
  if(area!==timerLayoutNode){ if(timerLayoutObserver) timerLayoutObserver.disconnect(); timerLayoutNode=area; if(area&&window.ResizeObserver){ timerLayoutObserver=new ResizeObserver(fitTimerLayout); timerLayoutObserver.observe(area); } }
  if(!area) return; const size=timerRingSize(area.clientWidth-16,area.clientHeight-16), value=size+'px';
- if(area.style.getPropertyValue('--timer-diameter')!==value){ area.style.setProperty('--timer-diameter',value); area.style.setProperty('--timer-number',Math.max(24,Math.min(116,size*.28))+'px'); }
+ if(area.style.getPropertyValue('--timer-diameter')!==value){ area.style.setProperty('--timer-diameter',value); area.style.setProperty('--timer-number',Math.max(24,Math.min(210,size*.30))+'px'); }
 }
 function fitPickedName(){
  const el=document.querySelector('.picker-content #pickName'); if(!el) return;
