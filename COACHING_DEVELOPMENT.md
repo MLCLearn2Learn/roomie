@@ -28,3 +28,9 @@ No real classroom accuracy study or browser walkthrough of this development UI h
 7. Define the controlled pilot and later launch independently of the classroom-management release.
 
 Production `main` remains unchanged by this branch.
+
+## Coaching cycle prototype increment
+
+The development report now has Plan, Review, Try next lesson and Peer conversation stages. Constructive suggestions require a relevant moment with wording/context explicitly checked by the teacher. A transcript edit retains its original text and revokes the old check. Confidence before/after is a private self-report and has no influence on feedback. Peer summaries exclude extracts, private notes and confidence by default; teachers can edit the exact text before deliberately copying it. This does not send a message or invite a colleague.
+
+The feedback is currently rule-based and interprets the first checked, relevant matching moment. It does not provide a live AI coaching conversation. The private Site preview uses fictional lessons and has no recording or microphone workflow. Nine additional cycle tests cover evidence gates, privacy defaults, transcript edits, invalid/cross-class updates, text limits, self-report separation and all stage rendering.
