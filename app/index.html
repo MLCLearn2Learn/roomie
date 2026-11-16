@@ -326,6 +326,15 @@ textarea{min-height:140px;resize:vertical;line-height:1.5}
 .relief h2{font-size:30px;color:var(--gum-d)} .relief h3{font-size:22px;margin-top:6px}
 .relief table{border-collapse:collapse;width:100%} .relief td{border-bottom:1px solid var(--line);padding:6px 8px;font-weight:700;vertical-align:top}
 #reliefPrint{display:none}
+body.full-view .top,body.full-view .strip,body.full-view .dock{display:none!important}
+body.full-view .app{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr)!important;padding-block:12px}
+body.full-view .teaching-space{grid-column:1/-1;grid-row:1/-1}
+.fv-bar{position:fixed;right:14px;bottom:12px;z-index:80;display:none;gap:8px;opacity:.6;transition:opacity .2s}
+.fv-bar:hover,.fv-bar:focus-within{opacity:1}
+body.full-view .fv-bar{display:flex}
+.fv-bar button{font:inherit;font-weight:800;font-size:16px;border:2.5px solid var(--ink,#2A1E3D);border-radius:999px;padding:7px 16px;background:#fff;color:var(--ink,#2A1E3D);cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.15)}
+.fv-bar .fv-att{background:#FF8FA3}
+#fsBtn[aria-pressed="true"]{background:var(--gum,#FF8CC6)}
 body.calm-screen .top-r [data-tool="float"],body.calm-screen .top-r [data-tool="remote"],body.calm-screen .top-r [data-tour="start"],body.calm-screen #micBtn:not(.on),body.calm-screen #liveBtn:not(.on){display:none!important}
 .cs-menu{position:fixed;z-index:60;background:#fff;border:2.5px solid var(--ink,#2A1E3D);border-radius:18px;padding:8px;display:flex;flex-direction:column;min-width:250px;box-shadow:0 10px 30px rgba(0,0,0,.18)}.cs-menu button{border:0;background:none;text-align:left;font:inherit;font-size:18px;font-weight:700;padding:11px 14px;border-radius:12px;color:var(--ink,#2A1E3D)}.cs-menu button:hover,.cs-menu button:focus-visible{background:#FFF1A8;outline:none}.cs-menu small{display:block;font-weight:500;font-size:14px;color:#6E625B}
 .rr-launch,.rr-back,.rr-strip{grid-column:1/-1}.rr-strip{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;background:#FFF6D6;border:2px solid #F5B700;border-radius:14px;padding:8px 14px}.rr-strip small{flex-basis:100%;font-weight:800;font-size:13px;color:#8C5A00;letter-spacing:.03em;text-transform:uppercase}.rr-strip b{font-size:20px}.rr-strip .rr-hint{flex:1 1 220px;color:#5B4F48}.rr-strip .rr-btns{display:flex;gap:8px;flex-wrap:wrap}
@@ -2378,7 +2387,7 @@ document.addEventListener('keydown',e=>{ if(e.target.closest('input,textarea,sel
   else if(k==='arrowleft'){ const P=A.P; if(A.overlay==='manualRoutine') act('mrBack'); else if(!A.overlay&&P&&P.phase==='routine'){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)-1; render(false); } } });
 document.addEventListener('dblclick',e=>{ const li=e.target.closest('.steps li'); if(!li) return; const P=A.P; if(P&&P.phase==='routine'&&!A.overlay){ const key=P.block.id+'|'+P.routine.id; A.stepBump[key]=(A.stepBump[key]||0)+1; render(false); } });
 $('#setupBtn').addEventListener('click',()=>{ tab='plan'; openSetup(); });
-$('#fsBtn').addEventListener('click',()=>{ try{ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(()=>toast('Full screen isn’t available here.')); }catch(e){ toast('Full screen isn’t available here.'); } });
+$('#fsBtn').addEventListener('click',()=>{ setFullView(!document.body.classList.contains('full-view')); });
 function demoEntryHTML(){ return S.studentsAreExample?'<button class="btn gold" type="button" data-act="demo">Try a demo day from 8:40</button>':''; }
 function syncDemoEntry(){ const b=document.getElementById('demoBtn'); if(b) b.hidden=!S.studentsAreExample; }
 function markMode(){ document.querySelectorAll('[data-mode]').forEach(x=>x.className='btn'+(x.dataset.mode===(S.mode||'day')?'':' alt')); document.body.classList.toggle('mode-tools',S.mode==='tools'); const start=document.getElementById('startBtn'); if(start) start.textContent=S.mode==='tools'?'Open my toolkit':'Start my day'; }
@@ -2534,6 +2543,7 @@ function fmtHHMM(m){ return pad(Math.floor(m/60)%24)+':'+pad(m%60); }
 document.addEventListener('input',e=>{ const el=e.target; if(!el.closest('#sheetHost')) return;
   const row=el.closest('.prow'); if(row&&el.dataset.f){ const b=S.days[editDay][+row.dataset.i]; const f=el.dataset.f; b[f]=el.type==='checkbox'?el.checked:el.value; if(f==='entryT'||f==='exitT'){ const k=f==='entryT'?'entry':'exit'; b[k]=b[f]!=='none'; if(b[f]==='none') b[f]=''; const cb=row.querySelector('[data-f="'+k+'"]'); if(cb) cb.checked=b[k]; } if(f==='entry'||f==='exit'){ const sel=row.querySelector('[data-f="'+f+'T"]'); if(sel) sel.value=b[f]?(b[f+'T']||''):'none'; } save(); return; }
   if(el.id==='autoStart'){ S.autoStart=el.checked; save(); return; }
+  if(el.id==='fullActs'){ S.fullActivities=el.checked; save(); return; }
   if(el.id==='fRoom'){ S.room=el.value||'My class'; save(); return; }
   if(el.id==='fTeacher'){ S.teacher=el.value||'your teacher'; save(); return; }
   if(el.id==='fRead'){ S.readAloud=el.checked; save(); return; }
@@ -5326,7 +5336,7 @@ drawTour=function(){ const opener=document.activeElement, result=uiDrawTourBase.
 const uiEndTourBase=endTour;
 endTour=function(){ const frame=uiModalFrames.find(f=>f.key==='tour'), result=uiEndTourBase.apply(this,arguments); uiLeaveModal('tour',frame); return result; };
 
-function uiLookPresetHTML(){ return '<div class="look-preset"><h3>Screen</h3><p class="hint" style="margin:0">The calm screen keeps the top bar simple: Full screen, More and Setup. Float, Phone remote, Student devices and Voice are under More. Choose your bottom bar tools in the Bottom bar tab.</p><div class="row" role="group" aria-label="Screen"><button class="btn alt" type="button" data-calm-screen="on" aria-pressed="'+calmScreen()+'">Calm screen (recommended)</button><button class="btn alt" type="button" data-calm-screen="off" aria-pressed="'+!calmScreen()+'">Show every button</button></div></div><div class="look-preset"><h3>Board style</h3><p class="hint" style="margin:0">Keep Roomie’s colourful look, or use simpler lettering and fewer decorations. Your colours and teaching tools stay available.</p><div class="row" role="group" aria-label="Board style"><button class="btn alt" type="button" data-ui-look="colourful" aria-pressed="'+!S.calmLook+'">Colourful</button><button class="btn alt" type="button" data-ui-look="calm" aria-pressed="'+!!S.calmLook+'">Calmer look</button></div></div>'; }
+function uiLookPresetHTML(){ return '<div class="look-preset"><h3>Screen</h3><p class="hint" style="margin:0">The calm screen keeps the top bar simple: Full screen, More and Setup. Float, Phone remote, Student devices and Voice are under More. Choose your bottom bar tools in the Bottom bar tab.</p><div class="row" role="group" aria-label="Screen"><button class="btn alt" type="button" data-calm-screen="on" aria-pressed="'+calmScreen()+'">Calm screen (recommended)</button><button class="btn alt" type="button" data-calm-screen="off" aria-pressed="'+!calmScreen()+'">Show every button</button></div><label class="chk"><input type="checkbox" id="fullActs" '+(S.fullActivities?'checked':'')+'><span>Open activities full screen<span class="hint" style="display:block">Brain breaks, timers, routines and other activities fill the screen, then the board comes back when you finish. Press F or Full screen any time.</span></span></label></div><div class="look-preset"><h3>Board style</h3><p class="hint" style="margin:0">Keep Roomie’s colourful look, or use simpler lettering and fewer decorations. Your colours and teaching tools stay available.</p><div class="row" role="group" aria-label="Board style"><button class="btn alt" type="button" data-ui-look="colourful" aria-pressed="'+!S.calmLook+'">Colourful</button><button class="btn alt" type="button" data-ui-look="calm" aria-pressed="'+!!S.calmLook+'">Calmer look</button></div></div>'; }
 const uiApplyThemeBase=applyTheme;
 applyTheme=function(){ const result=uiApplyThemeBase.apply(this,arguments); document.body.classList.toggle('ui-calm-look',S.calmLook===true); return result; };
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-ui-look]'); if(!b) return; S.calmLook=b.dataset.uiLook==='calm'; save(); applyTheme(); render(true); renderSetup(); });
@@ -5687,6 +5697,23 @@ document.addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&document.getElementById('calmMenu')){ closeCalmMenu(); const m=document.getElementById('calmMore'); if(m) m.focus(); } });
 { const f=tourSteps; tourSteps=function(){ const s=f.apply(this,arguments); if(!calmScreen()) return s; const drop=['#micBtn','#liveBtn','.top [data-tool="float"]','.top [data-tool="remote"]']; const out=s.filter(x=>!drop.includes(x.sel)); const at=out.findIndex(x=>x.sel==='#setupBtn'); out.splice(at<0?out.length-1:at,0,{sel:'#calmMore',t:'More',b:'Float over your slides, use your phone as a remote, connect student devices or turn on voice commands. They’re here when you need them, out of the way when you don’t.'}); return out; }; }
 if(!STUDENT){ applyCalm(); applyDock(); }
+
+/* ---- Full screen: the board or activity fills the whole screen. Top bar, timetable and tools step aside. ---- */
+const FV={auto:false};
+function setFullView(on,opts){ opts=opts||{}; if(STUDENT) return; on=!!on; document.body.classList.toggle('full-view',on); if(!on) FV.auto=false; else if(opts.auto) FV.auto=true;
+  const b=document.getElementById('fsBtn'); if(b){ b.setAttribute('aria-pressed',String(on)); const l=b.querySelector('.lbl'); if(l) l.textContent=on?'Exit full screen':'Full screen'; b.setAttribute('aria-label',on?'Exit full screen':'Full screen'); }
+  let bar=document.getElementById('fvBar'); if(!bar){ bar=document.createElement('div'); bar.id='fvBar'; bar.className='fv-bar'; bar.innerHTML='<button type="button" class="fv-att" data-fv="attention">Attention</button><button type="button" data-fv="exit">Exit full screen</button>'; document.body.appendChild(bar); }
+  if(opts.browser!==false){ try{ if(on&&!document.fullscreenElement&&document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{}); if(!on&&document.fullscreenElement) document.exitFullscreen().catch(()=>{}); }catch(_){ } }
+  setTimeout(()=>window.dispatchEvent(new Event('resize')),60); }
+document.addEventListener('fullscreenchange',()=>{ if(!document.fullscreenElement&&document.body.classList.contains('full-view')) setFullView(false,{browser:false}); });
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-fv]'); if(!b) return; if(b.dataset.fv==='exit') setFullView(false); if(b.dataset.fv==='attention') attention(); });
+document.addEventListener('keydown',e=>{ if(e.defaultPrevented||e.ctrlKey||e.metaKey||e.altKey) return; const t=e.target; if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return; if(document.querySelector('#sheetHost:not(:empty) .sheet,[role="dialog"][aria-modal="true"]')) return;
+  if(e.key==='f'||e.key==='F'){ e.preventDefault(); setFullView(!document.body.classList.contains('full-view')); }
+  else if(e.key==='Escape'&&document.body.classList.contains('full-view')&&!A.overlay){ setFullView(false); } });
+/* Optional: activities open full screen, and the board returns to normal when the activity closes. */
+{ const oo=openOverlay; openOverlay=function(name){ const was=A.overlay; const out=oo.apply(this,arguments); if(name&&!was&&S.fullActivities&&!document.body.classList.contains('full-view')) setFullView(true,{auto:true}); return out; }; }
+{ const r0=render; render=function(){ const out=r0.apply(this,arguments); if(FV.auto&&!A.overlay&&document.body.classList.contains('full-view')) setFullView(false); return out; }; }
+
 })();
 </script>
 
