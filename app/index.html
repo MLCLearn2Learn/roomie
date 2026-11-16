@@ -1365,7 +1365,7 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
   <main class="stage" id="stage" aria-live="polite"></main>
   <aside id="ytDock" aria-label="Video player"><section class="ytcard" id="ytCard" hidden aria-label="YouTube song">
   <div class="row" style="justify-content:space-between"><b style="font-size:15px">Now playing</b><a id="ytLink" href="#" target="_blank" rel="noopener" class="hint">Open on YouTube</a></div>
-  <button type="button" class="btn alt sm" id="ytExpand" aria-pressed="false" onclick="expandYouTube(!document.getElementById('teachingSpace').classList.contains('video-expanded'))">Enlarge video</button>
+  <button type="button" class="btn alt sm" id="ytExpand" aria-pressed="false">Enlarge video</button>
   <div id="ytHost" style="margin-top:8px"></div>
   <p class="hint" id="ytMsg" style="margin:6px 0 0"></p>
 </section></aside>
@@ -1518,6 +1518,7 @@ function expandYouTube(expanded){
   if(space)space.classList.toggle('video-expanded',!!expanded);
   if(button){button.setAttribute('aria-pressed',String(!!expanded));button.textContent=expanded?'Smaller video':'Enlarge video';}
 }
+document.getElementById('ytExpand').addEventListener('click',()=>expandYouTube(!document.getElementById('teachingSpace').classList.contains('video-expanded')));
 const YT_ = { player:null, ready:null, routine:null, fadeH:null, start:0,
   parse(url){ url=String(url||'').trim(); let id=null, t=0;
     const m=url.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{11})/);
