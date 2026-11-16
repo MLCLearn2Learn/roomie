@@ -1195,7 +1195,7 @@ body.ui-calm-look .mascot *,body.ui-calm-look .bigbird *,body.ui-calm-look .stk 
 @media(max-width:599px){.tool-grid{grid-template-columns:1fr}.dmenu[data-for="more"]{padding:12px}}
 
 /* Teaching layout pass: preserve the existing artwork, fonts and colour choices. */
-.lesson-expectations{display:flex;flex:1;min-height:0;flex-direction:column;justify-content:center;gap:22px;padding:12px 0}
+.lesson-expectations{display:flex;flex:1;min-height:0;flex-direction:column;justify-content:center;justify-content:safe center;gap:22px;padding:12px 0}
 .lesson-content .exp{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
 .lesson-content .exp>div{min-height:120px;justify-content:center;gap:10px;padding:20px;font-size:clamp(24px,2.3vw,34px)}
 body.scrap .lesson-content .exp>div{font-size:clamp(25px,2.3vw,34px)}
@@ -5179,7 +5179,7 @@ function monsterShapes(){ const RC=roomieCol(); const B=RC[0], D=RC[1], L=RC[2],
 const UI_FOCUSABLE='button:not([disabled]),a[href],input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 const UI_SIMPLE_DOCK=['routines','timer','brain','pick'];
 function calmScreen(){ return !STUDENT&&S.calmScreen!==false; }
-function dockPresetNow(){ return calmScreen()&&S.dockPreset!=='custom'?'simple':S.dockPreset; }
+function dockPresetNow(){ return S.dockPreset; }
 function uiDockKeys(order,hidden,preset){ return preset==='simple'?UI_SIMPLE_DOCK.slice():order.filter(k=>!hidden.includes(k)); }
 function uiTabDestination(items,current,backwards){
   if(!items.length) return null;
@@ -5321,7 +5321,7 @@ drawTour=function(){ const opener=document.activeElement, result=uiDrawTourBase.
 const uiEndTourBase=endTour;
 endTour=function(){ const frame=uiModalFrames.find(f=>f.key==='tour'), result=uiEndTourBase.apply(this,arguments); uiLeaveModal('tour',frame); return result; };
 
-function uiLookPresetHTML(){ return '<div class="look-preset"><h3>Screen</h3><p class="hint" style="margin:0">The calm screen shows only what the class needs: what’s happening now, what to do and the time left. Extra tools stay under More and More tools.</p><div class="row" role="group" aria-label="Screen"><button class="btn alt" type="button" data-calm-screen="on" aria-pressed="'+calmScreen()+'">Calm screen (recommended)</button><button class="btn alt" type="button" data-calm-screen="off" aria-pressed="'+!calmScreen()+'">Show every button</button></div></div><div class="look-preset"><h3>Board style</h3><p class="hint" style="margin:0">Keep Roomie’s colourful look, or use simpler lettering and fewer decorations. Your colours and teaching tools stay available.</p><div class="row" role="group" aria-label="Board style"><button class="btn alt" type="button" data-ui-look="colourful" aria-pressed="'+!S.calmLook+'">Colourful</button><button class="btn alt" type="button" data-ui-look="calm" aria-pressed="'+!!S.calmLook+'">Calmer look</button></div></div>'; }
+function uiLookPresetHTML(){ return '<div class="look-preset"><h3>Screen</h3><p class="hint" style="margin:0">The calm screen keeps the top bar simple: Full screen, More and Setup. Float, Phone remote, Student devices and Voice are under More. Choose your bottom bar tools in the Bottom bar tab.</p><div class="row" role="group" aria-label="Screen"><button class="btn alt" type="button" data-calm-screen="on" aria-pressed="'+calmScreen()+'">Calm screen (recommended)</button><button class="btn alt" type="button" data-calm-screen="off" aria-pressed="'+!calmScreen()+'">Show every button</button></div></div><div class="look-preset"><h3>Board style</h3><p class="hint" style="margin:0">Keep Roomie’s colourful look, or use simpler lettering and fewer decorations. Your colours and teaching tools stay available.</p><div class="row" role="group" aria-label="Board style"><button class="btn alt" type="button" data-ui-look="colourful" aria-pressed="'+!S.calmLook+'">Colourful</button><button class="btn alt" type="button" data-ui-look="calm" aria-pressed="'+!!S.calmLook+'">Calmer look</button></div></div>'; }
 const uiApplyThemeBase=applyTheme;
 applyTheme=function(){ const result=uiApplyThemeBase.apply(this,arguments); document.body.classList.toggle('ui-calm-look',S.calmLook===true); return result; };
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-ui-look]'); if(!b) return; S.calmLook=b.dataset.uiLook==='calm'; save(); applyTheme(); render(true); renderSetup(); });
@@ -5344,7 +5344,7 @@ dockSetupHTML=function(){
   const hidden=S.dockHide||[], order=dockOrder(), simple=dockPresetNow()==='simple';
   return '<div class="dockset"><h3 style="margin:0">Your bottom bar</h3><p class="hint" style="margin:0">Choose which tools appear along the bottom of your board and put them in the order you use them. Unticked tools stay in More tools; class tools are under Students.</p><div class="dock-preset"><div class="row" role="group" aria-label="Dock preset"><button class="btn alt" type="button" data-dock-preset="simple" aria-pressed="'+simple+'">Simple: four everyday tools</button><button class="btn alt" type="button" data-dock-preset="custom" aria-pressed="'+!simple+'">My custom bottom bar</button></div>'+(simple?'<p class="hint" style="margin:0">Routines, Timer, Brain break and Pick a name. Your custom tools and order are kept; switch back any time.</p>':'')+'</div><div class="docklist"'+(simple?' hidden':'')+'>'+order.map((k,i)=>'<div class="dockrow'+(hidden.includes(k)?' off':'')+'"><label class="chk"><input type="checkbox" data-dk="show:'+k+'" '+(hidden.includes(k)?'':'checked')+'><span>'+esc(DOCK_NAMES[k])+'</span></label><span><button type="button" class="btn alt sm" data-dk="up:'+k+'" '+(i?'':'disabled')+' aria-label="Move '+esc(DOCK_NAMES[k])+' earlier">←</button><button type="button" class="btn alt sm" data-dk="down:'+k+'" '+(i<order.length-1?'':'disabled')+' aria-label="Move '+esc(DOCK_NAMES[k])+' later">→</button></span></div>').join('')+'</div><button type="button" class="linkbtn" data-dk="reset:x"'+(simple?' hidden':'')+'>Show all tools in the usual order</button></div>';
 };
-document.addEventListener('click',e=>{ const b=e.target.closest('[data-dock-preset]'); if(!b) return; if(b.dataset.dockPreset==='custom'&&!Array.isArray(S.dockHide)&&!Array.isArray(S.dockOrder)){ const all=dockOrder(); S.dockOrder=[...UI_SIMPLE_DOCK,...all.filter(k=>!UI_SIMPLE_DOCK.includes(k))]; S.dockHide=all.filter(k=>!UI_SIMPLE_DOCK.includes(k)); } S.dockPreset=b.dataset.dockPreset; save(); applyDock(); renderSetup(); });
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-dock-preset]'); if(!b) return; S.dockPreset=b.dataset.dockPreset; save(); applyDock(); renderSetup(); });
 let uiDMenuOpener=null;
 const uiOpenDMenuBase=openDMenu, uiCloseDMenuBase=closeDMenu;
 closeDMenu=function(){ const menu=document.getElementById('dmenu'), hadFocus=menu&&menu.contains(document.activeElement); const result=uiCloseDMenuBase.apply(this,arguments); if(hadFocus&&uiDMenuOpener&&uiDMenuOpener.isConnected) uiDMenuOpener.focus({preventScroll:true}); return result; };
