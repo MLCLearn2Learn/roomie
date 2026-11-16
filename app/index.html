@@ -1462,7 +1462,7 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.8.13 · 16 Nov 2026';
+const VERSION='Roomie v2.8.14 · 16 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -2365,11 +2365,11 @@ function planSumHTML(b,i){ const ex=(typeof segInfo==='function'?segInfo({b}):[]
 function openSetup(){ if(Music.isYT&&!Music.paused) Music.pause(); editDay=editDay||(isWeekend(now())?'mon':dayKey(now())); renderSetup(); }
 function closeSetup(){ $('#sheetHost').innerHTML=''; refreshLabels(); A.phaseKey=''; tick(true); }
 
-const ATTENTION_SOUNDS=[['spoken','Say the teacher’s call'],['chime','Gentle chime'],['bell','Soft bell'],['clap','Clap pattern'],['water','Waterfall'],['none','Silent']];
+const ATTENTION_SOUNDS=[['spoken','Say the teacher’s call'],['chime','Gentle chime'],['bell','Soft bell'],['clap','Clap, clap'],['water','Waterfall shhh'],['none','Silent']];
 let attentionSources=[],attentionSpeech=null;
 function attentionSound(){
  const p=attentionPreset(),saved=(S.attentionSounds||{})[p.id]||{};
- const fallback=p.id==='hand'?'none':p.id==='chime'?'chime':'spoken';
+ const fallback=({hand:'none',chime:'chime',waterfalls:'water',class:'clap'})[p.id]||'spoken';
  return {cue:ATTENTION_SOUNDS.some(x=>x[0]===saved.cue)?saved.cue:fallback,volume:Number.isFinite(saved.volume)?Math.max(0,Math.min(1,saved.volume)):.55};
 }
 function stopAttentionSound(){
@@ -2394,9 +2394,9 @@ function playAttentionSound(preview=false){
  if(choice.cue==='bell'){tone(880,0,1.3,.25);tone(1760,0,.7,.05);return;}
  const duration=choice.cue==='water'?1.5:.13,buffer=a.createBuffer(1,Math.ceil(a.sampleRate*duration),a.sampleRate),data=buffer.getChannelData(0);
  for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;
- const offsets=choice.cue==='clap'?[0,.3,.6]:[0];offsets.forEach(offset=>{const src=a.createBufferSource(),filter=a.createBiquadFilter(),gain=a.createGain();src.buffer=buffer;filter.type=choice.cue==='water'?'lowpass':'highpass';filter.frequency.value=choice.cue==='water'?1800:1300;gain.gain.setValueAtTime(.0001,now+offset);gain.gain.linearRampToValueAtTime(choice.volume*(choice.cue==='water'?.16:.2),now+offset+.025);gain.gain.exponentialRampToValueAtTime(.0001,now+offset+duration);src.connect(filter);filter.connect(gain);gain.connect(master);src.onended=()=>{filter.disconnect();gain.disconnect();};src.start(now+offset);src.stop(now+offset+duration);attentionSources.push(src);});
+ const offsets=choice.cue==='clap'?[0,.35]:[0];offsets.forEach(offset=>{const src=a.createBufferSource(),filter=a.createBiquadFilter(),gain=a.createGain();src.buffer=buffer;filter.type=choice.cue==='water'?'bandpass':'highpass';filter.frequency.value=choice.cue==='water'?2600:1300;filter.Q.value=choice.cue==='water'?.65:.7;gain.gain.setValueAtTime(.0001,now+offset);gain.gain.linearRampToValueAtTime(choice.volume*(choice.cue==='water'?.16:.2),now+offset+(choice.cue==='water'?.18:.006));if(choice.cue==='water')gain.gain.setValueAtTime(choice.volume*.16,now+offset+.75);gain.gain.exponentialRampToValueAtTime(.0001,now+offset+duration);src.connect(filter);filter.connect(gain);gain.connect(master);src.onended=()=>{filter.disconnect();gain.disconnect();};src.start(now+offset);src.stop(now+offset+duration);attentionSources.push(src);});
 }
-function attentionSoundHTML(){const x=attentionSound();return '<div class="signal-builder"><h4>Sound for this attention signal</h4><div class="fld"><label for="attentionSoundChoice">What the class hears</label><select id="attentionSoundChoice" data-attention-sound="cue">'+ATTENTION_SOUNDS.map(c=>'<option value="'+c[0]+'" '+(x.cue===c[0]?'selected':'')+'>'+c[1]+'</option>').join('')+'</select></div><div class="fld"><label for="attentionSoundVolume">Volume</label><input id="attentionSoundVolume" data-attention-sound="volume" type="range" min="0" max="100" value="'+Math.round(x.volume*100)+'"></div><button type="button" class="btn alt" data-attention-preview>Preview sound</button><p class="hint">Saved for this signal. Spoken calls use an Australian female voice when your browser has one. Roomie says only the teacher’s call, then waits for the class response. Press Thank you when the class is ready.</p></div>';}
+function attentionSoundHTML(){const x=attentionSound();return '<div class="signal-builder"><h4>Sound for this attention signal</h4><div class="fld"><label for="attentionSoundChoice">What the class hears</label><select id="attentionSoundChoice" data-attention-sound="cue">'+ATTENTION_SOUNDS.map(c=>'<option value="'+c[0]+'" '+(x.cue===c[0]?'selected':'')+'>'+c[1]+'</option>').join('')+'</select></div><div class="fld"><label for="attentionSoundVolume">Volume</label><input id="attentionSoundVolume" data-attention-sound="volume" type="range" min="0" max="100" value="'+Math.round(x.volume*100)+'"></div><button type="button" class="btn alt" data-attention-preview>Preview sound</button><p class="hint">The cue plays as big Roomie appears, before the words come in. Saved for this signal. Spoken calls use an Australian female voice when your browser has one. Roomie says only the teacher’s call, then waits for the class response. Press Thank you when the class is ready.</p></div>';}
 document.addEventListener('click',e=>{if(e.target.closest('[data-attention-preview]'))playAttentionSound(true);});
 
 const ATTENTION_PRESETS=[
