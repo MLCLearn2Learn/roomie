@@ -1341,6 +1341,20 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
  .teaching-space:has(#ytCard:not([hidden]))>.stage{min-height:60vh}
  .teaching-space:has(#ytCard:not([hidden]))>.stage>.side .ring{max-width:130px}
 }
+
+/* Roomie leads every attention signal; movement settles after the entrance. */
+.attn.roomie-attention{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);grid-template-rows:minmax(0,1fr) auto auto auto minmax(0,1fr);column-gap:clamp(16px,4vw,64px);row-gap:18px;padding:40px clamp(24px,5vw,80px);overflow:auto}
+.roomie-attention>svg,.roomie-attention>b,.roomie-attention>p{display:none}
+.roomie-attention .atn-roomie{grid-column:1;grid-row:1/-1;width:100%;max-width:660px;justify-self:center;align-self:center;animation:roomieAttentionHello .85s ease-out both}
+.roomie-attention .atn-roomie svg{width:100%;height:min(74vh,680px);overflow:visible;filter:drop-shadow(0 12px 0 rgba(27,19,64,.12))}
+.roomie-attention .atn-t{grid-column:2;grid-row:2;font-size:clamp(42px,6.5vw,98px);max-width:100%;overflow-wrap:anywhere}
+.roomie-attention .atn-steps{grid-column:2;grid-row:3;min-width:0}
+.roomie-attention .atn-steps span{font-size:clamp(24px,3vw,42px);max-width:100%;overflow-wrap:anywhere}
+.roomie-attention #attnOk{grid-column:2;grid-row:4;justify-self:center}
+@keyframes roomieAttentionHello{0%{transform:translateY(28px) scale(.82);opacity:0}55%{transform:translateY(-10px) scale(1.03);opacity:1}100%{transform:none;opacity:1}}
+@media(max-width:700px){.attn.roomie-attention{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto auto;gap:12px;padding:60px 20px 24px;align-content:safe center}.roomie-attention .atn-roomie{grid-column:1;grid-row:1}.roomie-attention .atn-roomie svg{height:min(38vh,320px)}.roomie-attention .atn-t{grid-column:1;grid-row:2;font-size:clamp(34px,8vw,56px)}.roomie-attention .atn-steps{grid-column:1;grid-row:3}.roomie-attention #attnOk{grid-column:1;grid-row:4}}
+@media(prefers-reduced-motion:reduce){.roomie-attention .atn-roomie{animation:none}}
+
 </style>
 
 <svg class="land" viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60 C 260 10 520 40 760 70 S 1200 100 1440 50 L1440 150 L0 150 Z" fill="#7CC79A" id="hill1"></path><path d="M0 110 C 300 80 600 105 900 120 S 1260 130 1440 100 L1440 150 L0 150 Z" fill="#2F8F6B"></path></svg>
@@ -1446,7 +1460,7 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.8.9 · 16 Nov 2026';
+const VERSION='Roomie v2.8.10 · 16 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -4562,8 +4576,8 @@ function scLayout(card,band,art,h){ const cr0=card.getBoundingClientRect(); if(!
 function scRelayout(){ const c=document.querySelector('#stage > .card.scene'); if(c) scLayout(c,c.querySelector(':scope > .scn-band'),c.querySelector(':scope > .scn-art'),c.querySelector('h1')); }
 addEventListener('resize',scRelayout); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(scRelayout);
 /* attention: full-screen design */
-{ const f=attention; attention=function(){ const r=f.apply(this,arguments); const a=document.querySelector('#overlayHost .attn'); if(a&&!a.querySelector('.atn-art')&&!STUDENT&&S.scenes!==false){ a.classList.add('scn-attn');
-    a.insertAdjacentHTML('afterbegin','<div class="atn-art" aria-hidden="true">'+((S.pics||{}).attention?picArtHTML(S.pics.attention):'<svg viewBox="0 0 160 140"><g stroke="'+SCK+'" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">'+SC_ART.attention()+'</g></svg>')+'</div><h2 class="atn-t"><span class="pl" style="--pc:#FFD84D;--pr:-2deg">'+esc(attentionPreset().call)+'</span></h2><div class="atn-steps"><span style="--pc:#6FD6A0">'+esc(attentionPreset().response)+'</span></div>'); }
+{ const f=attention; attention=function(){ const r=f.apply(this,arguments); const a=document.querySelector('#overlayHost .attn'); if(a&&!a.querySelector('.atn-art')&&!STUDENT){ a.classList.add('roomie-attention'); if(S.scenes!==false)a.classList.add('scn-attn');
+    a.insertAdjacentHTML('afterbegin','<div class="atn-art atn-roomie" aria-hidden="true">'+birdSVG()+'</div><h2 class="atn-t"><span class="pl" style="--pc:#FFD84D;--pr:-2deg">'+esc(attentionPreset().call)+'</span></h2><div class="atn-steps"><span style="--pc:#6FD6A0">'+esc(attentionPreset().response)+'</span></div>'); }
   return r; }; }
 function scSetupHTML(){ return '<h3>Screen designs</h3><label class="chk"><input type="checkbox" data-scon '+(S.scenes===false?'':'checked')+'><span>Bright designs and pictures on each screen</span></label>'; }
 document.addEventListener('change',e=>{ const t=e.target; if(!t.matches||!t.matches('[data-scon]')) return; S.scenes=t.checked; save(); render(true); });
