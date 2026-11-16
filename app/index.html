@@ -2586,9 +2586,9 @@ function showClassCelebration(message,selected){
  const content=mode==='choice'?'<div class="celebration-choice-buttons"><button type="button" class="btn" data-celebration-run="dance">Roomie’s dance</button><button type="button" class="btn gold" data-celebration-run="highfive">Class high-five</button></div>':celebrationRoomieSVG(mode);
  const title=mode==='choice'?'How shall we celebrate?':mode==='highfive'?'High-five, team!':mode==='silent'?'Silent superstars!':mode==='wedidit'?'We did it!':'Let’s celebrate!';
  d.innerHTML='<div class="celebration-stars" aria-hidden="true">'+Array.from({length:12},(_,i)=>'<span style="--star:'+i+'">✦</span>').join('')+'</div><div class="celebration-content"><p class="celebration-class">'+esc(S.room||'Our class')+'</p><h1 id="classCelebrationTitle">'+title+'</h1>'+content+'<p class="celebration-message">'+esc(message||'You worked together. Well done!')+'</p><button type="button" class="btn alt" data-celebration-close>'+(mode==='choice'?'Back':'Back to our activity')+'</button></div>';
- d.addEventListener('close',()=>{clearTimeout(celebrationTimer);celebrationTimer=null;d.remove();});document.body.appendChild(d);d.showModal();
+ d.addEventListener('close',()=>{clearTimeout(d.celebrationTimer);if(document.getElementById('classCelebration')===d)celebrationTimer=null;d.remove();});document.body.appendChild(d);d.showModal();
  d.addEventListener('click',e=>{const b=e.target.closest('[data-celebration-run]');if(b){showClassCelebration(message,b.dataset.celebrationRun);return;}if(e.target.closest('[data-celebration-close]'))closeClassCelebration();});
- if(mode!=='choice')celebrationTimer=setTimeout(closeClassCelebration,4400);
+ if(mode!=='choice')celebrationTimer=d.celebrationTimer=setTimeout(closeClassCelebration,4400);
 }
 document.addEventListener('change',e=>{if(!e.target.matches('[data-celebration-choice]'))return;const id=e.target.value;if(CLASS_CELEBRATIONS.some(x=>x.id===id)){S.celebration=id;save();}});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-celebration-preview]');if(b)showClassCelebration('You helped each other. Great teamwork!',b.dataset.celebrationPreview);});
