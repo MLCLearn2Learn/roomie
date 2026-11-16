@@ -5337,7 +5337,7 @@ applyDock=function(){
   const displayOrder=dockPresetNow()==='simple'?[...UI_SIMPLE_DOCK,...order.filter(k=>!UI_SIMPLE_DOCK.includes(k))]:order;
   displayOrder.forEach(k=>{ const button=box.querySelector('.tool[data-tool="'+k+'"]'); if(button){ button.hidden=!visible.includes(k); box.appendChild(button); } });
   if(br){ const after=visible[Math.ceil(visible.length/2)-1], button=after&&box.querySelector('.tool[data-tool="'+after+'"]'); if(button&&visible.length>8) button.after(br); else box.appendChild(br); br.hidden=visible.length<=8; }
-  more.hidden=S.mode==='tools'&&toolkitVisible().length===toolkitTiles().length;
+  more.hidden=S.mode==='tools'?toolkitVisible().length===toolkitTiles().length:visible.length>=Object.keys(DOCK_NAMES).length;
   box.appendChild(more);
 };
 dockSetupHTML=function(){
@@ -5379,7 +5379,7 @@ const UI_TOOL_GROUPS=[
     ['routines','Routines','Run or practise a routine','routine transitions'],
     ['packup','Pack up','Get ready to leave','pack up home time'],
     ['reteach','Practise expectations','Revisit classroom expectations','behaviour behavior expectations']]],
-  ['Wellbeing',[
+  ['Body and mind',[
     ['brain','Brain break','Move, play or reset','movement active break'],
     ['calm','Calm breathing','Take a quiet minute','breathe breathing calm quiet'],
     ['wellbeing','Wellbeing','Settle, reconnect or lift energy','wellbeing calm energy kindness'] ,
