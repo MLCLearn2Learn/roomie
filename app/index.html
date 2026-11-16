@@ -5065,25 +5065,30 @@ function rmkDraw(){ const r=RMK.id?routineById(RMK.id):null; let h=document.getE
     lib.map(m=>'<button type="button" class="rmk-opt'+(cur==='m:'+m.id?' on':'')+'" data-rmsong="m:'+m.id+'"><i>'+(m.kind==='yt'?'▶':m.video?'🎬':'♪')+'</i><span>'+esc(m.title)+'<small>'+mediaLabel(m)+'</small></span></button>').join('')+
     '<button type="button" class="rmk-opt'+(cur==='none'?' on':'')+'" data-rmsong="none"><i>🔇</i><span>No music</span></button>'+
     '<label class="rmk-opt rmk-roomie'+(SONGS[cur]?' on':'')+'"><i>🎵</i><select id="rmkRoomie">'+songOpts+'</select></label></div>'+
-   '<div class="rmk-add"><b>Add to My music & videos</b><div class="row" style="gap:6px"><input id="rmkYt" type="url" placeholder="Paste a YouTube link" style="flex:1;min-width:180px"><input id="rmkYtStart" type="text" placeholder="Start 0:45" style="width:96px"><button class="btn sm" type="button" data-rmk="addyt">Add</button></div>'+
+   '<div class="rmk-add"><b>Add to My music & videos</b><div class="row" style="gap:6px"><input id="rmkYt" type="url" placeholder="Paste a YouTube link, then Add or Save" style="flex:1;min-width:180px"><input id="rmkYtStart" type="text" placeholder="Start 0:45" style="width:96px"><button class="btn sm" type="button" data-rmk="addyt">Add</button></div>'+
    '<div class="row" style="gap:6px;align-items:center"><label class="btn alt sm" style="cursor:pointer">Upload an MP3 or video<input id="rmkFile" type="file" accept="audio/*,video/*" hidden></label><span class="hint" id="rmkMsg">Saved in this browser. Use music you own or have a licence for.</span></div></div></div></div>'+
    '<div class="row" style="justify-content:flex-end;gap:8px">'+(r?'<button class="btn alt" type="button" data-rmk="del">Delete</button>':'')+'<button class="btn alt" type="button" data-rmk="save">Save</button><button class="btn gold" type="button" data-rmk="run">Save and run it now</button></div></div></div>';
   h.dataset.song=cur; }
 function rmkSong(){ const h=document.getElementById('rmkHost'); return h?h.dataset.song:'switch'; }
 function rmkSetSong(k){ const h=document.getElementById('rmkHost'); if(!h) return; h.dataset.song=k; h.querySelectorAll('.rmk-opt').forEach(b=>b.classList.toggle('on',b.dataset.rmsong===k||(b.classList.contains('rmk-roomie')&&!!SONGS[k]))); }
+function rmkYtItem(u,start){ return {id:uid(),kind:'yt',yt:u,ytStart:String(start||'').trim(),title:'YouTube '+(mediaList().filter(m=>m.kind==='yt').length+1)}; }
 function rmkSave(){ const name=($('#rmkName').value||'').trim(), steps=($('#rmkSteps').value||'').trim(); if(!name){ toast('Give your routine a name.'); $('#rmkName').focus(); return null; } if(!steps){ toast('Add at least one step.'); $('#rmkSteps').focus(); return null; }
+  /* A YouTube link pasted but not yet added is added and chosen for this routine, rather than silently dropped. */
+  const ytBox=$('#rmkYt'), ytu=ytBox?ytBox.value.trim():''; let pasted=null;
+  if(ytu){ if(!YT_.parse(ytu)){ toast('That YouTube link doesn’t look right. Check it, or clear the box.'); ytBox.focus(); return null; } pasted=rmkYtItem(ytu,$('#rmkYtStart')?$('#rmkYtStart').value:''); mediaList().push(pasted); }
   let r=RMK.id?routineById(RMK.id):null; if(!r){ r={id:uid(),auto:true}; S.routines.push(r); RMK.id=r.id; }
-  r.name=name; r.steps=steps; r.minutes=Math.max(1,Math.min(30,parseInt($('#rmkMin').value,10)||3)); r.song=rmkSong(); if(r.vis&&r.vis!==RMK.vis) visDrop(r.vis); r.vis=RMK.vis||null; save(); return r; }
+  r.name=name; r.steps=steps; r.minutes=Math.max(1,Math.min(30,parseInt($('#rmkMin').value,10)||3)); r.song=pasted?'m:'+pasted.id:rmkSong(); if(r.vis&&r.vis!==RMK.vis) visDrop(r.vis); r.vis=RMK.vis||null;
+  if(save()===false){ toast('Roomie couldn’t save in this browser. Download a backup from the yellow bar.'); return null; } return r; }
 async function rmkAddMedia(item,blob){ const editor=$('#rmkName'); if(blob){ try{ await idbPut('media-'+item.id,blob); }catch(_){ toast('This browser blocked saving the file. Try Chrome.'); return; } }
   mediaList().push(item); save(); if(editor&&editor===$('#rmkName')){ const keep={name:editor.value,steps:$('#rmkSteps').value,min:$('#rmkMin').value}; const rid=RMK.id;
     rmkDraw(); $('#rmkName').value=keep.name; $('#rmkSteps').value=keep.steps; $('#rmkMin').value=keep.min; RMK.id=rid; rmkSetSong('m:'+item.id); } toast('Added “'+item.title+'” to My music.'); }
 document.addEventListener('click',async e=>{ const s=e.target.closest('[data-rmsong]'); if(s){ rmkSetSong(s.dataset.rmsong); return; }
   const b=e.target.closest('[data-rmk]'); if(!b) return; const a=b.dataset.rmk;
   if(a==='close'){ rmkClose(); return; }
-  if(a==='save'||a==='run'){ const r=rmkSave(); if(!r) return; rmkClose(); if(a==='run'){ runRoutine(r.id); } else toast('Saved “'+r.name+'”.'); return; }
+  if(a==='save'||a==='run'){ const r=rmkSave(); if(!r) return; rmkClose(); if(a==='run'){ runRoutine(r.id); } else toast('Saved “'+r.name+'” with '+songLabel(r)+'.'); return; }
   if(a==='del'){ if(b.dataset.sure!=='1'){ b.dataset.sure='1'; b.textContent='Tap again to delete'; return; } S.routines=S.routines.filter(x=>x.id!==RMK.id); save(); rmkClose(); toast('Routine deleted.'); return; }
   if(a==='addyt'){ const u=$('#rmkYt').value.trim(), v=YT_.parse(u); if(!v){ toast('That doesn’t look like a YouTube link.'); return; }
-    await rmkAddMedia({id:uid(),kind:'yt',yt:u,ytStart:$('#rmkYtStart').value.trim(),title:'YouTube '+(mediaList().filter(m=>m.kind==='yt').length+1)}); return; } });
+    await rmkAddMedia(rmkYtItem(u,$('#rmkYtStart').value)); return; } });
 document.addEventListener('change',async e=>{ const t=e.target;
   if(t.id==='rmkRoomie'){ rmkSetSong(t.value); return; }
   if(t.id==='rmkFile'&&t.files&&t.files[0]){ const f=t.files[0]; if(f.size>60*1024*1024){ $('#rmkMsg').textContent='That file is over 60 MB. Choose a shorter one.'; return; }
