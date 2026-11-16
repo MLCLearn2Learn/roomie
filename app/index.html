@@ -326,6 +326,9 @@ textarea{min-height:140px;resize:vertical;line-height:1.5}
 .relief h2{font-size:30px;color:var(--gum-d)} .relief h3{font-size:22px;margin-top:6px}
 .relief table{border-collapse:collapse;width:100%} .relief td{border-bottom:1px solid var(--line);padding:6px 8px;font-weight:700;vertical-align:top}
 #reliefPrint{display:none}
+.rr-launch,.rr-back{grid-column:1/-1}
+.rr-launch{background:#FFF6D6;border:3px solid #F5B700;border-radius:20px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}.rr-launch:not(:has(.rr-steps)){flex-direction:row;align-items:center;justify-content:space-between;gap:18px}.rr-launch h2{font-size:26px;margin:2px 0}.rr-launch p{margin:0}.rr-steps{margin:0;padding-left:24px;display:grid;gap:8px}.rr-steps li{font-size:18px}.rr-steps .btn{margin-left:10px}.rr-dots{display:flex;gap:6px}.rr-dots i{width:22px;height:8px;border-radius:4px;background:#EADFC2}.rr-dots i.done{background:#2F8F6B}.rr-dots i.cur{background:#F5B700}.rr-tick{font-size:16px;color:#2F8F6B;white-space:nowrap}
+.rr-back{display:flex;flex-direction:column;gap:4px;background:#EAF6F0;border-radius:16px;padding:12px 16px}.rr-back>b{font-size:22px;color:#1F6B4F}.rr-rows{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}.rr-rows li{background:#fff;border-radius:12px;padding:6px 10px;display:flex;gap:8px;align-items:baseline}.rr-rows small,.rr-note{color:#5B6B65;font-size:13px}.race-rec{font-size:16px;font-weight:800;color:#6A4BC4}
 @media print{body.printing-relief>*:not(#reliefPrint){display:none!important}body.printing-relief{background:#fff!important}body.printing-relief #reliefPrint{display:block}#reliefPrint .relief{padding:0;border-radius:0;font-size:11pt;gap:8px}#reliefPrint .relief h2{font-size:18pt}#reliefPrint .relief h3{font-size:13pt;break-after:avoid}#reliefPrint .relief tr{break-inside:avoid}}
 @media (max-width:599px){
   html,body{overflow-x:hidden;max-width:100vw} .app{max-width:100vw;grid-template-columns:minmax(0,1fr)!important} .app>*{min-width:0;max-width:100%} #ver{display:none} .top{flex-wrap:wrap;row-gap:8px} .top-r{flex-wrap:wrap;justify-content:flex-start;gap:8px} .strip{flex-wrap:wrap!important;gap:6px} .strip .seg{flex:0 0 auto!important} .strip{max-width:100%} .splash .box{max-width:100%} .splash .row{flex-wrap:wrap}
@@ -1937,7 +1940,7 @@ function meterCard(){ return '<section class="card sm"><div class="row" style="j
 function renderRoutine(P,full){
   const R=P.routine, st=stepsOf(R), cur=stepIndexFor(P), left=(P.to-P.mins)*60, total=(P.to-P.from)*60;
   if(full||cur!==lastStep){ lastStep=cur;
-    let side='<section class="card sm" style="align-items:center">'+ringHTML('main','left','md')+'</section>'+npHTML()+raceHTML();
+    let side='<section class="card sm" style="align-items:center">'+ringHTML('main','left','md')+'</section>'+npHTML()+raceHTML(R);
     if(R.checkin) side='<section class="card sm">'+weatherHTML()+'</section>'+factHTML()+'<section class="card sm" style="flex-direction:row;align-items:center"><div style="width:130px;flex:none">'+ringHTML('main','','sm')+'</div><div><b style="font-family:var(--display);font-size:22px">'+esc(Music.title||(SONGS[R.song]||{}).title||'')+'</b><div class="hint">'+esc(R.name)+' ends at '+fmtClock(P.to)+'</div></div></section>';
     if(R.tomorrow) side='<section class="card sm"><div class="eyebrow">Tomorrow · '+esc(DAYNAME[nextDayKey(now())])+'</div><div style="font-size:21px">'+esc(S.reminders[nextDayKey(now())]||'Nothing special. Bring your best self!')+'</div></section>'+goalHTML()+'<section class="card sm" style="align-items:center">'+ringHTML('main','left')+'</section>';
     const lead=R.checkin&&S.reminders[dayKey(now())]?'<div class="task" style="margin-top:auto;font-size:22px">Today: '+esc(S.reminders[dayKey(now())])+'</div>':'';
@@ -2051,7 +2054,7 @@ function backBtn(label){ const stop=!!label&&/^(Stop|Finish)/.test(label); retur
 function renderOverlay(full){
   const o=A.overlay, P=A.P;
   if(renderFunOverlay(o,full)) return;
-  if(o==='routines'){ if(!full) return; setStage('one','<section class="card choice-picker routines-picker"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Classroom routines</h1>'+backBtn()+'</div><p class="lead">Run one now, or practise it: the class times itself and tries to beat its best.</p><div class="rlist choice-scroll" role="region" aria-label="Routine choices" tabindex="0">'+S.routines.map(r=>'<div class="rbtn tcard"><b>'+esc(r.name)+'</b><span>'+stepsOf(r).length+' steps · '+r.minutes+' min'+(r.best?' · best '+fmtLeft(r.best):'')+'</span><div class="row" style="margin-top:6px"><button class="btn sm" type="button" data-run="'+esc(r.id)+'">Run</button><button class="btn alt sm" type="button" data-practise="'+esc(r.id)+'">Practise</button></div></div>').join('')+'</div></section>'); return; }
+  if(o==='routines'){ if(!full) return; setStage('one','<section class="card choice-picker routines-picker"><div class="row" style="justify-content:space-between"><h1 class="mid" style="color:var(--gum-d)">Classroom routines</h1>'+backBtn()+'</div><p class="lead">Run one now, or practise it: the class times itself and tries to beat its best.</p><div class="rlist choice-scroll" role="region" aria-label="Routine choices" tabindex="0">'+launchHTML()+timeBackHTML('routines')+S.routines.map(r=>'<div class="rbtn tcard"><b>'+esc(r.name)+'</b><span>'+stepsOf(r).length+' steps · '+r.minutes+' min'+(r.best?' · best '+fmtLeft(r.best):'')+'</span><div class="row" style="margin-top:6px"><button class="btn sm" type="button" data-run="'+esc(r.id)+'">Run</button><button class="btn alt sm" type="button" data-practise="'+esc(r.id)+'">Practise</button></div></div>').join('')+'</div></section>'); return; }
   if(o==='manualRoutine'){ const R=routineById(A.mr.id); const st=stepsOf(R); const cur=A.mr.step;
     if(full||A.mr.drawn!==cur){ A.mr.drawn=cur; setStage('', '<section class="card"><div class="row" style="justify-content:space-between"><div class="eyebrow">Routine</div>'+backBtn('Stop')+'</div><h1 class="big">'+esc(R.name)+'</h1>'+stepsHTML(st,cur)+'<div class="row" style="margin-top:auto"><button class="btn" type="button" data-act="mrNext">'+(cur>=st.length-1?'Finish':'Next step')+'</button><button class="btn alt" type="button" data-act="mrBack">Previous step</button></div></section><aside class="side">'+(R.checkin?'<section class="card sm">'+weatherHTML()+'</section>':'')+'<section class="card sm" style="align-items:center">'+(R.checkin?'<div style="width:150px">'+ringHTML('main','left','sm')+'</div>':ringHTML('main','left'))+'</section>'+npHTML()+'</aside>'); updateNowPlaying(); }
     paintRing('main',MT.remaining(),MT.total); return; }
@@ -2279,8 +2282,10 @@ function act(a,el){
   if(a==='mrNext'){ const st=stepsOf(routineById(A.mr.id)); if(A.mr.step>=st.length-1){ chime(2); toast('Well done, everyone.'); closeOverlay(); } else { A.mr.step++; chime(1); say('Step '+(A.mr.step+1)+'. '+st[A.mr.step]); render(false); } return; }
   if(a==='mrBack'){ if(A.mr.step>0){ A.mr.step--; render(false); } return; }
   if(a==='mtPause'){ MT.running?MT.pause():MT.resume(); render(false); return; }
-  if(a==='prDone'){ const R=routineById(A.pr.id); if(A.pr.done) return; A.pr.done=(Date.now()-A.pr.t0)/1000; clearActivity(); Music.fadeStop(); const t=A.pr.done; const beat=!R.best||t<R.best; const m=$('#prMsg'); if(beat){ R.best=Math.round(t); save(); chime(3); if(m) m.innerHTML='<b style="color:var(--gum-d);font-size:28px">New best! '+fmtLeft(t)+'</b><br><button class="btn gold sm" type="button" data-act="point" style="margin-top:10px">+1 class point</button>'; } else { chime(1); if(m) m.textContent='Our best is still '+fmtLeft(R.best)+'. Do it again?'; } return; }
+  if(a==='prDone'){ const R=routineById(A.pr.id); if(A.pr.done) return; A.pr.done=(Date.now()-A.pr.t0)/1000; clearActivity(); Music.fadeStop(); const t=A.pr.done, rec=recordRoutineTime(R.id,t,'practise'); const beat=!!rec&&(rec.first||rec.record); const m=$('#prMsg'); if(beat){ chime(3); if(rec.record) celebrate('New class record!','big'); if(m) m.innerHTML='<b style="color:var(--gum-d);font-size:28px">'+(rec.record?'New class record! '+fmtLeft(t)+'</b><br><span>Old record '+fmtLeft(rec.prev)+'</span>':'Our first time: '+fmtLeft(t)+'</b>')+'<br><button class="btn gold sm" type="button" data-act="point" style="margin-top:10px">+1 class point</button>'; } else { chime(1); if(m) m.textContent=rec?'Our best is still '+fmtLeft(R.best)+'. Do it again?':'That was very quick! Try it again at full speed.'; } return; }
   if(a==='prAgain'){ startPractise(A.pr.id); return; }
+  if(a==='launchStart'){ S.launch={start:onceKey(isWeekend(now())?nextSchoolDay(now()):now()),ids:launchOrder()}; save(); render(true); return; }
+  if(a==='launchEnd'){ delete S.launch; save(); render(true); return; }
 }
 function runRoutine(id){ const R=routineById(id); if(!R) return; if(!navPrepareStart('manualRoutine')) return; clearActivity(); A.mr={id,step:0}; MT.start(R.minutes*60,()=>{ chime(2); Music.fadeStop(); toast('Time’s up for '+R.name); }); if(R.song&&R.song!=='none') Music.play(R.song,R.id); say(R.name+'. Step 1. '+(stepsOf(R)[0]||'')); openOverlay('manualRoutine'); }
 function startPractise(id){ const R=routineById(id); if(!R||!navPrepareStart('practise')) return; clearActivity(); A.pr={id,t0:Date.now(),done:0}; if(R.song&&R.song!=='none') Music.play(R.song,R.id); chime(1); openOverlay('practise'); }
@@ -2654,13 +2659,13 @@ function addPoint(el){ S.goal.points++; save(); const g=S.goal;
   pipRender(true); }
 
 /* ---- race the music ---- */
-function raceHTML(){ return '<section class="card sm"><div class="row" style="justify-content:space-between"><h2 style="font-size:22px">Race the music!</h2><span class="hint">Ready before it stops?</span></div><div class="track"><div class="fill" id="raceFill"></div><span class="flag"><svg width="28" height="44" viewBox="0 0 28 44"><path d="M3 2v40" stroke="#16302A" stroke-width="3"/><path d="M3 2h22l-6 8 6 8H3z" fill="#F2785C"/></svg></span><span class="runner" id="raceRunner">'+birdSVG()+'</span></div><button class="btn gold" type="button" data-act="ready" style="font-size:22px">We’re ready!</button></section>'; }
+function raceHTML(R){ const rec=R&&Number.isFinite(R.best)&&R.best>0?'<div class="race-rec">Class record: '+fmtLeft(R.best)+'. Can we beat it?</div>':''; return '<section class="card sm"><div class="row" style="justify-content:space-between"><h2 style="font-size:22px">Race the music!</h2><span class="hint">Ready before it stops?</span></div>'+rec+'<div class="track"><div class="fill" id="raceFill"></div><span class="flag"><svg width="28" height="44" viewBox="0 0 28 44"><path d="M3 2v40" stroke="#16302A" stroke-width="3"/><path d="M3 2h22l-6 8 6 8H3z" fill="#F2785C"/></svg></span><span class="runner" id="raceRunner">'+birdSVG()+'</span></div><button class="btn gold" type="button" data-act="ready" style="font-size:22px">We’re ready!</button></section>'; }
 function paintRace(P){ const f=Math.max(0,Math.min(1,(P.mins-P.from)/Math.max(0.01,P.to-P.from))); const r=document.getElementById('raceRunner'), fl=document.getElementById('raceFill'); if(r) r.style.left='calc(29px + '+(f*100).toFixed(2)+'% - '+(f*58).toFixed(1)+'px)'; if(fl) fl.style.width=(f*100).toFixed(2)+'%'; }
-function weAreReady(){ const P=A.P; if(!P||P.phase!=='routine') return; const left=Math.max(0,(P.to-P.mins)*60), b=P.block, R=P.routine;
+function weAreReady(){ const P=A.P; if(!P||P.phase!=='routine') return; const left=Math.max(0,(P.to-P.mins)*60), b=P.block, R=P.routine, rec=recordRoutineTime(R.id,(P.mins-P.from)*60,'day');
   if(P.where==='start'&&b.kind!=='routine') A.skipStart[b.id]=true; else A.ext[b.id]=(A.ext[b.id]||0)+(P.mins-0.002-P.en);
   Music.fadeStop(); const NP=phaseAt(now()); A.P=NP; A.phaseKey=phaseSig(NP);
-  A.ready={left,name:R.name,next:NP.phase==='lesson'?NP.block.name:(NP.next?NP.next.b.name+' at '+fmtClock(NP.next.st):'')};
-  clearActivity(); A.overlay='ready'; markTools(); render(true); celebrate(fmtLeft(left)+' to spare!','big');
+  A.ready={left,rec,name:R.name,next:NP.phase==='lesson'?NP.block.name:(NP.next?NP.next.b.name+' at '+fmtClock(NP.next.st):'')};
+  clearActivity(); A.overlay='ready'; markTools(); render(true); celebrate(rec&&rec.record?'New class record!':fmtLeft(left)+' to spare!','big');
   actH.push(setTimeout(()=>{ if(A.overlay==='ready') closeOverlay(); },10000)); }
 
 /* ---- Mystery Hero ---- */
@@ -2769,7 +2774,7 @@ function renderFunOverlay(o,full){
   if(o==='support'){renderSupport(full);return true;}
   if(o==='checkinpick'){renderCheckChoices(full);return true;}
   if(o==='quickcheck'){renderQuickCheck(full);return true;}
-  if(o==='ready'){ if(full){ const r=A.ready||{}; setStage('one','<section class="card yay"><div class="bigbird">'+birdSVG()+'</div><h1 class="big">Faster than the music!</h1><p class="lead" style="color:#2A1E00;font-size:30px">'+esc(r.name)+' done with <b>'+fmtLeft(r.left)+'</b> to spare.</p>'+(r.next?'<p class="lead" style="color:#4A3500">Next: '+esc(r.next)+'</p>':'')+'<div class="row" style="justify-content:center"><button class="btn" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-act="close">Let’s go</button></div></section>'); } return true; }
+  if(o==='ready'){ if(full){ const r=A.ready||{}; setStage('one','<section class="card yay"><div class="bigbird">'+birdSVG()+'</div><h1 class="big">'+(r.rec&&r.rec.record?'New class record!':'Faster than the music!')+'</h1><p class="lead" style="color:#2A1E00;font-size:30px">'+esc(r.name)+(r.rec?' in <b>'+fmtLeft(r.rec.secs)+'</b>':'')+', with <b>'+fmtLeft(r.left)+'</b> to spare.</p>'+(r.rec&&r.rec.record?'<p class="lead" style="color:#4A3500">Old record: '+fmtLeft(r.rec.prev)+'. That’s '+fmtSaved(r.rec.prev-r.rec.secs)+' faster!</p>':r.rec&&r.rec.first?'<p class="lead" style="color:#4A3500">That’s our first time on the clock. Can we beat it next time?</p>':r.rec&&r.rec.prev?'<p class="lead" style="color:#4A3500">Class record: '+fmtLeft(r.rec.prev)+'</p>':'')+(r.next?'<p class="lead" style="color:#4A3500">Next: '+esc(r.next)+'</p>':'')+'<div class="row" style="justify-content:center"><button class="btn" type="button" data-act="point">+1 class point</button><button class="btn alt" type="button" data-act="close">Let’s go</button></div></section>'); } return true; }
   if(o==='party'){ if(full){ setStage('one','<section class="card party"><div class="bigbird">'+birdSVG()+'</div><h1 class="big">Goal reached!</h1><p class="lead">'+esc(S.goal.name)+' is ON, '+esc(S.room)+'!</p><p class="hint" style="color:#D9D4FF">'+S.goal.target+' stars collected together.</p><div class="row" style="justify-content:center"><button class="btn gold" type="button" data-act="goalNew">Start a new goal</button><button class="btn alt" type="button" data-act="close">Back</button></div></section>'); } return true; }
   if(o==='hero'){ if(full){ const st=A.heroStage;
       setStage('one','<section class="card night" style="align-items:center;text-align:center"><div class="row" style="justify-content:space-between;width:100%"><div class="eyebrow">Mystery Hero</div>'+(st==='shown'?'':backBtn('Back to the lesson'))+'</div>'+(st==='chosen'?'<h1 class="mid">Someone is our Mystery Hero</h1><p class="lead">I’ve secretly picked one person. Show our expectations all lesson, because it might be you!</p>'+ENVELOPE+'<div class="row" style="justify-content:center" id="heroBtns"><button class="btn gold" type="button" data-act="heroReveal">They earned it: reveal!</button><button class="btn alt" type="button" data-act="heroKeep">Keep it secret this time</button><button class="btn peek" type="button" data-peek="1">Hold to peek</button></div><p class="hint" style="color:#B8B0FF">Not earned? Keep it secret, so nobody is singled out.</p>':'<div class="pick spin" id="heroName" style="color:#FFD45C">…</div><div class="row" style="justify-content:center" id="heroBtns"></div>')+'</section>'); }
@@ -4357,7 +4362,7 @@ function validateWizardDay(d){
 function resetExampleClass(){
   if(!S.studentsAreExample) return;
   S.goal=Object.assign({},S.goal,{points:0}); S.log={}; S.ticketUsed={}; S.ticketNo=0; S.life=0; S.goalsDone=0; delete S.resetBest; if(S.seat) S.seat.seats={}; if(S.jobs){S.jobs.fixed={};S.jobs.off=0;}
-  S.routines.forEach(r=>{delete r.best;});
+  S.routines.forEach(r=>{delete r.best;}); delete S.routineLog; delete S.launch;
   A.feel={great:0,good:0,okay:0,low:0,chat:0}; A.feelDay={}; A.feelSnap='{}'; A.goalShown=0; A.pickPool=[]; A.groups=[]; A.picked=null; A.pipPicked=null; A.hero=null; A.heroPool=[]; A.heroStage='';
 }
 /* first start: quick setup before the tour */
@@ -4420,6 +4425,54 @@ document.addEventListener('click',e=>{ const t=e.target.closest('[data-tool="rem
   if(a==='start'||a==='new') rmPair();
   if(a==='off'){ S.remote=null; save(); rmDraw(); } },true);
 
+/* ROUTINE_RECORDS_START */
+/* Class records, time back and the two-week routine launch. Counts and times only: no student names. */
+function rrLog(){ return Array.isArray(S.routineLog)?S.routineLog.filter(x=>x&&typeof x.id==='string'&&typeof x.d==='string'&&/^d\d{8}$/.test(x.d)&&Number.isFinite(x.s)&&x.s>0):[]; }
+function recordRoutineTime(id,secs,src){ const R=routineById(id); if(!R||!Number.isFinite(secs)||secs<5||secs>3600) return null; secs=Math.round(secs);
+  const prev=Number.isFinite(R.best)&&R.best>0?R.best:null, record=prev!==null&&secs<prev, first=prev===null;
+  if(first||record) R.best=secs;
+  const L=rrLog(); L.push({id,d:onceKey(now()),s:secs,src:src==='practise'?'practise':'day',rec:record||undefined}); S.routineLog=L.slice(-400); save();
+  return {secs,prev,record,first}; }
+function rrWeekStart(d){ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()-((x.getDay()+6)%7)); return onceKey(x); }
+function rrKeyDate(k){ return new Date(+k.slice(1,5),+k.slice(5,7)-1,+k.slice(7,9)); }
+/* A routine's starting point is the middle of its first three timed runs. */
+function rrBaseline(runs){ if(runs.length<3) return null; return runs.slice(0,3).map(x=>x.s).sort((a,b)=>a-b)[1]; }
+function timeBack(d){ d=d||now(); const wk=rrWeekStart(d), today=onceKey(d), by={};
+  rrLog().forEach(x=>{ (by[x.id]=by[x.id]||[]).push(x); });
+  let saved=0,runs=0,counted=0,records=0; const rows=[];
+  Object.keys(by).forEach(id=>{ const R=routineById(id); if(!R) return; const all=by[id], base=rrBaseline(all); let rs=0, wr=0;
+    all.forEach((x,i)=>{ if(x.d<wk||x.d>today) return; wr++; if(x.rec) records++; if(base!==null&&i>=3){ rs+=base-x.s; counted++; } });
+    runs+=wr; saved+=rs; rows.push({id,name:R.name,base,best:Number.isFinite(R.best)?R.best:null,last:all[all.length-1].s,runs:all.length,weekRuns:wr,saved:rs}); });
+  return {saved:Math.round(saved),runs,counted,records,rows}; }
+function fmtSaved(sec){ sec=Math.round(Math.abs(sec)); return sec<120?sec+(sec===1?' second':' seconds'):Math.floor(sec/60)+' minutes'; }
+function timeBackHTML(where){ const T=timeBack(), any=T.rows.length;
+  if(!any) return where==='today'?'':'<div class="rr-back"><b>Class records</b><span>When the class finishes a routine, tap <b>We’re ready!</b> or practise it here. Roomie keeps the times and shows how much faster your changeovers get.</span></div>';
+  const head=T.counted&&T.saved>0?'<b>'+fmtSaved(T.saved)+' back this week</b><span>Changeovers were faster than your class’s first tries'+(T.records?' · '+T.records+' new record'+(T.records>1?'s':''):'')+'.</span>'
+   :T.counted?'<b>About the same as your first tries</b><span>Practise one routine to bring the time down.</span>'
+   :'<b>'+T.runs+' timed routine'+(T.runs===1?'':'s')+' this week</b><span>After three tries of a routine, Roomie can show the time your class wins back.</span>';
+  const rows=T.rows.filter(r=>r.best).sort((a,b)=>b.runs-a.runs).slice(0,where==='today'?3:6).map(r=>'<li><span>'+esc(r.name)+'</span><b>'+fmtLeft(r.best)+'</b>'+(r.base!==null&&r.best<r.base?'<small>was '+fmtLeft(r.base)+'</small>':'')+'</li>').join('');
+  return '<div class="rr-back">'+head+(rows?'<ul class="rr-rows">'+rows+'</ul>':'')+'<small class="rr-note">Times from this computer only, compared with each routine’s first three timed tries.</small></div>'; }
+function rrWeekdaysBetween(fromKey,d){ const x=rrKeyDate(fromKey), end=new Date(d.getFullYear(),d.getMonth(),d.getDate()); let n=0; while(x<end){ if(!isWeekend(x)) n++; x.setDate(x.getDate()+1); } return n; }
+function launchOrder(){ const use={}; Object.keys(S.days||{}).forEach(k=>(S.days[k]||[]).forEach(b=>{ [b.startR,b.endR].forEach(id=>{ if(id) use[id]=(use[id]||0)+1; }); }));
+  return S.routines.map((r,i)=>({id:r.id,i,u:use[r.id]||0})).sort((a,b)=>b.u-a.u||a.i-b.i).slice(0,10).map(x=>x.id); }
+function launchState(d){ d=d||now(); const L=S.launch; if(!L||typeof L.start!=='string'||!/^d\d{8}$/.test(L.start)||!Array.isArray(L.ids)) return null;
+  const ids=L.ids.filter(id=>routineById(id)); if(!ids.length) return null;
+  const day=rrWeekdaysBetween(L.start,d)+1, practised=new Set(rrLog().filter(x=>x.src==='practise'&&x.d>=L.start).map(x=>x.id));
+  const total=Math.max(10,ids.length), finished=day>total;
+  let focus=null, kind='teach';
+  if(!finished){ if(day<=ids.length) focus=ids[day-1]; else { kind='beat'; const left=ids.filter(id=>!practised.has(id)); focus=left[0]||ids.slice().sort((a,b)=>{ const ra=routineById(a),rb=routineById(b); return (rb.best||0)/(rb.minutes||1)-(ra.best||0)/(ra.minutes||1); })[0]; } }
+  return {start:L.start,ids,day:Math.min(day,total),total,finished,focus,kind,practised,doneToday:!!focus&&rrLog().some(x=>x.src==='practise'&&x.id===focus&&x.d===onceKey(d))}; }
+function launchHTML(){ const L=launchState();
+  if(!L) return '<div class="rr-launch"><div><div class="eyebrow">New class or new term?</div><h2>Launch our routines</h2><p>A two-week plan. Each school day, teach one routine: show the steps, practise it, then try to beat the class’s time. After that, Roomie runs it on time from your day plan.</p></div><button class="btn gold" type="button" data-act="launchStart">Start the two-week plan</button></div>';
+  const dots='<div class="rr-dots" aria-label="Day '+L.day+' of '+L.total+'">'+Array.from({length:L.total},(_,i)=>'<i class="'+(i<L.day-1?'done':i===L.day-1&&!L.finished?'cur':'')+'"></i>').join('')+'</div>';
+  if(L.finished) return '<div class="rr-launch"><div><div class="eyebrow">Launch our routines · complete</div><h2>Routines launched!</h2><p>'+L.practised.size+' of '+L.ids.length+' routines practised. Keep tapping <b>We’re ready!</b> at changeovers so Roomie can track your class records.</p></div><div class="row"><button class="btn alt sm" type="button" data-act="launchStart">Start again</button><button class="btn alt sm" type="button" data-act="launchEnd">Hide</button></div></div>';
+  const R=routineById(L.focus), best=R.best?fmtLeft(R.best):'';
+  const steps=L.kind==='teach'
+   ?'<ol class="rr-steps"><li><b>Show the steps.</b> Model it while the class watches.<button class="btn alt sm" type="button" data-run="'+esc(R.id)+'">Show '+esc(R.name)+'</button></li><li><b>Practise it.</b> The class does it while Roomie times them.<button class="btn sm" type="button" data-practise="'+esc(R.id)+'">Practise</button></li><li><b>Beat our time.</b> Talk about what slowed you down, then go again.'+(best?' Class best: <b>'+best+'</b>.':'')+'</li></ol>'
+   :'<ol class="rr-steps"><li><b>Remind the class of the steps.</b><button class="btn alt sm" type="button" data-run="'+esc(R.id)+'">Show '+esc(R.name)+'</button></li><li><b>Beat our record.</b>'+(best?' Class best: <b>'+best+'</b>.':'')+'<button class="btn sm" type="button" data-practise="'+esc(R.id)+'">Practise</button></li></ol>';
+  return '<div class="rr-launch"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="eyebrow">Launch our routines · Day '+L.day+' of '+L.total+'</div><h2>'+(L.kind==='teach'?'Today we learn: ':'Today we beat: ')+esc(R.name)+(L.doneToday?' <span class="rr-tick">✓ practised</span>':'')+'</h2></div><button class="btn alt sm" type="button" data-act="launchEnd">End plan</button></div>'+dots+steps+'</div>'; }
+function launchToday(d){ const L=launchState(d); return L&&!L.finished&&L.focus?routineById(L.focus):null; }
+/* ROUTINE_RECORDS_END */
 /* ---- v2.2: Today in Roomie. A small day log on this computer (counts only), shown after school. ---- */
 function dlogKey(){ return onceKey(now()); }
 function dlog(k,v){ if(STUDENT) return; S.log=S.log||{}; const L=S.log[dlogKey()]=S.log[dlogKey()]||{pts:0,breaks:[],changes:0,tickets:0,routines:0}; if(k==='break'){ if(v&&!L.breaks.includes(v)) L.breaks.push(v); } else L[k]=(L[k]||0)+(v||1);
@@ -4441,6 +4494,7 @@ function todayHTML(){ const L=(S.log||{})[dlogKey()]||{pts:0,breaks:[],changes:0
   const tile=(n,l,s)=>'<div class="tdt"><b>'+n+'</b><span>'+l+'</span>'+(s?'<small>'+s+'</small>':'')+'</div>';
   return '<div class="today"><div class="tdhead"><small>Today in Roomie</small></div>'+
    (any?'<div class="tdtiles">'+tile(L.pts,'points earned',g.name?esc(g.name)+': '+g.points+' of '+g.target:'')+tile(L.changes,'changeovers Roomie ran',L.routines?L.routines+' routines':'')+tile(L.breaks.length,'brain breaks',L.breaks.slice(0,3).map(esc).join(', '))+tile(L.tickets,'tickets','')+'</div>'+(bars?'<div class="tdfeels"><small>How the class felt</small>'+bars+'</div>':''):'<p class="lead" style="margin:0">Nothing logged yet today. Tomorrow, Roomie will show your points, brain breaks, check-ins and changeovers here after school.</p>')+
+   timeBackHTML('today')+(launchToday(nextSchoolDay(now()))?'<div class="tdcoach">Launch our routines: next school day, practise <b>'+esc(launchToday(nextSchoolDay(now())).name)+'</b>.</div>':'')+
    (mir?'<div class="tdcoach">Your lesson mirror from today is ready. <button class="btn alt sm" type="button" data-cx="open:'+mir.id+'">Read my feedback</button></div>':goalF?'<div class="tdcoach">Coaching focus: <b>'+esc(focusOf(goalF).name)+'</b>. Plan where you’ll try it tomorrow.</div>':'')+
    '<div class="tdnext"><div><small>'+esc(nxName)+(once?' · one-off plan':'')+'</small><p>'+tm.slice(0,9).map(b=>'<span class="k-'+b.kind+'">'+fmtClock(toMin(b.start))+' '+esc(b.name)+'</span>').join('')+'</p></div><button class="btn sm" type="button" data-td="tomorrow">Set up '+(nx.getDay()===1&&now().getDay()!==0?'Monday':'tomorrow')+'</button></div></div>'; }
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-td]'); if(!b) return; audio(); if(b.dataset.td==='tomorrow'){ editDay=onceMake(nextSchoolDay(now())); planOpen=-1; tab='plan'; openSetup(); } });
