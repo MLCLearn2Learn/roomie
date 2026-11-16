@@ -11,6 +11,6 @@ test('F toggles, Escape leaves, and leaving browser full screen leaves Roomie fu
 });
 test('optional setting opens activities full screen and returns to the board afterwards',()=>{
  assert.ok(html.includes('id="fullActs"'));assert.ok(html.includes("if(el.id==='fullActs'){ S.fullActivities=el.checked; save(); return; }"));
- assert.ok(html.includes("if(name&&!was&&S.fullActivities&&!document.body.classList.contains('full-view')) setFullView(true,{auto:true});"));
+ assert.ok(html.includes("if(name&&!was&&S.fullActivities!==false&&!document.body.classList.contains('full-view')) setFullView(true,{auto:true});"));
  assert.ok(html.includes("if(FV.auto&&!A.overlay&&document.body.classList.contains('full-view')) setFullView(false);"));
 });
