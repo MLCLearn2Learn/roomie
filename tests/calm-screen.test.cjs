@@ -18,3 +18,7 @@ test('choosing a custom bottom bar for the first time starts from the four every
  assert.ok(html.includes("function meterCard(){ if(calmScreen()&&!N.on) return '';"));
  assert.ok(html.includes("if(k==='meter'){ act('noise'); return; }"));
 });
+test('More tools hides when every tool is already on the bottom bar, and the group is not called Wellbeing twice',()=>{
+ assert.ok(html.includes("more.hidden=S.mode==='tools'?toolkitVisible().length===toolkitTiles().length:visible.length>=Object.keys(DOCK_NAMES).length;"));
+ assert.ok(html.includes("['Body and mind',["));assert.ok(!html.includes("  ['Wellbeing',["));
+});
