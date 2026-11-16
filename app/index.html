@@ -1308,6 +1308,31 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
 .calm-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;flex-shrink:0}.calm-choice{display:flex;align-items:center;gap:10px;text-align:left;font-size:clamp(18px,1.7vw,24px);padding:10px!important}.calm-choice svg{width:48px;height:48px;flex-shrink:0}.calm-options .calm-choice[aria-pressed=true]{background:#FAD3E5!important;border-color:#B5306A!important;outline:2px solid #B5306A}.calm-options>.lead{font-size:clamp(22px,2vw,28px)}.calm-guide h2{font-size:clamp(26px,2.5vw,38px);margin:0}.breathe[data-calm-art]:not([data-calm-art=circle]) em{background:transparent;inset:8%;}.breathe em svg{width:100%;height:100%;opacity:.9}.breathe[data-calm-art]:not([data-calm-art=circle]) b{color:#1B1340;background:#FFFDF3eF;border-radius:16px;text-shadow:none;padding:8px 16px;align-self:end;margin-bottom:10px;font-size:clamp(22px,2.2vw,32px)}.calm-options .hint,.calm-guide .hint{font-size:18px}.calm-options{overflow-y:auto}.calm-guide{gap:12px}.calm-layout .breathe{width:min(100%,35vh,360px);flex-shrink:0}
 .app:has(.calm-full){zoom:1!important}.calm-full{zoom:1!important;position:fixed!important;inset:0!important;z-index:1100!important;width:100vw!important;height:100dvh!important;max-height:none!important;box-sizing:border-box;border-radius:0!important;display:flex!important;flex-direction:column;gap:8px;overflow:auto;padding:20px 30px!important}.calm-full .scn-hdr{flex-shrink:0;z-index:20!important}.calm-full .scn-art{pointer-events:none;left:55%!important;top:12px!important;width:72px!important}.calm-focus{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}.calm-focus h2{font-size:clamp(26px,3vw,44px);margin:0}.calm-full .breathe{width:min(52vh,65vw,620px);flex-shrink:0}.calm-full .breathe b{font-size:clamp(28px,3.6vw,54px)}.calm-instruction{font-size:clamp(22px,2.3vw,34px);line-height:1.3;max-width:1100px;margin:4px 0}.calm-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-shrink:0}.calm-footer .hint{font-size:clamp(18px,1.6vw,24px);margin:0}.calm-clock{width:90px;flex-shrink:0}.calm-clock .ring{width:90px!important}.calm-menu{position:relative}.calm-menu summary{list-style:none;cursor:pointer}.calm-menu summary::-webkit-details-marker{display:none}.calm-menu>.calm-choices{position:absolute;right:0;top:calc(100% + 10px);z-index:5;background:#FFFDF3;border:3px solid #1B1340;border-radius:20px;padding:14px;width:min(620px,85vw);box-shadow:5px 5px 0 #1B1340}.calm-full .calm-choice[aria-pressed=true]{background:#FAD3E5!important;border-color:#B5306A!important;outline:2px solid #B5306A}@media(max-width:1000px){.calm-full .scn-art{display:none!important}}@media(max-width:700px){.calm-full{padding:14px!important}.calm-full .scn-hdr{gap:12px}.calm-full h1{font-size:32px!important}.calm-menu>.calm-choices{grid-template-columns:1fr;width:min(380px,82vw)}.calm-focus{min-height:280px}.calm-full .breathe{width:min(42vh,76vw)}.calm-footer .hint{font-size:17px}}
 .calm-dialog{box-sizing:border-box;width:min(760px,92vw);max-height:88dvh;overflow:auto;margin:auto;padding:24px;border:4px solid #1B1340;border-radius:24px;background:#FFFDF3;color:#4A3F38;box-shadow:8px 8px 0 #1B1340}.calm-dialog::backdrop{background:rgba(27,19,64,.5)}.calm-dialog h2{font-family:var(--display);font-size:clamp(26px,3vw,38px);margin:0}.calm-dialog .calm-choices{margin-top:20px;gap:14px}.calm-dialog .calm-choice{font-size:clamp(20px,2.1vw,28px);min-height:84px}.calm-dialog .calm-choice[aria-pressed=true]{background:#FAD3E5!important;border-color:#B5306A!important;outline:2px solid #B5306A}@media(max-width:600px){.calm-dialog{padding:18px}.calm-dialog .calm-choices{grid-template-columns:1fr}.calm-dialog .calm-choice{min-height:64px}}
+
+/* Keep the persistent YouTube player beside the activity, never over it. */
+.teaching-space{display:grid;min-width:0;min-height:0;grid-template-columns:minmax(0,1fr)}
+#ytDock{display:none;min-width:0}
+.teaching-space:has(#ytCard:not([hidden])){grid-template-columns:minmax(0,1fr) minmax(300px,360px);gap:18px;overflow:auto;align-items:start}
+.teaching-space:has(#ytCard:not([hidden])) #ytDock{display:block}
+.teaching-space:has(#ytCard:not([hidden]))>.stage{grid-template-columns:minmax(0,1fr) minmax(200px,240px)}
+.teaching-space:has(#ytCard:not([hidden]))>.stage.one{grid-template-columns:minmax(0,1fr)}
+#ytDock .ytcard{position:static;width:auto;max-width:none;z-index:auto;box-sizing:border-box;border:3px solid var(--line,var(--ink));border-radius:24px;padding:16px;box-shadow:4px 5px 0 rgba(20,20,50,.12)}
+#ytDock .ytcard[hidden]{display:none}
+#ytDock .ytcard iframe{width:100%;height:auto;aspect-ratio:16/9;min-height:200px}
+#ytDock .row{flex-wrap:wrap;gap:8px}
+#ytExpand{margin-top:10px}
+.teaching-space.video-expanded:has(#ytCard:not([hidden])){grid-template-columns:minmax(0,1fr)}
+.teaching-space.video-expanded #ytDock{grid-row:1}
+.teaching-space.video-expanded>.stage{grid-row:2;min-height:60vh}
+.teaching-space.video-expanded #ytHost{max-width:1100px;margin-inline:auto}
+@media(max-width:1250px){
+ .teaching-space:has(#ytCard:not([hidden]))>.stage{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:850px){
+ .teaching-space:has(#ytCard:not([hidden])){grid-template-columns:minmax(0,1fr);overflow:auto}
+ .teaching-space:has(#ytCard:not([hidden]))>.stage{min-height:60vh}
+}
+
 </style>
 
 <svg class="land" viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true"><path d="M0 60 C 260 10 520 40 760 70 S 1200 100 1440 50 L1440 150 L0 150 Z" fill="#7CC79A" id="hill1"></path><path d="M0 110 C 300 80 600 105 900 120 S 1260 130 1440 100 L1440 150 L0 150 Z" fill="#2F8F6B"></path></svg>
@@ -1336,7 +1361,15 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
     <div class="schedule-controls" id="activityNav" hidden><span id="activityNavStatus"></span><button type="button" class="btn alt sm" id="activityReturn" data-nav-return>Return to activity</button><button type="button" class="btn alt sm" id="activityStop" data-act="stopActivity">Stop activity</button></div>
   </header>
   <nav class="strip" id="strip" aria-label="Today's timetable"></nav>
+  <div class="teaching-space" id="teachingSpace">
   <main class="stage" id="stage" aria-live="polite"></main>
+  <aside id="ytDock" aria-label="Video player"><section class="ytcard" id="ytCard" hidden aria-label="YouTube song">
+  <div class="row" style="justify-content:space-between"><b style="font-size:15px">Now playing</b><a id="ytLink" href="#" target="_blank" rel="noopener" class="hint">Open on YouTube</a></div>
+  <button type="button" class="btn alt sm" id="ytExpand" aria-pressed="false" onclick="expandYouTube(!document.getElementById('teachingSpace').classList.contains('video-expanded'))">Enlarge video</button>
+  <div id="ytHost" style="margin-top:8px"></div>
+  <p class="hint" id="ytMsg" style="margin:6px 0 0"></p>
+</section></aside>
+  </div>
   <footer class="dock" id="dock">
     <div class="dtools">
     <button class="tool" type="button" data-tool="routines">Routines</button>
@@ -1365,11 +1398,7 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
   </footer>
 </div>
 
-<section class="ytcard" id="ytCard" hidden aria-label="YouTube song">
-  <div class="row" style="justify-content:space-between"><b style="font-size:15px">Now playing</b><a id="ytLink" href="#" target="_blank" rel="noopener" class="hint">Open on YouTube</a></div>
-  <div id="ytHost" style="margin-top:8px"></div>
-  <p class="hint" id="ytMsg" style="margin:6px 0 0"></p>
-</section>
+
 
 <div class="splash" id="splash">
   <div class="box">
@@ -1409,7 +1438,7 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.8.6 · 15 Nov 2026';
+const VERSION='Roomie v2.8.7 · 16 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -1484,6 +1513,11 @@ const Music = {
 };
 
 /* ---------- YouTube songs (official embedded player: kept visible, never covered, ads untouched) ---------- */
+function expandYouTube(expanded){
+  const space=document.getElementById('teachingSpace'),button=document.getElementById('ytExpand');
+  if(space)space.classList.toggle('video-expanded',!!expanded);
+  if(button){button.setAttribute('aria-pressed',String(!!expanded));button.textContent=expanded?'Smaller video':'Enlarge video';}
+}
 const YT_ = { player:null, ready:null, routine:null, fadeH:null, start:0,
   parse(url){ url=String(url||'').trim(); let id=null, t=0;
     const m=url.match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{11})/);
@@ -1497,7 +1531,7 @@ const YT_ = { player:null, ready:null, routine:null, fadeH:null, start:0,
       const s=document.createElement('script'); s.src='https://www.youtube.com/iframe_api'; s.onerror=()=>rej(new Error('blocked')); document.head.appendChild(s);
       setTimeout(()=>rej(new Error('timeout')),8000); });
     this.ready.catch(()=>{ this.ready=null; }); return this.ready; },
-  card(show){ const c=$('#ytCard'); if(c){ c.hidden=!show; c.style.visibility=''; } },
+  card(show){ const c=$('#ytCard'); if(c){ c.hidden=!show; c.style.visibility=''; } if(!show)expandYouTube(false); },
   async play(r){ const v=this.parse(r.yt); if(!v){ toast('That YouTube link doesn’t look right. Check it in Setup.'); return; }
     const st=this.secs(r.ytStart); const start = st!=null ? st : (v.t||0); this.routine=r; this.start=start;
     $('#ytLink').href='https://www.youtube.com/watch?v='+v.id+(start?'&t='+start+'s':''); $('#ytMsg').textContent=''; this.card(true);
@@ -1774,7 +1808,7 @@ const T={ get running(){ return !!Music.playing; } };
 
 /* ================= Shared bits ================= */
 let toastH; function toast(msg){ let t=document.getElementById('toast'); if(!t){ t=document.createElement('div'); t.id='toast'; t.className='toast'; t.setAttribute('role','status'); document.body.appendChild(t); } t.textContent=msg; t.hidden=false; clearTimeout(toastH); toastH=setTimeout(()=>{ t.hidden=true; },3500); }
-function updateNowPlaying(){ const n=document.getElementById('np'); if(!n) return; n.classList.toggle('playing',Music.playing&&!Music.paused); const t=n.querySelector('[data-np-title]'); if(t) t.textContent=Music.playing?Music.title:'Music off'; const s=n.querySelector('[data-np-sub]'); if(s) s.textContent=Music.playing?(Music.isYT?'YouTube · playing in the corner':Music.fileAudio?'Your own song':'Roomie original'):'Tap to play'; }
+function updateNowPlaying(){ const n=document.getElementById('np'); if(!n) return; n.classList.toggle('playing',Music.playing&&!Music.paused); const t=n.querySelector('[data-np-title]'); if(t) t.textContent=Music.playing?Music.title:'Music off'; const s=n.querySelector('[data-np-sub]'); if(s) s.textContent=Music.playing?(Music.isYT?'YouTube · video player':Music.fileAudio?'Your own song':'Roomie original'):'Tap to play'; }
 function ringHTML(id,sub,size){ return '<div class="ring '+(size||'')+'"><svg viewBox="0 0 300 300" role="img" aria-label="Time left"><circle cx="150" cy="150" r="124" fill="none" stroke="#E3F4EA" stroke-width="28"/><circle id="'+id+'Arc" cx="150" cy="150" r="124" fill="none" stroke="#2F8F6B" stroke-width="28" stroke-linecap="round" stroke-dasharray="779 779" stroke-dashoffset="0" transform="rotate(-90 150 150)"/></svg><div class="rt"><b id="'+id+'Txt">0:00</b><span id="'+id+'Sub">'+esc(sub||'left')+'</span></div></div>'; }
 function paintRing(id,left,total,warnColour){ const a=document.getElementById(id+'Arc'), t=document.getElementById(id+'Txt'); if(!a||!t) return; const C=779; const f=total>0?Math.max(0,Math.min(1,left/total)):0; a.setAttribute('stroke-dashoffset',String(C*(1-f))); a.style.stroke=left<=10&&total>0?'var(--coral)':(warnColour||'var(--gum)'); t.textContent=fmtLeft(left); }
 function npHTML(){ return '<button type="button" class="np" id="np" data-act="music" style="border:0;text-align:left;width:100%"><span class="ic">'+icon('music',24,'#fff',2.6)+'</span><span style="min-width:0"><span data-np-title style="display:block;font-family:var(--display);font-size:21px">Music off</span><span data-np-sub class="hint">Tap to play</span></span><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></button>'; }
