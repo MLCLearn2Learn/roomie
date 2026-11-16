@@ -15,3 +15,8 @@ test('the More menu reaches every hidden top-bar tool',()=>{
  for(const k of ['float','remote','live','voice','tour']) assert.ok(html.includes("['"+k+"',"));
  assert.ok(html.includes('id="calmMore"'));assert.ok(html.includes('data-calm-screen="off"'));
 });
+test('choosing a custom bottom bar for the first time starts from the four everyday tools',()=>{
+ assert.ok(html.includes("S.dockHide=all.filter(k=>!UI_SIMPLE_DOCK.includes(k));"));
+ assert.ok(html.includes("function meterCard(){ if(calmScreen()&&!N.on) return '';"));
+ assert.ok(html.includes("if(k==='meter'){ act('noise'); return; }"));
+});
