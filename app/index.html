@@ -1345,12 +1345,12 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
 /* Roomie is centered with an exaggerated, wide-eyed attention expression. */
 .attn.roomie-attention{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(140px,1fr) auto auto auto;gap:10px;padding:60px 24px 24px;overflow:auto;justify-items:center}
 .roomie-attention>svg,.roomie-attention>b,.roomie-attention>p{display:none}
-.roomie-attention .atn-roomie{grid-column:1;grid-row:1;width:min(82vw,700px);height:100%;max-height:64dvh;min-height:0;align-self:center;animation:roomieAttentionHello .85s ease-out both}
+.roomie-attention .atn-roomie{grid-column:1;grid-row:1;width:min(82vw,700px);height:100%;max-height:52dvh;min-height:0;align-self:center;animation:roomieAttentionHello .85s ease-out both}
 .roomie-attention .atn-roomie svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 10px 0 rgba(27,19,64,.12))}
-.roomie-attention .atn-t{grid-column:1;grid-row:2;font-size:clamp(32px,6dvh,72px);line-height:1.05;max-width:94vw;margin:0;overflow-wrap:anywhere}
+.roomie-attention .atn-t{grid-column:1;grid-row:2;font-size:clamp(42px,9dvh,104px);line-height:1.05;max-width:94vw;margin:0;overflow-wrap:anywhere}
 .roomie-attention .atn-t .pl{margin:0;padding:.02em .3em .08em}
 .roomie-attention .atn-steps{grid-column:1;grid-row:3;max-width:94vw;min-width:0}
-.roomie-attention .atn-steps span{font-size:clamp(22px,3.5dvh,38px);max-width:100%;padding:4px 20px;overflow-wrap:anywhere}
+.roomie-attention .atn-steps span{font-size:clamp(30px,5.5dvh,62px);max-width:100%;padding:4px 20px;overflow-wrap:anywhere}
 .roomie-attention #attnOk{grid-column:1;grid-row:4;justify-self:center;font-size:24px;padding:8px 28px}
 @keyframes roomieAttentionHello{0%{transform:translateY(20px) scale(.88);opacity:0}60%{transform:translateY(-5px) scale(1.02);opacity:1}100%{transform:none;opacity:1}}
 @media(max-width:600px){.attn.roomie-attention{padding:60px 16px 18px;gap:10px}.roomie-attention .atn-roomie{width:min(94vw,540px)}}
@@ -1461,7 +1461,7 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.8.11 · 16 Nov 2026';
+const VERSION='Roomie v2.8.12 · 16 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -4402,7 +4402,7 @@ function growSVG(items){ const K='#1B1340'; let h='';
   if(items.includes('crown')) h+='<path d="M47 26 L47 12 L53.5 19 L60 9 L66.5 19 L73 12 L73 26 Z" fill="#FFD84D" stroke="'+K+'" stroke-width="2.5" stroke-linejoin="round"/><circle cx="60" cy="21" r="2.3" fill="#E63946"/>';
   else if(items.includes('hat')) h+='<path d="M51 27 L60 3 L69 27 Z" fill="#7EC3FF" stroke="'+K+'" stroke-width="2.5" stroke-linejoin="round"/><path d="M55 16 L65 16 M53 22 L67 22" stroke="#FF8CC6" stroke-width="3"/><circle cx="60" cy="4" r="3.5" fill="#FFD84D" stroke="'+K+'" stroke-width="2"/>';
   return h; }
-{ const f=monsterShapes; monsterShapes=function(){ const s=f.apply(this,arguments); const it=growLevel().items; if(!it.length||S.growOff) return s; const cape=it.includes('cape')?growSVG(['cape']):''; const front=growSVG(it.filter(x=>x!=='cape'));
+{ const f=monsterShapes; monsterShapes=function(){ const s=f.apply(this,arguments); const it=growLevel().items; if((arguments[0]&&arguments[0].plain)||!it.length||S.growOff) return s; const cape=it.includes('cape')?growSVG(['cape']):''; const front=growSVG(it.filter(x=>x!=='cape'));
     return s.replace("<g class=\"bodyg\">","<g class=\"bodyg\">"+cape).replace(/<\/g>$/,front+'</g>'); }; }
 if(!STUDENT){
   { const f=addPoint; addPoint=function(){ const before=growLevel(); S.life=(S.life||0)+1; const g=S.goal; const reached=g.points+1===g.target; if(reached) S.goalsDone=(S.goalsDone||0)+1;
@@ -4578,7 +4578,7 @@ function scRelayout(){ const c=document.querySelector('#stage > .card.scene'); i
 addEventListener('resize',scRelayout); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(scRelayout);
 function attentionRoomieSVG(){
  const eyes='<g class="m-attention-eyes"><ellipse cx="45" cy="55" rx="14" ry="17" fill="#fff" stroke="#1B1340" stroke-width="2.6"/><ellipse cx="75" cy="55" rx="14" ry="17" fill="#fff" stroke="#1B1340" stroke-width="2.6"/><circle cx="47" cy="57" r="8.4" fill="#7EC3FF" stroke="#1B1340" stroke-width="1.8"/><circle cx="73" cy="57" r="8.4" fill="#7EC3FF" stroke="#1B1340" stroke-width="1.8"/><circle cx="48" cy="58" r="4.8" fill="#1B1340"/><circle cx="72" cy="58" r="4.8" fill="#1B1340"/><circle cx="49.5" cy="55.5" r="2.4" fill="#fff"/><circle cx="73.5" cy="55.5" r="2.4" fill="#fff"/></g>';
- return '<svg class="monster attention-roomie" viewBox="0 0 120 120" aria-hidden="true">'+monsterShapes().replace(/<g class="m-eyes-open">[\s\S]*?<\/g>/,eyes)+'</svg>';
+ return '<svg class="monster attention-roomie" viewBox="0 0 120 120" aria-hidden="true">'+monsterShapes({plain:true}).replace(/<g class="m-eyes-open">[\s\S]*?<\/g>/,eyes)+'</svg>';
 }
 /* attention: full-screen design */
 { const f=attention; attention=function(){ const r=f.apply(this,arguments); const a=document.querySelector('#overlayHost .attn'); if(a&&!a.querySelector('.atn-art')&&!STUDENT){ a.classList.add('roomie-attention'); if(S.scenes!==false)a.classList.add('scn-attn');
