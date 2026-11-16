@@ -88,3 +88,45 @@ test('app wires records into changeovers, practice, the routines screen and Toda
  assert.ok(html.includes('npHTML()+raceHTML(R)'));
  assert.ok(html.includes("delete S.routineLog; delete S.launch;"));
 });
+
+const jobsBlock=html.slice(html.indexOf('const JOB_DEF='),html.indexOf('function renderJobs('));
+function withJobs(S,clock){ const c=make(S,clock); c.names=()=>(S.students||[]).filter(Boolean); vm.runInContext(jobsBlock,c); return c; }
+
+test('new classes get a Timekeeper helper and the guide names this week’s student',()=>{
+ const S={...cls(),students:['Ava','Ben','Cy','Di','Eli','Fay','Gus','Hal','Ivy']},c=withJobs(S,new Date(2026,10,16,9));
+ assert.equal(vm.runInContext('JOB_DEF[1]',c),'Timekeeper');
+ const T=c.timekeeper();assert.equal(T.has,true);assert.equal(T.who,'Ben');
+ assert.match(c.timekeeperHTML(),/Timekeeper: Ben/);
+});
+
+test('existing classes without the job are offered it, and empty classes do not crash',()=>{
+ const S={...cls(),students:['Ava','Ben'],jobs:{list:['Line leader','Lights'],off:0,fixed:{},auto:false,week:'x'}},c=withJobs(S,new Date(2026,10,16,9));
+ assert.equal(c.timekeeper().has,false);assert.match(c.timekeeperHTML(),/data-act="addTimekeeper"/);
+ const E=withJobs({...cls(),students:[]},new Date(2026,10,16,9));assert.equal(E.timekeeper().has,false);
+});
+
+test('W only acts while a routine race or practice is running',()=>{
+ const S=cls(),c=make(S,new Date(2026,10,16,9)),calls=[];c.act=a=>calls.push(a);c.weAreReady=()=>calls.push('ready');
+ c.A={overlay:null,P:{phase:'lesson'}};assert.equal(c.weAreReadyKey(),false);
+ c.A={overlay:null,P:{phase:'routine'}};assert.equal(c.weAreReadyKey(),true);
+ c.A={overlay:'practise',pr:{done:0}};assert.equal(c.weAreReadyKey(),true);
+ c.A={overlay:'practise',pr:{done:40}};assert.equal(c.weAreReadyKey(),false);
+ c.A={overlay:'timer'};assert.equal(c.weAreReadyKey(),false);
+ assert.deepEqual(calls,['ready','prDone']);
+});
+
+test('term totals add up every run since the term start',()=>{
+ const S=cls(),c=make(S,new Date(2026,9,12,9));
+ [180,200,160].forEach(t=>c.recordRoutineTime('pack',t,'day'));
+ c.clock=new Date(2026,9,20,9);c.recordRoutineTime('pack',120,'day');
+ c.clock=new Date(2026,10,16,9);c.recordRoutineTime('pack',100,'day');
+ let T=c.termBack();assert.equal(T.saved,140);assert.equal(T.runs,5);assert.equal(T.records,3);assert.equal(T.best[0].name,'Pack up');assert.equal(T.best[0].base,180);
+ S.termStart='d20261101';T=c.termBack();assert.equal(T.runs,1);assert.equal(T.saved,80);
+ assert.equal(make(cls(),new Date()).termBack(),null);
+});
+
+test('phone remote and keyboard are wired to the same ready action',()=>{
+ assert.ok(html.includes("ready:()=>weAreReadyKey(),"));
+ assert.ok(html.includes("if(k==='w'&&weAreReadyKey())"));
+ assert.ok(html.includes("st.racing?'<div class=\"rmgrid\">'+B('ready'"));
+});
