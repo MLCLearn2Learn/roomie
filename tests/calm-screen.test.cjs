@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const html=fs.readFileSync('app/index.html','utf8');
-const src=html.slice(html.indexOf('function calmScreen()'),html.indexOf('function uiTabDestination('));
+const src=html.slice(html.indexOf('const UI_SIMPLE_DOCK='),html.indexOf('function uiTabDestination('));
 const run=S=>{ const c=vm.createContext({S,STUDENT:false}); vm.runInContext(src+';this.calmScreen=calmScreen;this.dockPresetNow=dockPresetNow;this.uiDockKeys=uiDockKeys;',c); return c; };
 test('calm screen is on by default and shows the four everyday tools',()=>{
  const c=run({});assert.equal(c.calmScreen(),true);assert.equal(c.dockPresetNow(),'simple');
