@@ -62,7 +62,7 @@ test('time back is honest when there is too little data or no improvement',()=>{
 test('launch plan teaches the most-used routines first over ten school days',()=>{
  const S=cls(),c=make(S,new Date(2026,10,16,9)); // Monday
  assert.deepEqual([...c.launchOrder()],['line','settle','pack']);
- assert.equal(c.launchState(),null);assert.equal(c.launchHTML(),'');assert.match(c.launchOfferHTML(),/Start the two-week plan/);
+ assert.equal(c.launchState(),null);assert.equal(c.launchHTML(),'');assert.match(c.launchOfferHTML('top'),/Start the two-week plan/);assert.equal(c.launchOfferHTML('bottom'),'');S.launchOfferLater=true;assert.equal(c.launchOfferHTML('top'),'');assert.match(c.launchOfferHTML('bottom'),/Start the two-week plan/);delete S.launchOfferLater;
  S.launch={start:'d20261116',ids:c.launchOrder()};
  let L=c.launchState();assert.equal(L.day,1);assert.equal(L.total,10);assert.equal(L.focus,'line');assert.equal(L.kind,'teach');
  assert.match(c.launchHTML(),/Today we learn: Line up/);assert.match(c.launchHTML(),/data-practise="line"/);
@@ -83,7 +83,7 @@ test('launch plan survives deleted routines and bad saved data',()=>{
 test('app wires records into changeovers, practice, the routines screen and Today in Roomie',()=>{
  assert.ok(html.includes("rec=recordRoutineTime(R.id,(P.mins-P.from)*60,'day')"));
  assert.ok(html.includes("rec=recordRoutineTime(R.id,t,'practise')"));
- assert.ok(html.includes("'+launchHTML()+S.routines.map("));assert.ok(html.includes(".join('')+timeBackHTML('routines')+timekeeperHTML()+"));
+ assert.ok(html.includes("'+launchHTML()+launchOfferHTML('top')+S.routines.map("));assert.ok(html.includes(".join('')+timeBackHTML('routines')+timekeeperHTML()+"));
  assert.ok(html.includes("timeBackHTML('today')"));
  assert.ok(html.includes('npHTML()+raceHTML(R)'));
  assert.ok(html.includes("delete S.routineLog; delete S.launch;"));
