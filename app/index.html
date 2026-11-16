@@ -1446,7 +1446,7 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
 'use strict';
 const REMOTE=/[?&]remote=/.test(location.search);
 const STUDENT=/[?&]join(=|&|$)/.test(location.search)||REMOTE;
-const VERSION='Roomie v2.8.8 · 16 Nov 2026';
+const VERSION='Roomie v2.8.9 · 16 Nov 2026';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
@@ -2072,10 +2072,10 @@ function makeGroups(o){ const all=names().slice(); if(!all.length){ toast('Add y
   let c=o.count||Math.max(1,Math.round(all.length/(o.size||4))); c=Math.min(c,all.length); const g=Array.from({length:c},()=>[]); all.forEach((n,i)=>g[i%c].push(n)); A.groups=g; if(o.quiet) return; chime(1); openOverlay('groups'); }
 
 /* attention */
-function attention(){ const h=$('#overlayHost'); if(A.attnClose){ A.attnClose(); return; } if(RS.on) endReset(); const was=Music.playing&&!Music.paused; if(was) Music.pause(); Focus.pause(); if(attentionPreset().sound)chime(1); if(typeof mirEvent==='function') mirEvent('att');
-  h.innerHTML='<div class="attn" role="alertdialog" aria-label="Attention"><svg width="96" height="96" viewBox="0 0 40 40" aria-hidden="true"><path d="M9.5 23.5c3-7.5 9.5-10.5 15.5-8.3l4.3-2.1-1.1 4.1c1 5.3-3 10.3-10.2 10.3-3.4 0-6.4-1.3-8.5-4z" fill="#fff"></path></svg><b>'+esc(attentionPreset().call)+'</b><p>'+esc(attentionPreset().response)+'</p><button class="btn" type="button" id="attnOk" style="background:#fff;color:#F2785C">Thank you</button></div>';
-  const yc=$('#ytCard'); if(yc) yc.style.visibility='hidden';
-  const close=()=>{ h.innerHTML=''; if(yc) yc.style.visibility=''; if(was) Music.resume(); Focus.resume(); A.attnClose=null; pipRender(true); }; A.attnClose=close; $('#attnOk').onclick=close; pipRender(true); }
+function attention(){ const h=$('#overlayHost'); if(A.attnClose){ A.attnClose(); return; } if(RS.on) endReset(); const was=Music.playing&&!Music.paused; if(was) Music.pause(); Focus.pause(); if(typeof mirEvent==='function') mirEvent('att');
+  h.innerHTML='<div class="attn" role="alertdialog" aria-label="Attention"><svg width="96" height="96" viewBox="0 0 40 40" aria-hidden="true"><path d="M9.5 23.5c3-7.5 9.5-10.5 15.5-8.3l4.3-2.1-1.1 4.1c1 5.3-3 10.3-10.2 10.3-3.4 0-6.4-1.3-8.5-4z" fill="#fff"></path></svg><b>'+esc(attentionPreset().call)+'</b><p>'+esc(attentionPreset().response)+'</p><p id="attentionTurn" class="hint" aria-live="polite">Your turn</p><button class="btn" type="button" id="attnOk" style="background:#fff;color:#F2785C">Thank you</button></div>';
+  playAttentionSound(); const yc=$('#ytCard'); if(yc) yc.style.visibility='hidden';
+  const close=()=>{ stopAttentionSound(); h.innerHTML=''; if(yc) yc.style.visibility=''; if(was) Music.resume(); Focus.resume(); A.attnClose=null; pipRender(true); }; A.attnClose=close; $('#attnOk').onclick=close; pipRender(true); }
 
 /* noise meter */
 const N={on:false,stream:null,an:null,raf:0,lvl:0}; const NOISE_MAX=[2,4,6,8,10];
@@ -2349,6 +2349,40 @@ function planSumHTML(b,i){ const ex=(typeof segInfo==='function'?segInfo({b}):[]
 function openSetup(){ if(Music.isYT&&!Music.paused) Music.pause(); editDay=editDay||(isWeekend(now())?'mon':dayKey(now())); renderSetup(); }
 function closeSetup(){ $('#sheetHost').innerHTML=''; refreshLabels(); A.phaseKey=''; tick(true); }
 
+const ATTENTION_SOUNDS=[['spoken','Say the teacher’s call'],['chime','Gentle chime'],['bell','Soft bell'],['clap','Clap pattern'],['water','Waterfall'],['none','Silent']];
+let attentionSources=[],attentionSpeech=null;
+function attentionSound(){
+ const p=attentionPreset(),saved=(S.attentionSounds||{})[p.id]||{};
+ const fallback=p.id==='hand'?'none':p.id==='chime'?'chime':'spoken';
+ return {cue:ATTENTION_SOUNDS.some(x=>x[0]===saved.cue)?saved.cue:fallback,volume:Number.isFinite(saved.volume)?Math.max(0,Math.min(1,saved.volume)):.55};
+}
+function stopAttentionSound(){
+ attentionSources.forEach(n=>{try{n.stop();}catch(_){}try{n.disconnect();}catch(_){}});attentionSources=[];
+ if(attentionSpeech&&window.speechSynthesis){try{window.speechSynthesis.cancel();}catch(_){}}attentionSpeech=null;
+}
+function attentionTurn(text){const el=document.getElementById('attentionTurn');if(el)el.textContent=text||'Your turn';}
+function playAttentionSound(preview=false){
+ stopAttentionSound();const choice=attentionSound();if(choice.cue==='none'||choice.volume===0){attentionTurn('Your turn');return;}
+ if(choice.cue==='spoken'){
+  const synth=window.speechSynthesis;
+  const voices=synth?synth.getVoices():[];
+  const voice=voices.find(v=>/^en[-_]AU$/i.test(v.lang)&&/Natasha|Karen|Catherine|female/i.test(v.name));
+  if(!voice){attentionTurn('Teacher: '+attentionPreset().call);toast('An Australian female voice is not available in this browser. Choose a sound cue, or say the call yourself.');return;}
+  const u=new SpeechSynthesisUtterance(attentionPreset().call);u.voice=voice;u.lang='en-AU';u.rate=.9;u.volume=choice.volume;attentionSpeech=u;
+  attentionTurn('Listen…');u.onend=()=>{if(attentionSpeech===u){attentionSpeech=null;attentionTurn('Your turn');}};u.onerror=()=>{if(attentionSpeech===u){attentionSpeech=null;attentionTurn('Teacher: '+attentionPreset().call);}};
+  synth.cancel();synth.speak(u);return;
+ }
+ const a=audio();if(!a)return;attentionTurn('Your turn');const now=a.currentTime;
+ function tone(f,offset,duration,level){const o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(.0001,now+offset);g.gain.exponentialRampToValueAtTime(Math.max(.0001,level*choice.volume),now+offset+.015);g.gain.exponentialRampToValueAtTime(.0001,now+offset+duration);o.connect(g);g.connect(master);o.start(now+offset);o.stop(now+offset+duration+.03);o.onended=()=>g.disconnect();attentionSources.push(o);}
+ if(choice.cue==='chime'){[784,988,1175].forEach((f,i)=>tone(f,i*.16,.65,.2));return;}
+ if(choice.cue==='bell'){tone(880,0,1.3,.25);tone(1760,0,.7,.05);return;}
+ const duration=choice.cue==='water'?1.5:.13,buffer=a.createBuffer(1,Math.ceil(a.sampleRate*duration),a.sampleRate),data=buffer.getChannelData(0);
+ for(let i=0;i<data.length;i++)data[i]=Math.random()*2-1;
+ const offsets=choice.cue==='clap'?[0,.3,.6]:[0];offsets.forEach(offset=>{const src=a.createBufferSource(),filter=a.createBiquadFilter(),gain=a.createGain();src.buffer=buffer;filter.type=choice.cue==='water'?'lowpass':'highpass';filter.frequency.value=choice.cue==='water'?1800:1300;gain.gain.setValueAtTime(.0001,now+offset);gain.gain.linearRampToValueAtTime(choice.volume*(choice.cue==='water'?.16:.2),now+offset+.025);gain.gain.exponentialRampToValueAtTime(.0001,now+offset+duration);src.connect(filter);filter.connect(gain);gain.connect(master);src.onended=()=>{filter.disconnect();gain.disconnect();};src.start(now+offset);src.stop(now+offset+duration);attentionSources.push(src);});
+}
+function attentionSoundHTML(){const x=attentionSound();return '<div class="signal-builder"><h4>Sound for this attention signal</h4><div class="fld"><label for="attentionSoundChoice">What the class hears</label><select id="attentionSoundChoice" data-attention-sound="cue">'+ATTENTION_SOUNDS.map(c=>'<option value="'+c[0]+'" '+(x.cue===c[0]?'selected':'')+'>'+c[1]+'</option>').join('')+'</select></div><div class="fld"><label for="attentionSoundVolume">Volume</label><input id="attentionSoundVolume" data-attention-sound="volume" type="range" min="0" max="100" value="'+Math.round(x.volume*100)+'"></div><button type="button" class="btn alt" data-attention-preview>Preview sound</button><p class="hint">Saved for this signal. Spoken calls use an Australian female voice when your browser has one. Roomie says only the teacher’s call, then waits for the class response. Press Thank you when the class is ready.</p></div>';}
+document.addEventListener('click',e=>{if(e.target.closest('[data-attention-preview]'))playAttentionSound(true);});
+
 const ATTENTION_PRESETS=[
  {id:'listen',name:'Stop, look and listen',call:'Stop, look and listen',response:'Pause your task · Ready to listen',sound:false},
  {id:'waterfalls',name:'Waterfalls',call:'Waterfalls!',response:'Shhh…',sound:false},
@@ -2368,10 +2402,10 @@ const RESET_PRESETS=[
 function attentionPreset(){if(S.attentionPreset==='custom'){const x=S.customAttention||{};return {id:'custom',name:'Our attention signal',call:signalText(x.call,45,'Our quiet signal'),response:signalText(x.response,90,'Pause · Ready to listen'),sound:x.sound===true};}return ATTENTION_PRESETS.find(x=>x.id===S.attentionPreset)||ATTENTION_PRESETS[0];}
 function signalText(value,max,fallback){return typeof value==='string'&&value.trim()?value.trim().slice(0,max):fallback;}
 function resetPreset(){if(S.resetPreset==='custom'){const x=Array.isArray(S.customReset)?S.customReset:[],base=RESET_PRESETS[1].steps;return {id:'custom',name:'Our class reset',steps:base.map((step,i)=>[signalText(x[i]?.[0],30,step[0]),signalText(x[i]?.[1],160,step[1])])};}return RESET_PRESETS.find(x=>x.id===S.resetPreset)||RESET_PRESETS[0];}
-function signalSettingsHTML(){return '<h2>Our class signals</h2><p class="lead">Choose once, teach and practise together. Attention and Reset room open your saved choice straight away.</p><h3>Attention signal</h3><div class="signal-options">'+ATTENTION_PRESETS.map(x=>'<label class="signal-option"><input type="radio" name="attentionPreset" data-signal="attentionPreset" value="'+x.id+'" '+(attentionPreset().id===x.id?'checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+esc(x.call)+' → '+esc(x.response)+'</small></span></label>').join('')+'</div>'+customAttentionHTML()+'<h3>Class reset</h3><div class="signal-options">'+RESET_PRESETS.map(x=>'<label class="signal-option"><input type="radio" name="resetPreset" data-signal="resetPreset" value="'+x.id+'" '+(resetPreset().id===x.id?'checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+esc(x.detail)+'</small></span></label>').join('')+'</div>'+customResetHTML()+'<p class="hint">Model the signal, practise the response and wait before giving instructions. Use the same routine consistently, with adjustments for students’ needs. The teacher moves each new reset step on when the class is ready.</p>';}
-document.addEventListener('change',e=>{const t=e.target;if(!t.matches('[data-signal]'))return;const list=t.dataset.signal==='attentionPreset'?ATTENTION_PRESETS:RESET_PRESETS;if(!list.some(x=>x.id===t.value))return;S[t.dataset.signal]=t.value;save();if(typeof renderSetup==='function')renderSetup();});
+function signalSettingsHTML(){return '<h2>Our class signals</h2><p class="lead">Choose once, teach and practise together. Attention and Reset room open your saved choice straight away.</p><h3>Attention signal</h3><div class="signal-options">'+ATTENTION_PRESETS.map(x=>'<label class="signal-option"><input type="radio" name="attentionPreset" data-signal="attentionPreset" value="'+x.id+'" '+(attentionPreset().id===x.id?'checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+esc(x.call)+' → '+esc(x.response)+'</small></span></label>').join('')+'</div>'+customAttentionHTML()+attentionSoundHTML()+'<h3>Class reset</h3><div class="signal-options">'+RESET_PRESETS.map(x=>'<label class="signal-option"><input type="radio" name="resetPreset" data-signal="resetPreset" value="'+x.id+'" '+(resetPreset().id===x.id?'checked':'')+'><span><b>'+esc(x.name)+'</b><small>'+esc(x.detail)+'</small></span></label>').join('')+'</div>'+customResetHTML()+'<p class="hint">Model the signal, practise the response and wait before giving instructions. Use the same routine consistently, with adjustments for students’ needs. The teacher moves each new reset step on when the class is ready.</p>';}
+document.addEventListener('change',e=>{const t=e.target;if(t.dataset.attentionSound){const key=t.dataset.attentionSound;if(key==='cue'&&!ATTENTION_SOUNDS.some(x=>x[0]===t.value))return;const current=attentionSound();S.attentionSounds=S.attentionSounds||{};S.attentionSounds[attentionPreset().id]={...current,[key]:key==='volume'?Math.max(0,Math.min(1,Number(t.value)/100)):t.value};stopAttentionSound();save();return;}if(!t.matches('[data-signal]'))return;const list=t.dataset.signal==='attentionPreset'?ATTENTION_PRESETS:RESET_PRESETS;if(!list.some(x=>x.id===t.value))return;S[t.dataset.signal]=t.value;save();if(typeof renderSetup==='function')renderSetup();});
 
-function customAttentionHTML(){if(S.attentionPreset!=='custom')return '';const x=S.customAttention||{};return '<div class="signal-builder"><h4>Your attention signal</h4><div class="fld"><label for="customAttentionCall">Teacher’s call or signal</label><input id="customAttentionCall" data-custom-attention="call" maxlength="45" value="'+esc(x.call||'')+'" placeholder="e.g. Hocus pocus!"></div><div class="fld"><label for="customAttentionResponse">Class response or action</label><input id="customAttentionResponse" data-custom-attention="response" maxlength="90" value="'+esc(x.response||'')+'" placeholder="e.g. Everybody focus!"></div><label class="chk"><input type="checkbox" data-custom-attention="sound" '+(x.sound===true?'checked':'')+'>Play a gentle chime with this signal</label><p class="hint">Your words appear on the full-screen Attention display. Blank fields use “Our quiet signal” and “Pause · Ready to listen”.</p></div>';}
+function customAttentionHTML(){if(S.attentionPreset!=='custom')return '';const x=S.customAttention||{};return '<div class="signal-builder"><h4>Your attention signal</h4><div class="fld"><label for="customAttentionCall">Teacher’s call or signal</label><input id="customAttentionCall" data-custom-attention="call" maxlength="45" value="'+esc(x.call||'')+'" placeholder="e.g. Hocus pocus!"></div><div class="fld"><label for="customAttentionResponse">Class response or action</label><input id="customAttentionResponse" data-custom-attention="response" maxlength="90" value="'+esc(x.response||'')+'" placeholder="e.g. Everybody focus!"></div><p class="hint">Your words appear on the full-screen Attention display. Blank fields use “Our quiet signal” and “Pause · Ready to listen”.</p></div>';}
 function customResetHTML(){if(S.resetPreset!=='custom')return '';const steps=resetPreset().steps;return '<div class="signal-builder"><h4>Your four reset steps</h4><p class="hint">Keep the words familiar and brief. Tap Next step when the class is ready. Blank fields use the Pause, breathe, begin wording.</p>'+steps.map((step,i)=>'<div class="signal-reset-step"><h4>Step '+(i+1)+'</h4><div class="fld"><label for="customResetTitle'+i+'">Step heading</label><input id="customResetTitle'+i+'" data-custom-reset="'+i+':0" maxlength="30" value="'+esc(step[0])+'"></div><div class="fld"><label for="customResetWords'+i+'">What the class does</label><textarea id="customResetWords'+i+'" data-custom-reset="'+i+':1" maxlength="160" rows="2">'+esc(step[1])+'</textarea></div></div>').join('')+'</div>';}
 document.addEventListener('input',e=>{const t=e.target;if(t.matches('[data-custom-attention]')){const key=t.dataset.customAttention;if(!['call','response','sound'].includes(key))return;S.customAttention=S.customAttention&&typeof S.customAttention==='object'?S.customAttention:{};S.customAttention[key]=key==='sound'?t.checked:t.value.slice(0,key==='call'?45:90);save();}if(t.matches('[data-custom-reset]')){const [i,k]=t.dataset.customReset.split(':').map(Number);if(!Number.isInteger(i)||i<0||i>3||![0,1].includes(k))return;const steps=resetPreset().steps.map(x=>x.slice());steps[i][k]=t.value.slice(0,k?160:30);S.customReset=steps;save();}});
 
