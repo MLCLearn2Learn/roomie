@@ -4961,7 +4961,7 @@ function pipScreen(){ const d=A.pipDoc, st=document.getElementById('stage'); if(
   const box=pipFrame(); box.hidden=false; const bar=d.getElementById('pbar'); bar.hidden=false;
   const P=A.P||{}, left=P.to?fmtLeft((P.to-P.mins)*60):'', mir=typeof M!=='undefined'&&M.on;
   const sched=S.mode==='tools'?'':'<button data-pv="schedule" aria-label="'+(SCHED.paused?'Resume timetable':'Pause timetable')+'">'+(SCHED.paused?'Resume timetable':'Pause timetable')+'</button>'+((SCHED.pending||SCHED.paused)&&scheduleProtected()?'<button data-pv="scheduleSwitch">End activity and switch</button>':'');
-  const barH='<span class="t">'+(mir?'● Mirror':SCHED.paused?'Paused':esc(left))+'</span><span>'+(mir?(()=>{ const gg=M.goal&&(((S.coach||{}).goals||[]).find(x=>x.id===M.goal)), g=gg&&focusOf(gg); return (g&&g.part?'<button data-pv="mirmark">'+(M.inPart?'End ':'Mark ')+esc(g.part)+'</button>':'')+'<button data-pv="mirend">End lesson</button>'; })():'')+sched+'<button class="a" data-pv="attention">Attention</button>'+(mir?'':'<button data-pv="point">+1 point</button>')+'<button data-pv="bar" title="Shrink to a slim bar">Smaller</button><button data-pv="mini" title="Shrink to a tiny Roomie">Mini</button></span>';
+  const barH='<span class="t">'+(mir?'● Mirror':SCHED.paused?'Paused':esc(left))+'</span><span>'+(mir?(()=>{ const gg=M.goal&&(((S.coach||{}).goals||[]).find(x=>x.id===M.goal)), g=gg&&focusOf(gg); return (g&&g.part?'<button data-pv="mirmark">'+(M.inPart?'End ':'Mark ')+esc(g.part)+'</button>':'')+'<button data-pv="mirend">End lesson</button>'; })():'')+sched+'<button class="a" data-pv="attention">Attention</button>'+(mir?'':'<button data-pv="point">+1 point</button>')+'<button data-pv="bar" title="Back to your tools bar">Back to tools</button><button data-pv="mini" title="Shrink to a tiny Roomie">Mini</button></span>';
   if(bar.dataset.h!==barH){ bar.innerHTML=barH; bar.dataset.h=barH; }
   const f=d.getElementById('pfr'), fd=f.contentDocument; if(!fd||!fd.body) return;
   const cl=st.cloneNode(true); cl.querySelectorAll('[id]').forEach(x=>x.removeAttribute('id'));
@@ -4982,10 +4982,13 @@ function pipHideScreen(){ const d=A.pipDoc; if(!d) return; const b=d.getElementB
     A.pipDoc.addEventListener('click',e=>{ if(!e.target.closest('[data-pact="expand"]')) return; e.stopPropagation(); pipSetView('bar'); },true); } return r; }; }
 
 /* ---- Float bar: a slim strip over SEQTA, OneNote or slides. Shows what's on now and starts anything without leaving the lesson. ---- */
-const PIP_SIZES={bar:[680,158],screen:[560,380],mini:[210,240]};
+const PIP_SIZES={bar:[820,216],screen:[820,520],mini:[210,240]};
 function pipViewPref(){ return ['bar','screen','mini'].includes(S.floatView)?S.floatView:'bar'; }
-function pipSizeFor(v){ return PIP_SIZES[v]||PIP_SIZES.bar; }
-function pipSetView(v){ if(!A.pipDoc) return; A.pipView=v; A.pipBig=false; A.pbMenu=null; S.floatView=v; save(); const z=pipSizeFor(v); try{ A.pip.resizeTo(z[0],z[1]); }catch(_){} A.pipSig=''; pipRender(true); }
+function pbarTools(){ return uiDockKeys(dockOrder(),S.dockHide||[],dockPresetNow()).filter(k=>DOCK_NAMES[k]); }
+function pipSizeFor(v){ if(v==='bar'){ const n=pbarTools().length+3, rows=Math.max(1,Math.ceil(n/7)); return [820,Math.min(320,84+rows*44)]; } return PIP_SIZES[v]||PIP_SIZES.bar; }
+/* Tools the bar runs itself; every other tool opens inside the float so the teacher never has to switch tabs. */
+const PBAR_INLINE=['routines','timer','brain','pick'];
+function pipSetView(v){ if(!A.pipDoc) return; if(v!=='screen') A.pipAuto=false; A.pipView=v; A.pipBig=false; A.pbMenu=null; S.floatView=v; save(); const z=pipSizeFor(v); try{ A.pip.resizeTo(z[0],z[1]); }catch(_){} A.pipSig=''; pipRender(true); }
 const PBAR_CSS='#pb2{position:fixed;inset:0;display:flex;flex-direction:column;gap:8px;padding:10px 12px;box-sizing:border-box;background:#FFF6E0;color:#2A1E3D;font-family:Nunito,system-ui,sans-serif;font-weight:800}'+
  '#pb2.warn{background:#FFD84D}#pb2.go{background:#FF9F80}#pb2.attn{background:#F2785C;color:#fff}'+
  '#pb2 .st{display:flex;align-items:center;gap:12px;min-height:0;flex:1}#pb2 .roo{flex:none;width:44px;height:44px}#pb2 .roo svg{width:100%;height:100%}'+
@@ -4994,7 +4997,7 @@ const PBAR_CSS='#pb2{position:fixed;inset:0;display:flex;flex-direction:column;g
  '#pb2 .ac{display:flex;gap:6px;align-items:center;overflow-x:auto;scrollbar-width:none}#pb2 .ac::-webkit-scrollbar{display:none}'+
  '#pb2 button{flex:none;font:800 13px Nunito,system-ui,sans-serif;border:2px solid #2A1E3D;border-radius:999px;padding:6px 11px;background:#fff;color:#2A1E3D;cursor:pointer;white-space:nowrap}'+
  '#pb2 button.a{background:#F2785C;color:#fff;border-color:#F2785C}#pb2 button.g{background:#FFD84D}#pb2 button.q{background:transparent;border-color:rgba(42,30,61,.35)}#pb2.attn button{border-color:#fff}'+
- '#pb2 .sp{flex:1}#pb2 .pk{border:0;background:#fff;border-radius:999px;padding:2px 10px;margin-left:6px;font-size:14px;vertical-align:middle}'+'#pb2 .vw{flex:none;display:flex;flex-direction:column;gap:4px}#pb2 .vw button{padding:2px 9px;font-size:11px}'+'#pb2.menu .ln{display:none}#pb2.menu .ac{flex-wrap:wrap;overflow:visible;align-content:flex-start}#pb2.menu .roo{width:32px;height:32px}#pb2.menu .tm{font-size:30px}';
+ '#pb2 .sp{flex:1}#pb2 .pk{border:0;background:#fff;border-radius:999px;padding:2px 10px;margin-left:6px;font-size:14px;vertical-align:middle}'+'#pb2 .vw{flex:none;display:flex;flex-direction:column;gap:4px}#pb2 .vw button{padding:2px 9px;font-size:11px}'+'#pb2 .tl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;align-content:flex-start}#pb2 .tl button{font-size:14px;padding:6px 12px}#pb2 .tl .sp{flex:1 0 8px}#pb2 .tl button.on{outline:3px solid #2A1E3D;outline-offset:1px}#pb2 .ex{display:flex;gap:6px;flex:none}'+'#pb2.menu .ln{display:none}#pb2.menu .ac{flex-wrap:wrap;overflow:visible;align-content:flex-start}#pb2.menu .roo{width:32px;height:32px}#pb2.menu .tm{font-size:30px}';
 function pbarState(){ const P=A.P||phaseAt(now()), o=A.overlay, rem=MT.remaining();
   if(A.attnClose){ const sig=typeof attentionPreset==='function'?attentionPreset():null; return {cls:'attn',k:'ATTENTION',t:'Eyes this way',ln:sig?sig.call+' · '+sig.response:'',tm:''}; }
   if(o==='manualRoutine'&&A.mr){ const R=routineById(A.mr.id); if(R){ const st=stepsOf(R); return {cls:'go',k:'ROUTINE · STEP '+(A.mr.step+1)+' OF '+st.length,t:R.name,ln:st[A.mr.step]||'',tm:rem>0?fmtLeft(rem):'',extra:'<button data-pb="mrBack" class="q">Back</button><button data-pb="mrNext" class="g">'+(A.mr.step>=st.length-1?'Finish':'Next step')+'</button>'}; } }
@@ -5010,22 +5013,30 @@ function pbarHTML(){ const z=pbarState(), m=A.pbMenu;
   let row;
   if(m==='routines') row=S.routines.map(r=>'<button data-pb="run" data-id="'+esc(r.id)+'">'+esc(r.name)+'</button>').join('');
   else if(m==='timer') row=[[60,'1 min'],[120,'2 min'],[180,'3 min'],[300,'5 min'],[600,'10 min'],[900,'15 min']].map(([sec,l])=>'<button data-pb="time" data-s="'+sec+'">'+l+'</button>').join('');
-  else if(m==='more') row='<button data-pb="brain">Brain break</button><button data-pb="pick">Pick a name</button><button data-pb="point">+1 point</button><button data-pb="reset">Reset room</button><button data-pb="door">At the door</button>'+(S.mode==='tools'?'':'<button data-pb="sched">'+(SCHED.paused?'Resume timetable':'Pause timetable')+'</button>')+(navHasActivity()?'<button data-pb="stop">Stop activity</button>':'');
+  else if(m==='more') row='<button data-pb="door">At the door</button>'+(S.mode==='tools'?'':'<button data-pb="sched">'+(SCHED.paused?'Resume timetable':'Pause timetable')+'</button>')+(navHasActivity()?'<button data-pb="stop">Stop activity</button>':'');
   if(m) row='<button data-pb="menu" class="q" aria-label="Close">✕</button>'+row;
-  else row='<button data-pb="attention" class="a">Attention</button>'+(z.extra||'')+'<button data-pb="menu" data-m="routines">Routines</button><button data-pb="menu" data-m="timer">Timer</button>'+(z.extra?'':'<button data-pb="brain">Brain break</button><button data-pb="pick">Pick a name</button>')+'<button data-pb="menu" data-m="more">More</button>';
-  return {cls:z.cls+(m?' menu':''),html:'<div class="st"><div class="roo">'+birdSVG()+'</div><div class="tx">'+(z.k?'<div class="k">'+esc(z.k)+'</div>':'')+'<div class="t">'+esc(z.t)+(A.pipPicked?'<button class="pk" data-pb="unpick" title="Clear">Ask '+esc(A.pipPicked)+' ✕</button>':'')+'</div>'+(z.ln?'<div class="ln">'+esc(z.ln)+'</div>':'')+'</div>'+(z.tm?'<div class="tm">'+esc(z.tm)+'</div>':'')+'<div class="vw"><button data-pb="bigger" class="q" title="Show the whole board here">Bigger</button><button data-pb="mini" class="q" title="Shrink to a tiny Roomie">Mini</button></div></div><div class="ac">'+row+'</div>'}; }
+  else row=pbarTools().map(k=>{ const db=document.querySelector('#dock .tool[data-tool="'+k+'"]'), cs=db&&getComputedStyle(db), on=db&&db.classList.contains('on');
+      const style=cs?' style="background:'+cs.backgroundColor+';color:'+cs.color+'"':'';
+      return '<button data-pb="tool" data-k="'+k+'"'+style+(on?' class="on"':'')+'>'+esc(DOCK_NAMES[k])+'</button>'; }).join('')+
+    '<span class="sp"></span>'+(navHasActivity()?'<button data-pb="stop" class="q">Stop activity</button>':'')+'<button data-pb="menu" data-m="more" class="q">⋯</button><button data-pb="point">+1 point</button><button data-pb="reset">Reset room</button><button data-pb="attention" class="a">Attention</button>';
+  return {cls:z.cls+(m?' menu':''),html:'<div class="st"><div class="roo">'+birdSVG()+'</div><div class="tx">'+(z.k?'<div class="k">'+esc(z.k)+'</div>':'')+'<div class="t">'+esc(z.t)+(A.pipPicked?'<button class="pk" data-pb="unpick" title="Clear">Ask '+esc(A.pipPicked)+' ✕</button>':'')+'</div>'+(z.ln?'<div class="ln">'+esc(z.ln)+'</div>':'')+'</div>'+(z.extra&&!m?'<div class="ex">'+z.extra+'</div>':'')+(z.tm?'<div class="tm">'+esc(z.tm)+'</div>':'')+'<div class="vw"><button data-pb="bigger" class="q" title="Show the whole board here">Bigger</button><button data-pb="mini" class="q" title="Shrink to a tiny Roomie">Mini</button></div></div><div class="'+(m?'ac':'tl')+'">'+row+'</div>'}; }
 function pbarSetup(){ const d=A.pipDoc; if(!d||d.getElementById('pb2CSS')) return; const c=d.createElement('style'); c.id='pb2CSS'; c.textContent=PBAR_CSS; d.head.appendChild(c);
   const root=d.createElement('div'); root.id='pb2'; root.hidden=true; d.body.appendChild(root);
   d.addEventListener('click',e=>{ const b=e.target.closest('#pb2 [data-pb]'); if(!b) return; e.stopPropagation(); const v=b.dataset.pb;
     const fresh=()=>{ if(navHasActivity()) navStopActivity(false); };
     if(v==='menu'){ A.pbMenu=b.dataset.m&&A.pbMenu!==b.dataset.m?b.dataset.m:null; }
+    else if(v==='tool'){ const k=b.dataset.k;
+      if(k==='routines'||k==='timer'){ A.pbMenu=A.pbMenu===k?null:k; }
+      else if(k==='brain'){ fresh(); A.pbMenu=null; startBrain(); }
+      else if(k==='pick'){ A.pbMenu=null; pickQuiet(); }
+      else { const db=document.querySelector('#dock .tool[data-tool="'+k+'"]'); if(!db) return; if(!b.classList.contains('on')) fresh(); A.pbMenu=null; db.click(); if(A.overlay){ A.pipAuto=true; pipSetView('screen'); S.floatView='bar'; save(); return; } } }
     else if(v==='attention') attention();
     else if(v==='run'){ fresh(); A.pbMenu=null; runRoutine(b.dataset.id); }
     else if(v==='time'){ fresh(); A.pbMenu=null; navStartTimer(Number(b.dataset.s)); }
     else if(v==='brain'){ fresh(); A.pbMenu=null; startBrain(); }
     else if(v==='pick'){ A.pbMenu=null; pickQuiet(); } else if(v==='unpick'){ A.pipPicked=null; }
     else if(v==='point'){ act('point'); A.pbMenu=null; } else if(v==='reset'){ A.pbMenu=null; resetRoom(); } else if(v==='door'){ A.pbMenu=null; openOverlay('door'); }
-    else if(v==='sched'){ A.pbMenu=null; SCHED.paused?resumeTimetable():pauseTimetable(); } else if(v==='stop'){ A.pbMenu=null; navStopActivity(); }
+    else if(v==='sched'){ A.pbMenu=null; SCHED.paused?resumeTimetable():pauseTimetable(); } else if(v==='stop'){ A.pbMenu=null; navStopActivity(false); }
     else if(v==='ready'){ weAreReadyKey(); } else if(v==='startNow'){ act('startNow'); } else if(v==='plus5'){ act('plus5'); }
     else if(v==='mrNext'){ act('mrNext'); } else if(v==='mrBack'){ act('mrBack'); }
     else if(v==='tplus'){ MT.add(60); } else if(v==='tpause'){ MT.running?MT.pause():MT.resume(); }
@@ -5033,7 +5044,7 @@ function pbarSetup(){ const d=A.pipDoc; if(!d||d.getElementById('pb2CSS')) retur
     A.pipSig=''; pipRender(true); },true); }
 function pbarRender(){ const d=A.pipDoc; pbarSetup(); const root=d.getElementById('pb2'); root.hidden=false; const pip=d.getElementById('pip'); if(pip) pip.style.display='none'; const sc=d.getElementById('pscr'), sb=d.getElementById('pbar'); if(sc) sc.hidden=true; if(sb) sb.hidden=true;
   const z=pbarHTML(); if(root.dataset.h!==z.cls+z.html){ root.className=z.cls; root.innerHTML=z.html; root.dataset.h=z.cls+z.html; } }
-{ const f=pipRender; pipRender=function(force){ if(A.pipDoc&&A.pipView==='bar'){ try{ pbarRender(); }catch(e){ console.warn(e); } return; } const r=A.pipDoc&&A.pipDoc.getElementById('pb2'); if(r) r.hidden=true; return f.apply(this,arguments); }; }
+{ const f=pipRender; pipRender=function(force){ if(A.pipDoc&&A.pipAuto&&A.pipView==='screen'&&!A.overlay){ A.pipAuto=false; pipSetView('bar'); return; } if(A.pipDoc&&A.pipView==='bar'){ try{ pbarRender(); }catch(e){ console.warn(e); } return; } const r=A.pipDoc&&A.pipDoc.getElementById('pb2'); if(r) r.hidden=true; return f.apply(this,arguments); }; }
 /* keep the copy live: re-copy when the screen changes */
 { let q=0; const mo=new MutationObserver(()=>{ if(!A.pipDoc||A.pipView!=='screen') return; cancelAnimationFrame(q); q=requestAnimationFrame(()=>pipRender(true)); }); const st=document.getElementById('stage'); if(st) mo.observe(st,{subtree:true,childList:true,characterData:true,attributes:true}); }
 
