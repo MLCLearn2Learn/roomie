@@ -22,3 +22,7 @@ test('one tap stops the clock on a running routine, with no need to click throug
  assert.ok(html.includes("{id:'weready',"),'Hey Roomie, we’re ready');
  assert.ok(html.includes("setTimeout(()=>{ if(this.song===was) this.stop(); },1500)"),'a fading song never cuts off the next one');
 });
+test('the playing video always has a Stop button',()=>{
+ assert.ok(html.includes('<button type="button" class="btn alt sm" id="ytStop">Stop video</button>'));
+ assert.ok(html.includes("document.getElementById('ytStop').addEventListener('click',()=>{ A.songKeep=false;"));
+});
