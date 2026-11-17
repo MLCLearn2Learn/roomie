@@ -15,3 +15,10 @@ test('running a routine from the list saves its time too',()=>{
  assert.ok(html.includes("recordRoutineTime(R.id,(Date.now()-A.mr.t0)/1000,'run')"));
  assert.ok(html.includes("of the song to spare."));
 });
+test('one tap stops the clock on a running routine, with no need to click through the steps',()=>{
+ assert.ok(html.includes('data-act="mrReady">We’re ready!</button>'));
+ assert.ok(html.includes("if(a==='mrReady'){ if(!A.mr) return;"));
+ assert.ok(html.includes("function weAreReadyKey(){ if(A.overlay==='manualRoutine'&&A.mr){ act('mrReady'); return true; }"),'W key');
+ assert.ok(html.includes("{id:'weready',"),'Hey Roomie, we’re ready');
+ assert.ok(html.includes("setTimeout(()=>{ if(this.song===was) this.stop(); },1500)"),'a fading song never cuts off the next one');
+});
