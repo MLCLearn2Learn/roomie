@@ -1339,7 +1339,8 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
 #ytDock .ytcard iframe{width:100%;height:auto;aspect-ratio:16/9;min-height:200px}
 #ytDock .row{flex-wrap:wrap;gap:6px}
 #ytDock #ytMsg{display:none}
-#ytExpand{margin-top:8px;padding:8px 12px;font-size:16px}
+.ytbtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+#ytExpand,#ytStop{padding:8px 12px;font-size:16px}
 .teaching-space:has(#ytCard:not([hidden])) #np{display:none}
 @media(min-width:851px){
  .teaching-space:not(.video-expanded):has(#ytCard:not([hidden])):has(>.stage>.side){grid-template-rows:auto minmax(0,1fr);row-gap:12px}
@@ -1374,8 +1375,8 @@ body.mode-tools .toolkit-main .tiles.toolkit-few{grid-template-columns:repeat(au
  .teaching-space.video-expanded:has(#ytCard:not([hidden]))>.stage>.side .ring .rt b{font-size:24px}
  .teaching-space.video-expanded #ytDock{min-height:0;display:flex;align-self:stretch;overflow:hidden}
  .teaching-space.video-expanded #ytCard{flex:1;height:100%;min-height:0;display:flex;flex-direction:column;position:relative;inset:auto}
- .teaching-space.video-expanded #ytExpand{position:absolute;top:10px;right:12px}
- .teaching-space.video-expanded #ytLink{margin-right:130px}
+ .teaching-space.video-expanded .ytbtns{position:absolute;top:10px;right:12px;margin:0}
+ .teaching-space.video-expanded #ytLink{margin-right:260px}
  .teaching-space.video-expanded #ytHost{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
  .teaching-space.video-expanded #ytHost video.own-video{height:100%;width:auto;max-height:100%;max-width:100%;object-fit:contain}
  .teaching-space.video-expanded #ytHost{flex-direction:column}
@@ -1449,7 +1450,7 @@ body.fun-calm .celebration-character,body.fun-calm .celebration-stars span{anima
   <main class="stage" id="stage" aria-live="polite"></main>
   <aside id="ytDock" aria-label="Video player"><section class="ytcard" id="ytCard" hidden aria-label="YouTube song">
   <div class="row" style="justify-content:space-between"><b style="font-size:15px">Now playing</b><a id="ytLink" href="#" target="_blank" rel="noopener" class="hint">Open on YouTube</a></div>
-  <button type="button" class="btn alt sm" id="ytExpand" aria-pressed="false">Enlarge video</button>
+  <div class="ytbtns"><button type="button" class="btn alt sm" id="ytExpand" aria-pressed="false">Enlarge video</button><button type="button" class="btn alt sm" id="ytStop">Stop video</button></div>
   <div id="ytHost" style="margin-top:8px"></div>
   <p class="hint" id="ytMsg" style="margin:6px 0 0"></p>
 </section></aside>
@@ -1602,6 +1603,7 @@ function expandYouTube(expanded){
   if(space)space.classList.toggle('video-expanded',!!expanded);
   if(button){button.setAttribute('aria-pressed',String(!!expanded));button.textContent=expanded?'Smaller video':'Enlarge video';}
 }
+document.getElementById('ytStop').addEventListener('click',()=>{ A.songKeep=false; expandYouTube(false); Music.stop(); if(typeof YT_!=='undefined'&&YT_.card) YT_.card(false); });
 document.getElementById('ytExpand').addEventListener('click',()=>expandYouTube(!document.getElementById('teachingSpace').classList.contains('video-expanded')));
 const YT_ = { player:null, ready:null, routine:null, fadeH:null, start:0,
   parse(url){ url=String(url||'').trim(); let id=null, t=0;
