@@ -6027,7 +6027,7 @@ document.addEventListener('keydown',e=>{ if(e.defaultPrevented||e.ctrlKey||e.met
    The Roomie tab is only a setup page. The engine (timetable, routines, records, music) is the same as the board's. ==== */
 const W4=/[?&]widget\b/.test(location.search);
 if(W4){ document.documentElement.classList.add('w4'); }
-const W4_SIZES={rest:[132,146],menu:[400,270],brains:[420,230],routines:[420,370],tickets:[420,350],timers:[420,350],
+const W4_SIZES={rest:[132,146],menu:[400,270],brains:[420,230],routines:[420,370],tickets:[420,350],more:[420,330],timers:[420,350],
   routine:[500,380],routineVid:[660,400],done:[480,300],warning:[440,260],timer:[430,156],pick:[340,156],attn:[440,230],brain:[500,330],checkin:[580,320],ticket:[540,360]};
 function w4State(){ const P=A.P||phaseAt(now()), o=A.overlay, rem=MT.remaining();
   if(A.attnClose){ const p=typeof attentionPreset==='function'?attentionPreset():null; return {k:'attn',call:p?p.call:'Eyes this way',resp:p?p.response:''}; }
@@ -6122,15 +6122,16 @@ function w4Html(){ const v=A.w4v||'rest', z=w4State(), pop=Date.now()<(A.w4Pop||
     return '<div class="card g"><div class="hd">'+w4Me()+'<h1>'+esc(msg)+'</h1></div><p class="huge" style="margin:auto 0">Back to your work</p><div class="ft"><button class="pill k go" data-w="rest">Back to Roomie</button></div></div>'; }
   if(v==='rest'||v==='end'||(v==='card'&&!z)){ const n=w4Now(), busy=!!z&&!A.attnClose, lbl=A.attnClose?'Eyes this way':z?(z.k==='routine'?z.R.name:z.k==='ticket'?'Ticket':z.k==='warning'?'2 minutes':z.k==='timer'?z.tm:z.k==='pick'?z.name:'Tap me'):(n.left||n.t||'Tap me');
     return '<div class="rest'+(busy?' busy':'')+(A.attnClose?' attn':'')+'"><button class="me" data-w="'+(A.attnClose?'attention':'menu')+'" title="Tap Roomie">'+birdSVG()+'</button>'+(A.w4Win&&!A.w4Win.closed&&z?'':A.w4FsReady&&z?'<button class="pill k fsgo" data-w="fsgo2">⛶ Full screen</button>':Date.now()<(A.w4FsBlocked||0)?'<span class="chip" style="font-size:11px;white-space:normal">Allow pop-ups for this site</span>':'<span class="chip" data-w="'+(busy?'card':'menu')+'">'+esc(lbl)+'</span>')+'</div>'; }
-  if(v==='menu'||v==='routines'||v==='tickets'||v==='timers'||v==='brains'){ let l='';
+  if(v==='menu'||v==='routines'||v==='tickets'||v==='timers'||v==='brains'||v==='more'){ let l='';
     const running=z&&z.k!=='pick'?'<button class="pill k big" data-w="card">Back to '+esc(z.k==='routine'?z.R.name:z.k==='timer'?'the timer':z.k==='brain'?'the brain break':z.k==='checkin'?'the check-in':z.k==='ticket'?'the ticket':z.k==='warning'?'finishing up':'it')+'</button>':'';
     if(v==='menu'){ const word=(w,t,c,more)=>'<button class="pill wd" data-w="'+w+'" style="background:'+c+'">'+t+(more?'<i>›</i>':'')+'</button>';
-      l=running+'<div class="words'+pop+'">'+word('attention','Attention','#F2785C;color:#fff;border-color:#F2785C',false)+word('routines','Routines','#FFD84D',true)+word('timers','Timer','#FFF0A8',true)+word('brains','Brain break','#C9EBD8',true)+word('pick','Pick a name','#E4D7FF',false)+word('checkin','Check-in','#D9EEFF',false)+word('tickets','Tickets','#FFE0D6',true)+word('point','+1 point','#fff',false)+'</div>'; }
+      l=running+'<div class="words'+pop+'">'+word('attention','Attention','#F2785C;color:#fff;border-color:#F2785C',false)+word('routines','Routines','#FFD84D',true)+word('timers','Timer','#FFF0A8',true)+word('bpick','Brain break','#C9EBD8',false)+word('pick','Pick a name','#E4D7FF',false)+word('checkin','Check-in','#D9EEFF',false)+word('tickets','Tickets','#FFE0D6',true)+word('more','More','#fff',true)+word('point','+1 point','#fff',false)+'</div>'; }
     else if(v==='brains') l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">Brain break</span></div><div class="grid2'+pop+'">'+[['','Surprise me'],['movement','Movement'],['game','Game'],['pair','With a partner'],['calm','Calm down']].map(([t,n])=>'<button class="pill" style="background:#C9EBD8" data-w="brain" data-t="'+t+'">'+n+'</button>').join('')+'</div>';
     else if(v==='routines') l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">All routines</span></div><div class="grid2'+pop+'">'+w4Routines().map(r=>'<button class="pill y" data-w="run" data-id="'+esc(r.id)+'">'+esc(r.name)+'<small>'+(r.best?'Record '+fmtLeft(r.best):'No record yet')+'</small></button>').join('')+'</div>'+
         '<div class="lbl">Practise (not timed for the record)</div><div class="row">'+w4Routines().map(r=>'<button class="pill q" data-w="prac" data-id="'+esc(r.id)+'">'+esc(r.name)+'</button>').join('')+'</div>';
     else if(v==='timers') l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">Timer</span></div><div class="grid2'+pop+'">'+[[30,'30 sec'],[60,'1 min'],[120,'2 min'],[180,'3 min'],[300,'5 min'],[600,'10 min'],[900,'15 min'],[1200,'20 min']].map(([s,t])=>'<button class="pill" data-w="time" data-s="'+s+'">'+t+'</button>').join('')+'</div>';
-    else l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">Tickets</span></div><div class="grid2'+pop+'"><button class="pill" style="background:#FFE0D6" data-w="ticket" data-kind="entry">Entry ticket<small>Start of the lesson</small></button><button class="pill" style="background:#FFE0D6" data-w="ticket" data-kind="exit">Exit ticket<small>End of the lesson</small></button></div>';
+    else if(v==='more') l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">More tools</span></div><div class="grid2'+pop+'">'+pbarTools().filter(k=>!['routines','timer','brain','checkin','exit','pick'].includes(k)).map(k=>{ const db=document.querySelector('#dock .tool[data-tool="'+k+'"]'), cs=db&&getComputedStyle(db), bg=cs&&cs.backgroundColor&&cs.backgroundColor!=='rgba(0, 0, 0, 0)'?cs.backgroundColor:'#fff'; return '<button class="pill" style="background:'+bg+';color:'+(cs?cs.color:'')+'" data-w="dock" data-k="'+k+'">'+esc(DOCK_NAMES[k])+'</button>'; }).join('')+'</div>';
+    else l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">Tickets</span></div><div class="grid2'+pop+'"><button class="pill" style="background:#FFE0D6" data-w="tpick" data-kind="entry">Entry ticket<small>Start of the lesson</small></button><button class="pill" style="background:#FFE0D6" data-w="tpick" data-kind="exit">Exit ticket<small>End of the lesson</small></button></div>';
     const n=w4Now(); return '<div class="menu"><div class="l">'+l+'</div><div class="r"><button class="me" data-w="rest" title="Tuck away">'+birdSVG()+'</button>'+(n.left?'<span class="chip">'+esc(n.left)+'</span>':'')+'<div class="hint">Tap me to tuck away</div></div></div>'; }
   /* cards */
   const x='<button class="pill q bg" data-w="fshint" title="'+(A.w4Big?'Back to normal size':'Make Roomie as big as possible')+'">'+(A.w4Big?'Smaller':'Full screen')+'</button><button class="x" data-w="rest" aria-label="Tuck Roomie away" title="Tuck Roomie away">✕</button>';
@@ -6169,7 +6170,7 @@ function w4Click(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) re
   const full=()=>{ if(w4PopOpen()){ A.w4v='rest'; A.w4End=null; return w4Render(); } return card(); };
   /* After full screen, Roomie may still be big: the first tap on Roomie just tucks it away. */
   if(A.w4v==='rest'&&A.pip&&(A.pip.innerWidth>360||A.pip.innerHeight>230)&&['menu','card'].includes(w)){ A.w4Size=null; w4Fit(); return w4Render(); }
-  if(['menu','routines','tickets','timers','brains','rest'].includes(w)){ A.w4End=null; if(w==='rest'&&A.overlay==='ready') closeOverlay(); return w4Go(w); }
+  if(['menu','routines','tickets','timers','brains','more','rest'].includes(w)){ A.w4End=null; if(w==='rest'&&A.overlay==='ready') closeOverlay(); return w4Go(w); }
   if(w==='card') return card();
   if(w==='fshint'){ if(A.w4Big){ w4BigToggle(); return; } if(A.w4Win&&!A.w4Win.closed){ w4PopClose(); return; } A.w4FsReady=true; w4Go('rest'); return; }
   if(w==='fsgo2'){ A.w4FsReady=false; if(!w4PopOpen()){ A.w4FsBlocked=Date.now()+8000; setTimeout(w4Render,8100); } return w4Render(); }
@@ -6182,6 +6183,9 @@ function w4Click(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) re
   if(w==='unpick'){ A.w4Pick=null; A.pipPicked=null; return w4Go('rest'); }
   if(w==='brain'){ fresh(); startBrain(b.dataset.t||undefined); return full(); }
   if(w==='checkin'){ fresh(); openOverlay('checkin'); return full(); }
+  if(w==='bpick'){ fresh(); openOverlay('brainpick'); return full(); }
+  if(w==='tpick'){ fresh(); openTicketPicker(b.dataset.kind||'exit',false); return full(); }
+  if(w==='dock'){ fresh(); const db=document.querySelector('#dock .tool[data-tool="'+b.dataset.k+'"]'); if(db) db.click(); return full(); }
   if(w==='feel'){ A.feel=feelBucket(); A.feel[b.dataset.f]++; blip(); b.animate&&b.animate([{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:220}); return w4Render(); }
   if(w==='ticket'){ fresh(); A.tp={kind:b.dataset.kind,live:false,form:false}; useTicket(''); return full(); }
   if(w==='exitAgain'||w==='exitDone'){ exitAct(w); return w==='exitDone'?w4Go('rest'):w4Render(); }
@@ -6282,7 +6286,7 @@ function mwClose(){ const w=A.mwWin; A.mwWin=null; try{ if(w&&!w.closed){ if(w.d
 function mwBig(){ const w=A.mwWin; if(!w) return; try{ w.moveTo(screen.availLeft||0,screen.availTop||0); w.resizeTo(screen.availWidth,screen.availHeight); }catch(_){ } try{ w.document.documentElement.requestFullscreen().catch(()=>{}); }catch(_){ } }
 function mwClick(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) return; e.stopPropagation(); const w=b.dataset.w, fresh=()=>{ if(navHasActivity()) navStopActivity(false); };
   const go=()=>{ A.mwV='card'; A.mwSeen=true; mwBig(); mwRender(); };
-  if(['menu','routines','tickets','timers','brains'].includes(w)){ A.mwV=w; return mwRender(); }
+  if(['menu','routines','tickets','timers','brains','more'].includes(w)){ A.mwV=w; return mwRender(); }
   if(w==='rest'||w==='fsexit'||w==='fshint'){ return mwClose(); }
   if(w==='card'){ A.mwV='card'; A.mwSeen=true; if(w4State()&&w4State().k!=='pick') mwBig(); return mwRender(); }
   if(w==='run'){ fresh(); runRoutine(b.dataset.id); return go(); }
@@ -6316,6 +6320,53 @@ if(MW){
   { const f=pipRender; pipRender=function(){ const r=f.apply(this,arguments); try{ mwRender(); }catch(_){ } return r; }; }
   setInterval(()=>{ try{ mwRender(); }catch(_){ } },500);
 }
+
+/* /widget2/: the full-screen window shows the original board screens (live copy of the board's stage), so every
+   chooser and activity keeps its original look; taps are passed through to the real board. */
+function mwActive(){ return !!(A.overlay||A.attnClose||w4State()); }
+function mwMenuHTML(){ const z=w4State(), pop=Date.now()<(A.w4Pop||0)?' pop':'';
+  const word=(attrs,t,c,more)=>'<button class="pill wd" '+attrs+' style="background:'+c+'">'+t+(more?'<i>›</i>':'')+'</button>';
+  const tools=pbarTools().filter(k=>!['routines','timer'].includes(k)).map(k=>{ const db=document.querySelector('#dock .tool[data-tool="'+k+'"]'), cs=db&&getComputedStyle(db); return word('data-w="tool" data-k="'+k+'"',esc(DOCK_NAMES[k]),cs&&cs.backgroundColor&&cs.backgroundColor!=='rgba(0, 0, 0, 0)'?cs.backgroundColor:'#fff',false); }).join('');
+  const running=z&&z.k!=='pick'?'<button class="pill k big" data-w="card">Back to '+esc(z.k==='routine'?z.R.name:'the activity')+'</button>':'';
+  return '<div class="menu"><div class="l">'+running+'<div class="words'+pop+'">'+word('data-w="attention"','Attention','#F2785C;color:#fff;border-color:#F2785C',false)+word('data-w="routines"','Routines','#FFD84D',true)+word('data-w="timers"','Timer','#FFF0A8',true)+tools+word('data-w="point"','+1 point','#fff',false)+'</div></div><div class="r"><button class="me" data-w="rest" title="Close">'+birdSVG()+'</button><div class="hint">Tap me to close</div></div></div>'; }
+const MW_FULL_CSS='html,body{margin:0;height:100%;overflow:hidden}body{background:var(--paper,#FFF6E0)}#mwStage{position:fixed;inset:0;height:100vh!important;width:100vw!important;max-width:none!important;margin:0!important;padding:2.2vh 2vw!important;box-sizing:border-box}#mwX{position:fixed;bottom:12px;right:14px;z-index:50;font:800 15px Nunito,system-ui,sans-serif;background:#fff;color:#2A1E3D;border:2px solid #2A1E3D;border-radius:999px;padding:7px 16px;cursor:pointer;opacity:.9}';
+function mwMirror(){ return fsMirror(A.mwWin,mwClose); }
+function fsMirror(w,close){ const d=w.document, roots=[['s',document.getElementById('stage'),'mwStage'],['o',document.getElementById('overlayHost'),'mwOver']]; if(!roots[0][1]) return;
+  if(!d.getElementById('mwStage')){ d.head.innerHTML='<meta charset="utf-8"><title>Roomie</title>';
+    document.querySelectorAll('link[rel="stylesheet"],style').forEach(s=>d.head.appendChild(d.importNode(s,true)));
+    const x=d.createElement('style'); x.textContent=MW_FULL_CSS; d.head.appendChild(x);
+    d.body.innerHTML='<div class="app"><div id="mwStage" class="stage"></div></div><div id="mwOver"></div><button id="mwX" type="button">Close full screen</button>';
+    if(!d.__fsm){ d.__fsm=1; d.addEventListener('dblclick',()=>{ try{ d.documentElement.requestFullscreen(); }catch(_){ } }); d.addEventListener('click',e=>{ if(e.target.closest('#mwX')){ close(); return; } const t=e.target.closest('[data-pi]'); if(!t) return; if(t.matches('summary,input,select,textarea,label')) return; e.preventDefault();
+      const path=t.dataset.pi.split('.'), r=roots.find(q=>q[0]===path.shift()); let n=r&&r[1]; for(const i of path){ n=n&&n.children[+i]; } if(n){ n.click(); setTimeout(()=>{ mwRender(); w4PopRender(); },60); setTimeout(()=>{ mwRender(); w4PopRender(); },400); } },true); } }
+  d.documentElement.className=document.documentElement.className.replace(/\bw4\b/,''); d.documentElement.setAttribute('style',document.documentElement.getAttribute('style')||'');
+  d.body.className=document.body.className+' full-view';
+  const SEL='button,a,summary,[role="button"],[role="tab"],[data-act],[data-tool],[data-run],[data-brain],[data-bpick],[data-bcat],[data-tuse],[data-tkind],[data-rs],[data-rz]';
+  roots.forEach(([key,src,id])=>{ const box=d.getElementById(id); if(!src){ box.innerHTML=''; return; }
+    const cl=src.cloneNode(true); const tag=(a,b,path)=>{ [...a.children].forEach((c,i)=>{ const p=path+'.'+i, dc=b.children[i]; if(!dc) return; if(c.matches(SEL)) dc.setAttribute('data-pi',p); tag(c,dc,p); }); }; tag(src,cl,key);
+    cl.querySelectorAll('video,iframe').forEach(v=>{ const ph=d.createElement('div'); ph.className='mw-vid'; ph.style.cssText='display:flex;align-items:center;justify-content:center;min-height:120px'; v.replaceWith(ph); });
+    const html=cl.innerHTML, cls=key==='s'?src.className:'';
+    if(box.dataset.h!==html||(key==='s'&&box.className!==cls)){ if(key==='s') box.className=cls; box.innerHTML=html; box.dataset.h=html;
+      const c=box.querySelector('.card.scene'); if(c&&typeof scLayout==='function'){ const lay=()=>{ try{ scLayout(c,c.querySelector(':scope > .scn-band'),c.querySelector(':scope > .scn-art'),c.querySelector('h1')); }catch(_){ } }; lay(); if(d.fonts&&d.fonts.ready) d.fonts.ready.then(lay); } }
+    const mc=src.querySelectorAll('canvas'), pc=box.querySelectorAll('canvas'); mc.forEach((c,i)=>{ const t=pc[i]; if(!t) return; try{ if(t.width!==c.width) t.width=c.width; if(t.height!==c.height) t.height=c.height; const x=t.getContext('2d'); x.clearRect(0,0,t.width,t.height); x.drawImage(c,0,0); }catch(_){ } }); });
+  const box=d.getElementById('mwStage'); d.getElementById('mwOver').style.display=roots[1][1]&&roots[1][1].children.length?'':'none';
+  const slot=d.querySelector('.mw-vid'), main=w4VidMain();
+  if(slot&&main){ if(!A.mwVid||A.mwVid.ownerDocument!==d){ const v=d.createElement('video'); v.muted=true; v.playsInline=true; v.style.cssText='max-width:100%;max-height:52vh;border-radius:16px'; A.mwVid=v; }
+    const v=A.mwVid; if(main.currentSrc&&v.dataset.src!==main.currentSrc){ v.src=main.currentSrc; v.dataset.src=main.currentSrc; } if(v.parentNode!==slot) slot.appendChild(v);
+    if(Math.abs((v.currentTime||0)-(main.currentTime||0))>0.4){ try{ v.currentTime=main.currentTime; }catch(_){ } } if(main.paused){ if(!v.paused) v.pause(); } else if(v.paused) v.play().catch(()=>{}); } }
+if(MW){
+  { const f=mwRender; mwRender=function(){ const w=A.mwWin; if(!w) return; if(w.closed){ A.mwWin=null; return; }
+      if(A.mwV==='card'){ if(!mwActive()){ if(A.mwSeen) return mwClose(); A.mwV='menu'; } else { A.mwSeen=true; return mwMirror(); } }
+      if(A.mwV==='menu'){ const d=w.document; let root=d.getElementById('w4'); if(!root){ d.open(); d.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Roomie</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;800&display=swap"><style>'+W4_CSS+'</style></head><body><div id="w4"></div></body></html>'); d.close(); d.addEventListener('click',mwClick,true); root=d.getElementById('w4'); }
+        const h=mwMenuHTML(); if(root.dataset.h!==h){ root.innerHTML=h; root.dataset.h=h; } return; }
+      return f.apply(this,arguments); }; }
+  { const f=mwClick; mwClick=function(e){ const b=e.target.closest('[data-w]'); if(b&&b.dataset.w==='tool'){ e.stopPropagation(); const k=b.dataset.k, db=document.querySelector('#dock .tool[data-tool="'+k+'"]');
+        if(k==='point'){ act('point'); return mwClose(); } if(navHasActivity()) navStopActivity(false); if(db) db.click(); A.mwV='card'; A.mwSeen=false; mwBig(); return mwRender(); }
+      return f.apply(this,arguments); }; }
+}
+
+/* /widget/: the full-screen window shows the original board screens, live, with taps passed to the board. */
+if(W4&&!MW){ w4PopRender=function(){ const w=A.w4Win; if(!w) return; if(w.closed){ A.w4Win=null; return; } const z=w4State();
+    if(!(A.overlay||A.attnClose||(z&&z.k!=='pick'))) return w4PopClose(); fsMirror(w,w4PopClose); };}
 
 })();
 </script>
