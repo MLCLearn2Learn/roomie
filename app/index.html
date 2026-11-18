@@ -6073,7 +6073,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .rest{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px}
 .rest .me{width:min(96px,62vh);height:min(100px,66vh);transition:transform .15s;flex:none}
 @media (min-aspect-ratio:3/2){.rest{flex-direction:row;gap:12px}.rest .me{width:min(110px,80vh);height:min(116px,84vh)}.rest .chip{font-size:20px;padding:3px 14px}.rest .fsgo{font-size:16px;padding:10px 16px}}.rest .me:hover{transform:scale(1.05) rotate(-3deg)}
-.rest.busy{background:#FFD84D}.rest.busy .chip{background:#2A1E3D;color:#FFD84D}
+.rest.busy{background:#FFD84D}.rest.busy .chip{background:#fff;color:#2A1E3D}
 .rest.attn{background:#F2785C}
 .fsgo{font-size:13px;padding:6px 10px;animation:glow 1.2s ease-in-out infinite}@keyframes glow{50%{box-shadow:0 0 0 6px rgba(255,216,77,.9)}}
 /* menu */
@@ -6121,7 +6121,7 @@ function w4Html(){ const v=A.w4v||'rest', z=w4State(), pop=Date.now()<(A.w4Pop||
   if(v==='end'&&A.w4End){ const e=A.w4End, msg=e.k==='timer'?'Time’s up!':e.k==='brain'?'Brain break done!':e.k==='routine'?e.name+' is finished':'All done!';
     return '<div class="card g"><div class="hd">'+w4Me()+'<h1>'+esc(msg)+'</h1></div><p class="huge" style="margin:auto 0">Back to your work</p><div class="ft"><button class="pill k go" data-w="rest">Back to Roomie</button></div></div>'; }
   if(v==='rest'||v==='end'||(v==='card'&&!z)){ const n=w4Now(), busy=!!z&&!A.attnClose, lbl=A.attnClose?'Eyes this way':z?(z.k==='routine'?z.R.name:z.k==='ticket'?'Ticket':z.k==='warning'?'2 minutes':z.k==='timer'?z.tm:z.k==='pick'?z.name:'Tap me'):(n.left||n.t||'Tap me');
-    return '<div class="rest'+(busy?' busy':'')+(A.attnClose?' attn':'')+'"><button class="me" data-w="'+(A.attnClose?'attention':'menu')+'" title="Tap Roomie">'+birdSVG()+'</button>'+(A.w4Win&&!A.w4Win.closed&&z?'<span class="chip" data-w="menu">'+(A.w4Size&&A.w4Size!=='rest'?'Tap me to tuck away':'On full screen')+'</span>':A.w4FsReady&&z?'<button class="pill k fsgo" data-w="fsgo2">⛶ Full screen</button>':Date.now()<(A.w4FsBlocked||0)?'<span class="chip" style="font-size:11px;white-space:normal">Allow pop-ups for this site</span>':'<span class="chip" data-w="'+(busy?'card':'menu')+'">'+esc(lbl)+'</span>')+'</div>'; }
+    return '<div class="rest'+(busy?' busy':'')+(A.attnClose?' attn':'')+'"><button class="me" data-w="'+(A.attnClose?'attention':'menu')+'" title="Tap Roomie">'+birdSVG()+'</button>'+(A.w4Win&&!A.w4Win.closed&&z?'':A.w4FsReady&&z?'<button class="pill k fsgo" data-w="fsgo2">⛶ Full screen</button>':Date.now()<(A.w4FsBlocked||0)?'<span class="chip" style="font-size:11px;white-space:normal">Allow pop-ups for this site</span>':'<span class="chip" data-w="'+(busy?'card':'menu')+'">'+esc(lbl)+'</span>')+'</div>'; }
   if(v==='menu'||v==='routines'||v==='tickets'||v==='timers'||v==='brains'){ let l='';
     const running=z&&z.k!=='pick'?'<button class="pill k big" data-w="card">Back to '+esc(z.k==='routine'?z.R.name:z.k==='timer'?'the timer':z.k==='brain'?'the brain break':z.k==='checkin'?'the check-in':z.k==='ticket'?'the ticket':z.k==='warning'?'finishing up':'it')+'</button>':'';
     if(v==='menu'){ const word=(w,t,c,more)=>'<button class="pill wd" data-w="'+w+'" style="background:'+c+'">'+t+(more?'<i>›</i>':'')+'</button>';
@@ -6168,7 +6168,7 @@ function w4Click(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) re
   /* Activities open full screen straight away (Chrome allows that or a resize per tap, not both). */
   const full=()=>{ if(w4PopOpen()){ A.w4v='rest'; A.w4End=null; return w4Render(); } return card(); };
   /* After full screen, Roomie may still be big: the first tap on Roomie just tucks it away. */
-  if(A.w4v==='rest'&&A.w4Size&&A.w4Size!=='rest'&&['menu','card'].includes(w)){ A.w4Size=null; w4Fit(); return w4Render(); }
+  if(A.w4v==='rest'&&A.pip&&(A.pip.innerWidth>360||A.pip.innerHeight>230)&&['menu','card'].includes(w)){ A.w4Size=null; w4Fit(); return w4Render(); }
   if(['menu','routines','tickets','timers','brains','rest'].includes(w)){ A.w4End=null; if(w==='rest'&&A.overlay==='ready') closeOverlay(); return w4Go(w); }
   if(w==='card') return card();
   if(w==='fshint'){ if(A.w4Big){ w4BigToggle(); return; } if(A.w4Win&&!A.w4Win.closed){ w4PopClose(); return; } A.w4FsReady=true; w4Go('rest'); return; }
@@ -6221,7 +6221,7 @@ if(W4){
   pipViewPref=function(){ return 'rest'; };
   pipSizeFor=function(){ return W4_SIZES[w4SizeKey()]||W4_SIZES.rest; };
   pipRender=function(){ try{ w4Render(); }catch(e){ console.warn(e); } try{ w4Home(); }catch(_){ } try{ w4FullRender(); }catch(_){ } try{ w4PopRender(); }catch(_){ } };
-  { const f=floatOpen; floatOpen=async function(){ A.w4v='rest'; A.w4Size=null; A.w4Big=false; const dp=window.documentPictureInPicture, rq=dp&&dp.requestWindow, own=rq&&Object.prototype.hasOwnProperty.call(dp,'requestWindow'); if(rq&&!A.pip){ try{ dp.requestWindow=function(o){ return rq.call(dp,Object.assign({},o,{preferInitialWindowPlacement:true})); }; }catch(_){ } } let r; try{ r=await f.apply(this,arguments); } finally{ try{ if(own) dp.requestWindow=rq; else delete dp.requestWindow; }catch(_){ } } if(A.pip){ A.w4Size=null; w4Fit(); w4Corner(); } w4Home(); return r; }; }
+  { const f=floatOpen; floatOpen=async function(){ A.w4v='rest'; A.w4Size=null; A.w4Big=false; const dp=window.documentPictureInPicture, rq=dp&&dp.requestWindow, own=rq&&Object.prototype.hasOwnProperty.call(dp,'requestWindow'); if(rq&&!A.pip){ try{ dp.requestWindow=function(o){ return rq.call(dp,o); }; }catch(_){ } } let r; try{ r=await f.apply(this,arguments); } finally{ try{ if(own) dp.requestWindow=rq; else delete dp.requestWindow; }catch(_){ } } if(A.pip){ A.w4Size=null; w4Fit(); w4Corner(); } w4Home(); return r; }; }
   { const f=markFloat; markFloat=function(){ f(); try{ w4Home(); }catch(_){ } }; }
   setInterval(()=>{ try{ w4Home(); }catch(_){ } },2000); setTimeout(w4Home,0);
   setInterval(()=>{ try{ w4FullRender(); if(!w4State()) A.w4FullSeen=''; w4PopRender(); }catch(_){ } },500);

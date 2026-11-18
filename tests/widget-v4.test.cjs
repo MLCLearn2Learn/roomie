@@ -20,7 +20,7 @@ test('tapping Roomie shows one word per tool; words with › open their options'
  assert.ok(html.includes("startBrain(b.dataset.t||undefined)"));
 });
 test('Roomie’s Full screen button shows where to tap',()=>{ assert.ok(html.includes('data-w="fshint"')); assert.ok(html.includes('in the bar above Roomie, then tap')); });
-test('Roomie always opens small, not at the last size Chrome remembers',()=>{ assert.ok(html.includes('preferInitialWindowPlacement:true')); });
+test('Chrome remembers where the teacher puts Roomie',()=>{ assert.ok(!html.includes('preferInitialWindowPlacement:true')); });
 test('Full screen opens its own window; closing it returns to the lesson underneath',()=>{
  assert.ok(html.includes("A.w4FsReady=true; w4Go('rest'); return; }"),'first tap: Roomie tucks into its corner');
  assert.ok(html.includes("if(w==='fsgo2'){ A.w4FsReady=false; if(!w4PopOpen())"),'second tap: the full-screen window opens');
@@ -31,5 +31,5 @@ test('Full screen opens its own window; closing it returns to the lesson underne
 test('Roomie starts in the bottom-right corner and grows from the corner it sits in',()=>{ assert.ok(html.includes('function w4Corner(){')); assert.ok(html.includes('if(ox+ow/2>L+W/2) nx=ox+ow-nw;')); });
 test('activities go straight to full screen from the Roomie menu; the next tap on Roomie tucks it away',()=>{
  assert.ok(html.includes("if(w==='run'){ fresh(); runRoutine(b.dataset.id); return full(); }"));
- assert.ok(html.includes("if(A.w4v==='rest'&&A.w4Size&&A.w4Size!=='rest'&&['menu','card'].includes(w)){ A.w4Size=null; w4Fit(); return w4Render(); }"));
+ assert.ok(html.includes("if(A.w4v==='rest'&&A.pip&&(A.pip.innerWidth>360||A.pip.innerHeight>230)&&['menu','card'].includes(w))"));
 });
