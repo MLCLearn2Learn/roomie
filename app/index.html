@@ -6114,7 +6114,7 @@ function w4Html(){ const v=A.w4v||'rest', z=w4State(), pop=Date.now()<(A.w4Pop||
   if(v==='end'&&A.w4End){ const e=A.w4End, msg=e.k==='timer'?'Time’s up!':e.k==='brain'?'Brain break done!':e.k==='routine'?e.name+' is finished':'All done!';
     return '<div class="card g"><div class="hd">'+w4Me()+'<h1>'+esc(msg)+'</h1></div><p class="huge" style="margin:auto 0">Back to your work</p><div class="ft"><button class="pill k go" data-w="rest">Back to Roomie</button></div></div>'; }
   if(v==='rest'||v==='end'||(v==='card'&&!z)){ const n=w4Now(), busy=!!z&&!A.attnClose, lbl=A.attnClose?'Eyes this way':z?(z.k==='routine'?z.R.name:z.k==='ticket'?'Ticket':z.k==='warning'?'2 minutes':z.k==='timer'?z.tm:z.k==='pick'?z.name:'Tap me'):(n.left||n.t||'Tap me');
-    return '<div class="rest'+(busy?' busy':'')+(A.attnClose?' attn':'')+'"><button class="me" data-w="'+(A.attnClose?'attention':busy?'card':'menu')+'" title="Tap Roomie">'+birdSVG()+'</button><span class="chip" data-w="'+(busy?'card':'menu')+'">'+esc(lbl)+'</span></div>'; }
+    return '<div class="rest'+(busy?' busy':'')+(A.attnClose?' attn':'')+'"><button class="me" data-w="'+(A.attnClose?'attention':'menu')+'" title="Tap Roomie">'+birdSVG()+'</button><span class="chip" data-w="'+(busy?'card':'menu')+'">'+esc(lbl)+'</span></div>'; }
   if(v==='menu'||v==='routines'||v==='tickets'||v==='timers'||v==='brains'){ let l='';
     const running=z&&z.k!=='pick'?'<button class="pill k big" data-w="card">Back to '+esc(z.k==='routine'?z.R.name:z.k==='timer'?'the timer':z.k==='brain'?'the brain break':z.k==='checkin'?'the check-in':z.k==='ticket'?'the ticket':z.k==='warning'?'finishing up':'it')+'</button>':'';
     if(v==='menu'){ const word=(w,t,c,more)=>'<button class="pill wd" data-w="'+w+'" style="background:'+c+'">'+t+(more?'<i>›</i>':'')+'</button>';
@@ -6160,7 +6160,7 @@ function w4Click(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) re
   const card=()=>w4Go('card');
   if(['menu','routines','tickets','timers','brains','rest'].includes(w)){ A.w4End=null; if(w==='rest'&&A.overlay==='ready') closeOverlay(); return w4Go(w); }
   if(w==='card') return card();
-  if(w==='fshint'){ w4BigToggle(); return; }
+  if(w==='fshint'){ if(A.w4Big){ w4BigToggle(); return; } if(A.w4Win&&!A.w4Win.closed){ w4PopClose(); return; } if(w4PopOpen()){ w4Go('rest'); return; } w4BigToggle(); return; }
   if(w==='big'){ A.w4Big=!A.w4Big; A.w4Size=null; w4Fit(); return w4Render(); }
   if(w==='attention'){ attention(); return A.attnClose?card():w4Go('rest'); }
   if(w==='run'){ fresh(); runRoutine(b.dataset.id); return card(); }
@@ -6207,11 +6207,11 @@ if(W4){
   setFullView=function(){ document.body.classList.remove('full-view'); };
   pipViewPref=function(){ return 'rest'; };
   pipSizeFor=function(){ return W4_SIZES[w4SizeKey()]||W4_SIZES.rest; };
-  pipRender=function(){ try{ w4Render(); }catch(e){ console.warn(e); } try{ w4Home(); }catch(_){ } try{ w4FullRender(); }catch(_){ } };
+  pipRender=function(){ try{ w4Render(); }catch(e){ console.warn(e); } try{ w4Home(); }catch(_){ } try{ w4FullRender(); }catch(_){ } try{ w4PopRender(); }catch(_){ } };
   { const f=floatOpen; floatOpen=async function(){ A.w4v='rest'; A.w4Size=null; A.w4Big=false; const dp=window.documentPictureInPicture, rq=dp&&dp.requestWindow, own=rq&&Object.prototype.hasOwnProperty.call(dp,'requestWindow'); if(rq&&!A.pip){ try{ dp.requestWindow=function(o){ return rq.call(dp,Object.assign({},o,{preferInitialWindowPlacement:true})); }; }catch(_){ } } let r; try{ r=await f.apply(this,arguments); } finally{ try{ if(own) dp.requestWindow=rq; else delete dp.requestWindow; }catch(_){ } } if(A.pip){ A.w4Size=null; w4Fit(); } w4Home(); return r; }; }
   { const f=markFloat; markFloat=function(){ f(); try{ w4Home(); }catch(_){ } }; }
   setInterval(()=>{ try{ w4Home(); }catch(_){ } },2000); setTimeout(w4Home,0);
-  setInterval(()=>{ try{ w4FullRender(); if(!w4State()) A.w4FullSeen=''; }catch(_){ } },500);
+  setInterval(()=>{ try{ w4FullRender(); if(!w4State()) A.w4FullSeen=''; w4PopRender(); }catch(_){ } },500);
 }
 
 /* Full screen: the floating window can't go full screen, so the same card is shown full screen on the Roomie tab. */
@@ -6232,6 +6232,27 @@ function w4FullStop(){ const host=document.getElementById('w4full'); if(!host||h
 function w4StateKey(){ const z=w4State(); return z?z.k+(z.R?':'+z.R.id:''):''; }
 /* When the teacher brings the Roomie tab forward (Chrome's ⤢ in Roomie's title bar) during an activity, the tab shows it big. */
 
+
+/* Full screen in its own window: closing it returns the teacher to whatever was underneath (OneNote, SEQTA, slides). */
+function w4PopOpen(){ const W=screen.availWidth||1366, H=screen.availHeight||768, L=screen.availLeft||0, T=screen.availTop||0;
+  let w=null; try{ w=window.open('','roomieFull','popup=yes,left='+L+',top='+T+',width='+W+',height='+H); }catch(_){ w=null; }
+  if(!w) return false; A.w4Win=w; const d=w.document;
+  d.open(); d.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Roomie</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;800&display=swap"><style>'+W4_CSS+'#w4{background:#FFE7A8}</style></head><body><div id="w4" class="bigm"></div></body></html>'); d.close();
+  try{ w.moveTo(L,T); w.resizeTo(W,H); }catch(_){ }
+  d.addEventListener('click',e=>{ const b=e.target.closest('[data-w]'); if(!b) return; const k=b.dataset.w; e.stopPropagation(); if(k==='fsexit'||k==='rest'){ w4PopClose(); return; } w4Click(e); w4PopRender(); },true);
+  d.addEventListener('dblclick',()=>{ try{ d.documentElement.requestFullscreen(); }catch(_){ } });
+  w.addEventListener('beforeunload',()=>{ A.w4Win=null; });
+  w4PopRender(); return true; }
+function w4PopClose(){ const w=A.w4Win; A.w4Win=null; try{ if(w&&!w.closed) w.close(); }catch(_){ } if(A.w4WinVid){ try{ A.w4WinVid.pause(); }catch(_){ } A.w4WinVid=null; } }
+function w4PopRender(){ const w=A.w4Win; if(!w) return; if(w.closed){ A.w4Win=null; return; } const z=w4State(); if(!z||z.k==='pick'){ w4PopClose(); return; }
+  const d=w.document, root=d.getElementById('w4'); if(!root) return;
+  const was=A.w4v; A.w4v='card'; let h=w4Html(); A.w4v=was;
+  h=h.replace(/<button class="pill q bg"[^>]*>[^<]*<\/button>/,'<button class="pill q bg" data-w="fsexit">Exit full screen</button>').replace(/<button class="x"[^>]*>✕<\/button>/,'');
+  if(root.dataset.h!==h){ root.innerHTML=h; root.dataset.h=h; }
+  const slot=d.getElementById('w4vid'), main=w4VidMain();
+  if(slot&&main){ if(!A.w4WinVid||A.w4WinVid.ownerDocument!==d){ const v=d.createElement('video'); v.muted=true; v.playsInline=true; A.w4WinVid=v; }
+    const v=A.w4WinVid; if(main.currentSrc&&v.dataset.src!==main.currentSrc){ v.src=main.currentSrc; v.dataset.src=main.currentSrc; } if(v.parentNode!==slot) slot.appendChild(v);
+    if(Math.abs((v.currentTime||0)-(main.currentTime||0))>0.4){ try{ v.currentTime=main.currentTime; }catch(_){ } } if(main.paused){ if(!v.paused) v.pause(); } else if(v.paused) v.play().catch(()=>{}); } }
 
 })();
 </script>
