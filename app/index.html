@@ -6267,6 +6267,56 @@ function w4PopRender(){ const w=A.w4Win; if(!w) return; if(w.closed){ A.w4Win=nu
     const v=A.w4WinVid; if(main.currentSrc&&v.dataset.src!==main.currentSrc){ v.src=main.currentSrc; v.dataset.src=main.currentSrc; } if(v.parentNode!==slot) slot.appendChild(v);
     if(Math.abs((v.currentTime||0)-(main.currentTime||0))>0.4){ try{ v.currentTime=main.currentTime; }catch(_){ } } if(main.paused){ if(!v.paused) v.pause(); } else if(v.paused) v.play().catch(()=>{}); } }
 
+/* ==== Test version (/widget2/): Roomie never changes size. Its menu opens in its own small window beside Roomie,
+   which goes full screen when an activity starts and closes when it ends. ==== */
+const MW=W4&&/[?&]mw\b/.test(location.search);
+function mwOpen(view){ const P=A.pip; const W=420, H=300;
+  let L=(screen.availLeft||0)+(screen.availWidth||1366)-W-20, T=(screen.availTop||0)+(screen.availHeight||768)-H-20;
+  try{ if(P){ L=Math.max(screen.availLeft||0,P.screenX-W-12); T=Math.max(screen.availTop||0,P.screenY+P.outerHeight-H); } }catch(_){ }
+  let w=null; try{ w=window.open('','roomieMenu','popup=yes,left='+L+',top='+T+',width='+W+',height='+H); }catch(_){ }
+  if(!w) return false; A.mwWin=w; A.mwV=view||'menu'; A.mwSeen=false; const d=w.document;
+  d.open(); d.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Roomie</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;800&display=swap"><style>'+W4_CSS+'</style></head><body><div id="w4"></div></body></html>'); d.close();
+  d.addEventListener('click',mwClick,true); w.addEventListener('beforeunload',()=>{ if(A.mwWin===w) A.mwWin=null; });
+  mwRender(); return true; }
+function mwClose(){ const w=A.mwWin; A.mwWin=null; try{ if(w&&!w.closed){ if(w.document.fullscreenElement) w.document.exitFullscreen().catch(()=>{}); w.close(); } }catch(_){ } if(A.mwVid){ try{ A.mwVid.pause(); }catch(_){ } A.mwVid=null; } }
+function mwBig(){ const w=A.mwWin; if(!w) return; try{ w.moveTo(screen.availLeft||0,screen.availTop||0); w.resizeTo(screen.availWidth,screen.availHeight); }catch(_){ } try{ w.document.documentElement.requestFullscreen().catch(()=>{}); }catch(_){ } }
+function mwClick(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) return; e.stopPropagation(); const w=b.dataset.w, fresh=()=>{ if(navHasActivity()) navStopActivity(false); };
+  const go=()=>{ A.mwV='card'; A.mwSeen=true; mwBig(); mwRender(); };
+  if(['menu','routines','tickets','timers','brains'].includes(w)){ A.mwV=w; return mwRender(); }
+  if(w==='rest'||w==='fsexit'||w==='fshint'){ return mwClose(); }
+  if(w==='card'){ A.mwV='card'; A.mwSeen=true; if(w4State()&&w4State().k!=='pick') mwBig(); return mwRender(); }
+  if(w==='run'){ fresh(); runRoutine(b.dataset.id); return go(); }
+  if(w==='prac'){ fresh(); startPractise(b.dataset.id); return go(); }
+  if(w==='time'){ fresh(); navStartTimer(Number(b.dataset.s)); return go(); }
+  if(w==='brain'){ fresh(); startBrain(b.dataset.t||undefined); return go(); }
+  if(w==='checkin'){ fresh(); openOverlay('checkin'); return go(); }
+  if(w==='ticket'){ fresh(); A.tp={kind:b.dataset.kind,live:false,form:false}; useTicket(''); return go(); }
+  if(w==='attention'){ attention(); if(A.attnClose) return go(); return mwClose(); }
+  if(w==='pick'){ if(!names().length) A.w4Pick='Add your class in setup'; else { pickQuiet(); A.w4Pick=A.pipPicked; } A.mwV='card'; A.mwSeen=true; return mwRender(); }
+  if(w==='unpick'){ A.w4Pick=null; A.pipPicked=null; return mwClose(); }
+  if(w==='point'){ act('point'); return mwClose(); }
+  A.w4FromFull=true; try{ w4Click(e); } finally{ A.w4FromFull=false; } mwRender(); }
+function mwRender(){ const w=A.mwWin; if(!w) return; if(w.closed){ A.mwWin=null; return; } const d=w.document, root=d.getElementById('w4'); if(!root) return;
+  const z=w4State(); let h;
+  if(A.mwV==='card'){ if(!z){ if(A.mwSeen) return mwClose(); A.mwV='menu'; return mwRender(); }
+    const was=A.w4v; A.w4v='card'; h=w4Html(); A.w4v=was;
+    h=h.replace(/<button class="pill q bg"[^>]*>[^<]*<\/button>/,'<button class="pill q bg" data-w="fsexit">Close</button>').replace(/<button class="x"[^>]*>✕<\/button>/,'');
+    root.className=z.k==='pick'?'':'bigm'; }
+  else { const was=A.w4v; A.w4v=A.mwV; h=w4Html(); A.w4v=was; h=h.replace('Tap me to tuck away','Tap me to close'); root.className=''; }
+  if(root.dataset.h!==h){ root.innerHTML=h; root.dataset.h=h; }
+  const slot=d.getElementById('w4vid'), main=w4VidMain();
+  if(slot&&main){ if(!A.mwVid||A.mwVid.ownerDocument!==d){ const v=d.createElement('video'); v.muted=true; v.playsInline=true; A.mwVid=v; }
+    const v=A.mwVid; if(main.currentSrc&&v.dataset.src!==main.currentSrc){ v.src=main.currentSrc; v.dataset.src=main.currentSrc; } if(v.parentNode!==slot) slot.appendChild(v);
+    if(Math.abs((v.currentTime||0)-(main.currentTime||0))>0.4){ try{ v.currentTime=main.currentTime; }catch(_){ } } if(main.paused){ if(!v.paused) v.pause(); } else if(v.paused) v.play().catch(()=>{}); } }
+if(MW){
+  /* Roomie itself always stays small */
+  w4SizeKey=function(){ return 'rest'; };
+  { const f=w4Click; w4Click=function(e){ const b=e.target.closest('[data-w]'); if(b&&!A.w4FromFull&&['menu','card'].includes(b.dataset.w)&&e.currentTarget===A.pipDoc){ e.stopPropagation();
+      if(A.mwWin&&!A.mwWin.closed){ mwClose(); return; } const z=w4State(); mwOpen(z&&z.k!=='pick'?'card':'menu'); if(A.mwV==='card'&&A.mwWin) mwBig(); return; } return f.apply(this,arguments); }; }
+  { const f=pipRender; pipRender=function(){ const r=f.apply(this,arguments); try{ mwRender(); }catch(_){ } return r; }; }
+  setInterval(()=>{ try{ mwRender(); }catch(_){ } },500);
+}
+
 })();
 </script>
 
