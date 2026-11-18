@@ -6027,7 +6027,7 @@ document.addEventListener('keydown',e=>{ if(e.defaultPrevented||e.ctrlKey||e.met
    The Roomie tab is only a setup page. The engine (timetable, routines, records, music) is the same as the board's. ==== */
 const W4=/[?&]widget\b/.test(location.search);
 if(W4){ document.documentElement.classList.add('w4'); }
-const W4_SIZES={rest:[132,146],menu:[420,290],routines:[420,370],tickets:[420,350],timers:[420,350],
+const W4_SIZES={rest:[132,146],menu:[400,270],brains:[420,230],routines:[420,370],tickets:[420,350],timers:[420,350],
   routine:[500,380],routineVid:[660,400],done:[480,300],warning:[440,260],timer:[380,156],pick:[340,156],attn:[440,230],brain:[500,330],checkin:[580,320],ticket:[540,360]};
 function w4State(){ const P=A.P||phaseAt(now()), o=A.overlay, rem=MT.remaining();
   if(A.attnClose){ const p=typeof attentionPreset==='function'?attentionPreset():null; return {k:'attn',call:p?p.call:'Eyes this way',resp:p?p.response:''}; }
@@ -6069,6 +6069,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* menu */
 .menu{flex:1;display:flex;gap:8px;padding:10px 10px 10px 12px;min-height:0}.menu .pill{font-size:13px;padding:5px 10px}.menu .big{font-size:17px;padding:9px 12px}.menu .row{gap:5px}.menu .grid2 .pill{padding:6px 10px}
 .menu .l{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0;overflow:auto}
+.words{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.words .wd{font-size:16px;padding:10px 12px;border-radius:16px;text-align:left;display:flex;justify-content:space-between;align-items:center}.words .wd i{font-style:normal;opacity:.6;font-size:18px}.words .wd:first-child{grid-column:1/-1;justify-content:center;font-size:18px}
 .menu .r{width:76px;flex:none;display:flex;flex-direction:column;align-items:center;gap:4px}
 .menu .r .me{width:72px;height:76px}.menu .r .hint{font-size:10.5px;color:#6A5F80;text-align:center;line-height:1.15}
 .big{width:100%;font-size:18px;padding:10px 12px}
@@ -6107,13 +6108,11 @@ function w4Routines(){ return (S.routines||[]); }
 function w4Html(){ const v=A.w4v||'rest', z=w4State(), pop=Date.now()<(A.w4Pop||0)?' pop':'';
   if(v==='rest'||(v==='card'&&!z)){ const n=w4Now(), busy=!!z&&!A.attnClose, lbl=A.attnClose?'Eyes this way':z?(z.k==='routine'?z.R.name:z.k==='ticket'?'Ticket':z.k==='warning'?'2 minutes':z.k==='timer'?z.tm:z.k==='pick'?z.name:'Tap me'):(n.left||n.t||'Tap me');
     return '<div class="rest'+(busy?' busy':'')+(A.attnClose?' attn':'')+'"><button class="me" data-w="'+(A.attnClose?'attention':busy?'card':'menu')+'" title="Tap Roomie">'+birdSVG()+'</button><span class="chip" data-w="'+(busy?'card':'menu')+'">'+esc(lbl)+'</span></div>'; }
-  if(v==='menu'||v==='routines'||v==='tickets'||v==='timers'){ let l='';
+  if(v==='menu'||v==='routines'||v==='tickets'||v==='timers'||v==='brains'){ let l='';
     const running=z&&z.k!=='pick'?'<button class="pill k big" data-w="card">Back to '+esc(z.k==='routine'?z.R.name:z.k==='timer'?'the timer':z.k==='brain'?'the brain break':z.k==='checkin'?'the check-in':z.k==='ticket'?'the ticket':z.k==='warning'?'finishing up':'it')+'</button>':'';
-    if(v==='menu'){ const R=w4Routines(); const top=R.filter(r=>r.best).concat(R.filter(r=>!r.best)).slice(0,3);
-      l=running+'<button class="pill p big" data-w="attention">Attention</button>'+
-        '<div class="lbl">Routines</div><div class="row'+pop+'">'+top.map(r=>'<button class="pill y" data-w="run" data-id="'+esc(r.id)+'">'+esc(r.name)+'</button>').join('')+'<button class="pill" data-w="routines">All ›</button></div>'+
-        '<div class="lbl">Timer</div><div class="row'+pop+'">'+[[60,'1 min'],[120,'2 min'],[300,'5 min']].map(([s,t])=>'<button class="pill" data-w="time" data-s="'+s+'">'+t+'</button>').join('')+'<button class="pill" data-w="timers">More ›</button></div>'+
-        '<div class="lbl">Tools</div><div class="row'+pop+'"><button class="pill" style="background:#E4D7FF" data-w="pick">Pick a name</button><button class="pill" style="background:#C9EBD8" data-w="brain">Brain break</button><button class="pill" style="background:#D9EEFF" data-w="checkin">Check-in</button><button class="pill" style="background:#FFE0D6" data-w="tickets">Tickets</button><button class="pill" data-w="point">+1 point</button></div>'; }
+    if(v==='menu'){ const word=(w,t,c,more)=>'<button class="pill wd" data-w="'+w+'" style="background:'+c+'">'+t+(more?'<i>›</i>':'')+'</button>';
+      l=running+'<div class="words'+pop+'">'+word('attention','Attention','#F2785C;color:#fff;border-color:#F2785C',false)+word('routines','Routines','#FFD84D',true)+word('timers','Timer','#FFF0A8',true)+word('brains','Brain break','#C9EBD8',true)+word('pick','Pick a name','#E4D7FF',false)+word('checkin','Check-in','#D9EEFF',false)+word('tickets','Tickets','#FFE0D6',true)+word('point','+1 point','#fff',false)+'</div>'; }
+    else if(v==='brains') l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">Brain break</span></div><div class="grid2'+pop+'">'+[['','Surprise me'],['movement','Movement'],['game','Game'],['pair','With a partner'],['calm','Calm down']].map(([t,n])=>'<button class="pill" style="background:#C9EBD8" data-w="brain" data-t="'+t+'">'+n+'</button>').join('')+'</div>';
     else if(v==='routines') l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">All routines</span></div><div class="grid2'+pop+'">'+w4Routines().map(r=>'<button class="pill y" data-w="run" data-id="'+esc(r.id)+'">'+esc(r.name)+'<small>'+(r.best?'Record '+fmtLeft(r.best):'No record yet')+'</small></button>').join('')+'</div>'+
         '<div class="lbl">Practise (not timed for the record)</div><div class="row">'+w4Routines().map(r=>'<button class="pill q" data-w="prac" data-id="'+esc(r.id)+'">'+esc(r.name)+'</button>').join('')+'</div>';
     else if(v==='timers') l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">Timer</span></div><div class="grid2'+pop+'">'+[[30,'30 sec'],[60,'1 min'],[120,'2 min'],[180,'3 min'],[300,'5 min'],[600,'10 min'],[900,'15 min'],[1200,'20 min']].map(([s,t])=>'<button class="pill" data-w="time" data-s="'+s+'">'+t+'</button>').join('')+'</div>';
@@ -6151,7 +6150,7 @@ function w4Render(){ const d=A.pipDoc; if(!d) return; if(!d.getElementById('w4CS
   else if(A.w4Vid&&!A.w4Vid.paused){ try{ A.w4Vid.pause(); }catch(_){ } } }
 function w4Click(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) return; e.stopPropagation(); const w=b.dataset.w, fresh=()=>{ if(navHasActivity()) navStopActivity(false); };
   const card=()=>w4Go('card');
-  if(['menu','routines','tickets','timers','rest'].includes(w)){ if(w==='rest'&&A.overlay==='ready') closeOverlay(); return w4Go(w); }
+  if(['menu','routines','tickets','timers','brains','rest'].includes(w)){ if(w==='rest'&&A.overlay==='ready') closeOverlay(); return w4Go(w); }
   if(w==='card') return card();
   if(w==='big'){ A.w4Big=!A.w4Big; A.w4Size=null; w4Fit(); return w4Render(); }
   if(w==='attention'){ attention(); return A.attnClose?card():w4Go('rest'); }
@@ -6160,7 +6159,7 @@ function w4Click(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) re
   if(w==='time'){ fresh(); navStartTimer(Number(b.dataset.s)); return card(); }
   if(w==='pick'){ if(!names().length){ A.w4Pick='Add your class in setup'; return card(); } pickQuiet(); A.w4Pick=A.pipPicked; return card(); }
   if(w==='unpick'){ A.w4Pick=null; A.pipPicked=null; return w4Go('rest'); }
-  if(w==='brain'){ fresh(); startBrain(); return card(); }
+  if(w==='brain'){ fresh(); startBrain(b.dataset.t||undefined); return card(); }
   if(w==='checkin'){ fresh(); openOverlay('checkin'); return card(); }
   if(w==='feel'){ A.feel=feelBucket(); A.feel[b.dataset.f]++; blip(); b.animate&&b.animate([{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:220}); return w4Render(); }
   if(w==='ticket'){ fresh(); A.tp={kind:b.dataset.kind,live:false,form:false}; useTicket(''); return card(); }
