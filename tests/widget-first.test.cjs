@@ -23,3 +23,9 @@ test('resting Roomie is tiny and options pop out in a ring around it',()=>{
  assert.ok(html.includes("{g:'lv',v:'routines',l:'Routines'"));
  assert.ok(html.includes('@keyframes wpop'));
 });
+test('the class view plays the song video inside Roomie and fits the window it is given',()=>{
+ assert.ok(html.includes('function wMainVideo(){'));
+ assert.ok(html.includes("v.muted=true;"),'the copy is silent; the sound stays in one place');
+ assert.ok(html.includes('<div id="wcvSlot"></div>'));
+ assert.ok(html.includes('#wc h1{font-size:clamp('));
+});
