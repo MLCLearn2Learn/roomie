@@ -6047,8 +6047,9 @@ function w4Now(){ const P=A.P||phaseAt(now()); const b=P.block; const left=P.to?
   const t=P.phase==='routine'&&P.routine?P.routine.name:P.phase==='lesson'&&b?b.name:P.phase==='break'&&b?b.name:''; return {t,left}; }
 function w4VidMain(){ const el=Music.playing&&Music.fileAudio; return el&&el.tagName==='VIDEO'?el:null; }
 function w4SizeKey(){ const v=A.w4v||'rest'; if(v!=='card') return v; const z=w4State(); if(!z) return 'rest'; if(z.k==='routine') return w4VidMain()?'routineVid':'routine'; return z.k; }
-function w4Fit(){ if(!A.pip) return; const k=w4SizeKey(), z=W4_SIZES[k]||W4_SIZES.rest; if(A.w4Size===k) return; try{ A.pip.resizeTo(z[0],z[1]); A.w4Size=k; }catch(_){ } }
-function w4Go(v){ A.w4v=v; A.w4Pop=Date.now()+420; w4Fit(); w4Render(); setTimeout(w4Render,450); }
+function w4BigSize(){ const W=(screen.availWidth||1366), H=(screen.availHeight||768); return [Math.round(Math.min(W*0.8,1400)),Math.round(Math.min(H*0.8,900))]; }
+function w4Fit(){ if(!A.pip) return; let k=w4SizeKey(), z=W4_SIZES[k]||W4_SIZES.rest; if(A.w4Big&&A.w4v==='card'&&k!=='rest'){ z=w4BigSize(); k='big'; } if(A.w4Size===k) return; try{ A.pip.resizeTo(z[0],z[1]); A.w4Size=k; }catch(_){ } }
+function w4Go(v){ if(v!=='card') A.w4Big=false; A.w4v=v; A.w4Pop=Date.now()+420; w4Fit(); w4Render(); setTimeout(w4Render,450); }
 const W4_CSS=`
 *{box-sizing:border-box}body{margin:0;background:#FFF6E0;color:#2A1E3D;font:800 15px Nunito,system-ui,sans-serif;overflow:hidden}
 #w4{position:fixed;inset:0;display:flex;flex-direction:column}
@@ -6098,7 +6099,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .tk{background:#fff;border:2px dashed #2A1E3D;border-radius:14px;padding:10px 14px;flex:1;min-height:0;overflow:auto}
 .tk h2{margin:0 0 4px;font:800 clamp(18px,4.4vw,26px)/1.1 "Baloo 2",system-ui,sans-serif}.tk p{margin:0;font-size:clamp(13px,2.8vw,16px)}.tk ol{margin:6px 0 0;padding-left:20px;font-size:14px}
 .small{flex:1;display:flex;align-items:center;gap:12px;padding:10px 14px}.small .me{width:72px;height:76px;flex:none}.small .bd{flex:1;min-width:0}
-.small .k{font-size:11px;letter-spacing:.08em;color:#6A5F80}.small .v{font:800 46px/1 "Baloo 2",system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bg{padding:5px 12px;font-size:13px;flex:none;border-color:#2A1E3D!important;background:#fff!important}.bigm .hd .me{width:90px;height:90px}.bigm .hd h1{font-size:clamp(28px,5vw,64px)}.bigm .hd .tm{font-size:clamp(40px,8vw,110px)}.bigm .goal span{font-size:22px;padding:5px 16px}.bigm .now{font-size:clamp(30px,5.6vw,76px);padding:20px 26px;border-width:4px}.bigm .now small{font-size:16px}.bigm .nx{font-size:clamp(18px,2.4vw,30px)}.bigm .huge{font-size:clamp(48px,9vw,130px)}.bigm .sub{font-size:clamp(20px,3vw,36px)}.bigm .ft .pill{font-size:18px;padding:8px 16px}.bigm .ft .go{font-size:clamp(24px,3vw,40px);padding:14px 40px}.bigm .feel button{font-size:22px}.bigm .feel svg{width:clamp(48px,8vw,110px);height:clamp(48px,8vw,110px)}.bigm .tk h2{font-size:clamp(28px,4vw,56px)}.bigm .tk p{font-size:clamp(18px,2.4vw,30px)}.bigm .tk ol{font-size:24px}.bigm .bg{font-size:15px;padding:6px 14px}.bigm .x{width:42px;height:42px}.small .me{width:clamp(72px,18vw,260px);height:clamp(76px,19vw,270px)}.small .k{font-size:clamp(11px,2vw,22px);letter-spacing:.08em;color:#6A5F80}.small .v{font:800 clamp(46px,14vw,220px)/1 "Baloo 2",system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .small .row{margin-top:6px}.small .pill{padding:4px 10px;font-size:12px}
 `;
 function w4Me(){ return '<span class="me" aria-hidden="true">'+birdSVG()+'</span>'; }
@@ -6119,7 +6120,7 @@ function w4Html(){ const v=A.w4v||'rest', z=w4State(), pop=Date.now()<(A.w4Pop||
     else l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">Tickets</span></div><div class="grid2'+pop+'"><button class="pill" style="background:#FFE0D6" data-w="ticket" data-kind="entry">Entry ticket<small>Start of the lesson</small></button><button class="pill" style="background:#FFE0D6" data-w="ticket" data-kind="exit">Exit ticket<small>End of the lesson</small></button></div>';
     const n=w4Now(); return '<div class="menu"><div class="l">'+l+'</div><div class="r"><button class="me" data-w="rest" title="Tuck away">'+birdSVG()+'</button>'+(n.left?'<span class="chip">'+esc(n.left)+'</span>':'')+'<div class="hint">Tap me to tuck away</div></div></div>'; }
   /* cards */
-  const x='<button class="x" data-w="rest" aria-label="Tuck Roomie away" title="Tuck Roomie away">✕</button>';
+  const x='<button class="pill q bg" data-w="big" title="'+(A.w4Big?'Make Roomie smaller':'Make Roomie bigger for the class')+'">'+(A.w4Big?'⤡ Smaller':'⤢ Bigger')+'</button><button class="x" data-w="rest" aria-label="Tuck Roomie away" title="Tuck Roomie away">✕</button>';
   const hd=(t,tm)=>'<div class="hd">'+w4Me()+'<h1>'+esc(t)+'</h1>'+(tm?'<span class="tm">'+esc(tm)+'</span>':'')+x+'</div>';
   if(z.k==='attn') return '<div class="card p">'+hd('Eyes this way','')+'<p class="huge">'+esc(z.call)+'</p><p class="sub">'+esc(z.resp)+'</p><div class="ft"><button class="pill go" style="background:#fff;color:#2A1E3D" data-w="attention">Thank you</button></div></div>';
   if(z.k==='done') return '<div class="card g">'+hd(z.name,'')+'<p class="huge">'+esc(z.h)+'</p><p class="sub">'+esc(z.sub)+'</p><div class="ft"><span class="sp"></span><button class="pill" data-w="rest">Back to Roomie</button></div></div>';
@@ -6142,7 +6143,7 @@ function w4Render(){ const d=A.pipDoc; if(!d) return; if(!d.getElementById('w4CS
   let root=d.getElementById('w4'); if(!root){ root=d.createElement('div'); root.id='w4'; d.body.appendChild(root); d.addEventListener('click',w4Click,true); }
   [...d.body.children].forEach(el=>{ if(el!==root&&el.tagName!=='STYLE'&&el.tagName!=='LINK'&&el.tagName!=='SCRIPT') el.style.display='none'; });
   if((A.w4v||'rest')==='card'&&!w4State()){ A.w4v='rest'; }
-  w4Fit(); const h=w4Html(); if(root.dataset.h!==h){ root.innerHTML=h; root.dataset.h=h; }
+  w4Fit(); root.className=A.w4Big&&A.w4v==='card'?'bigm':''; const h=w4Html(); if(root.dataset.h!==h){ root.innerHTML=h; root.dataset.h=h; }
   const slot=d.getElementById('w4vid'), main=w4VidMain();
   if(slot&&main){ if(!A.w4Vid||A.w4Vid.ownerDocument!==d){ const v=d.createElement('video'); v.muted=true; v.playsInline=true; A.w4Vid=v; }
     const v=A.w4Vid; if(main.currentSrc&&v.dataset.src!==main.currentSrc){ v.src=main.currentSrc; v.dataset.src=main.currentSrc; } if(v.parentNode!==slot) slot.appendChild(v);
@@ -6152,6 +6153,7 @@ function w4Click(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) re
   const card=()=>w4Go('card');
   if(['menu','routines','tickets','timers','rest'].includes(w)){ if(w==='rest'&&A.overlay==='ready') closeOverlay(); return w4Go(w); }
   if(w==='card') return card();
+  if(w==='big'){ A.w4Big=!A.w4Big; A.w4Size=null; w4Fit(); return w4Render(); }
   if(w==='attention'){ attention(); return A.attnClose?card():w4Go('rest'); }
   if(w==='run'){ fresh(); runRoutine(b.dataset.id); return card(); }
   if(w==='prac'){ fresh(); startPractise(b.dataset.id); return card(); }
@@ -6196,7 +6198,7 @@ if(W4){
   pipViewPref=function(){ return 'rest'; };
   pipSizeFor=function(){ return W4_SIZES[w4SizeKey()]||W4_SIZES.rest; };
   pipRender=function(){ try{ w4Render(); }catch(e){ console.warn(e); } try{ w4Home(); }catch(_){ } };
-  { const f=floatOpen; floatOpen=async function(){ A.w4v='rest'; A.w4Size=null; const r=await f.apply(this,arguments); if(A.pip) A.w4Size='rest'; w4Home(); return r; }; }
+  { const f=floatOpen; floatOpen=async function(){ A.w4v='rest'; A.w4Size=null; A.w4Big=false; const dp=window.documentPictureInPicture, rq=dp&&dp.requestWindow; if(rq&&!A.pip) dp.requestWindow=function(o){ return rq.call(dp,Object.assign({},o,{disallowReturnToOpener:true})); }; let r; try{ r=await f.apply(this,arguments); } finally{ if(rq) dp.requestWindow=rq; } if(A.pip) A.w4Size='rest'; w4Home(); return r; }; }
   { const f=markFloat; markFloat=function(){ f(); try{ w4Home(); }catch(_){ } }; }
   setInterval(()=>{ try{ w4Home(); }catch(_){ } },2000); setTimeout(w4Home,0);
 }
