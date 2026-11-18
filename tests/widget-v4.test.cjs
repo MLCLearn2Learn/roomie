@@ -22,7 +22,7 @@ test('tapping Roomie shows one word per tool; words with › open their options'
 test('Roomie’s Full screen button shows where to tap',()=>{ assert.ok(html.includes('data-w="fshint"')); assert.ok(html.includes('in the bar above Roomie, then tap')); });
 test('Roomie always opens small, not at the last size Chrome remembers',()=>{ assert.ok(html.includes('preferInitialWindowPlacement:true')); });
 test('Full screen opens its own window; closing it returns to the lesson underneath',()=>{
- assert.ok(html.includes("if(w4PopOpen()){ w4Go('rest'); return; }"));
+ assert.ok(html.includes("w4Go('rest'); if(w4PopOpen()) return;"),'Roomie shrinks first (Chrome only allows that before the window opens)');
  assert.ok(html.includes("function w4PopClose(){"));
  assert.ok(html.includes('function w4MoveBack(){'));
  assert.ok(html.includes("Back to your work"));

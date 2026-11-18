@@ -6052,7 +6052,7 @@ function w4BigToggle(){ const P=A.pip; if(!P) return; if(!A.w4Big){ A.w4Pos=[P.s
 function w4MoveBack(){ const P=A.pip, q=A.w4Pos; if(!P||!q) return; try{ P.moveTo(q[0],q[1]); }catch(_){ } A.w4Pos=null; }
 function w4BigSize(){ const W=(screen.availWidth||1366), H=(screen.availHeight||768); return [Math.round(W*0.8),Math.round(H*0.8)]; }
 function w4Fit(){ if(!A.pip) return; let k=w4SizeKey(), z=W4_SIZES[k]||W4_SIZES.rest; if(A.w4Big&&A.w4v==='card'&&k!=='rest'){ z=w4BigSize(); k='big'; } if(A.w4Size===k) return; try{ A.pip.resizeTo(z[0],z[1]); A.w4Size=k; }catch(_){ } }
-function w4Go(v){ if(v!=='card'&&A.w4Big){ A.w4Big=false; A.w4Size=null; w4Fit(); w4MoveBack(); } A.w4v=v; A.w4Pop=Date.now()+420; w4Fit(); w4Render(); setTimeout(w4Render,450); }
+function w4Go(v){ if(A.w4FromFull&&v!=='rest'){ A.w4v='rest'; w4Render(); return; } if(v!=='card'&&A.w4Big){ A.w4Big=false; A.w4Size=null; w4Fit(); w4MoveBack(); } A.w4v=v; A.w4Pop=Date.now()+420; w4Fit(); w4Render(); setTimeout(w4Render,450); }
 const W4_CSS=`
 *{box-sizing:border-box}body{margin:0;background:#FFF6E0;color:#2A1E3D;font:800 15px Nunito,system-ui,sans-serif;overflow:hidden}
 #w4{position:fixed;inset:0;display:flex;flex-direction:column}
@@ -6160,7 +6160,7 @@ function w4Click(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) re
   const card=()=>w4Go('card');
   if(['menu','routines','tickets','timers','brains','rest'].includes(w)){ A.w4End=null; if(w==='rest'&&A.overlay==='ready') closeOverlay(); return w4Go(w); }
   if(w==='card') return card();
-  if(w==='fshint'){ if(A.w4Big){ w4BigToggle(); return; } if(A.w4Win&&!A.w4Win.closed){ w4PopClose(); return; } if(w4PopOpen()){ w4Go('rest'); return; } w4BigToggle(); return; }
+  if(w==='fshint'){ if(A.w4Big){ w4BigToggle(); return; } if(A.w4Win&&!A.w4Win.closed){ w4PopClose(); return; } w4Go('rest'); if(w4PopOpen()) return; w4Go('card'); w4BigToggle(); return; }
   if(w==='big'){ A.w4Big=!A.w4Big; A.w4Size=null; w4Fit(); return w4Render(); }
   if(w==='attention'){ attention(); return A.attnClose?card():w4Go('rest'); }
   if(w==='run'){ fresh(); runRoutine(b.dataset.id); return card(); }
@@ -6174,6 +6174,7 @@ function w4Click(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) re
   if(w==='ticket'){ fresh(); A.tp={kind:b.dataset.kind,live:false,form:false}; useTicket(''); return card(); }
   if(w==='exitAgain'||w==='exitDone'){ exitAct(w); return w==='exitDone'?w4Go('rest'):w4Render(); }
   if(w==='point'){ act('point'); return w4Go('rest'); }
+  if(w==='ready'&&A.w4FromFull){ weAreReadyKey(); w4Render(); w4PopRender(); return; }
   if(w==='ready'){ weAreReadyKey(); A.w4v='card'; A.w4Size=null; w4Fit(); w4Render(); clearTimeout(A.w4T); A.w4T=setTimeout(()=>{ if(A.w4v==='card'){ const z=w4State(); if(!z||z.k==='done'){ if(A.overlay==='ready') closeOverlay(); w4Go('rest'); } } },4000); return; }
   if(w==='next') act('mrNext'); else if(w==='back') act('mrBack'); else if(w==='startNow') act('startNow'); else if(w==='plus5') act('plus5');
   else if(w==='tplus') MT.add(60); else if(w==='tpause'){ MT.running?MT.pause():MT.resume(); }
@@ -6235,15 +6236,15 @@ function w4StateKey(){ const z=w4State(); return z?z.k+(z.R?':'+z.R.id:''):''; }
 
 /* Full screen in its own window: closing it returns the teacher to whatever was underneath (OneNote, SEQTA, slides). */
 function w4PopOpen(){ const W=screen.availWidth||1366, H=screen.availHeight||768, L=screen.availLeft||0, T=screen.availTop||0;
-  let w=null; try{ w=window.open('','roomieFull','popup=yes,left='+L+',top='+T+',width='+W+',height='+H); }catch(_){ w=null; }
+  let w=null; try{ w=(A.pip||window).open('','roomieFull','popup=yes,left='+L+',top='+T+',width='+W+',height='+H); }catch(_){ w=null; }
   if(!w) return false; A.w4Win=w; const d=w.document;
   d.open(); d.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Roomie</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;800&display=swap"><style>'+W4_CSS+'#w4{background:#FFE7A8}</style></head><body><div id="w4" class="bigm"></div></body></html>'); d.close();
   try{ w.moveTo(L,T); w.resizeTo(W,H); }catch(_){ }
-  d.addEventListener('click',e=>{ const b=e.target.closest('[data-w]'); if(!b) return; const k=b.dataset.w; e.stopPropagation(); if(k==='fsexit'||k==='rest'){ w4PopClose(); return; } w4Click(e); w4PopRender(); },true);
+  d.addEventListener('click',e=>{ const b=e.target.closest('[data-w]'); if(!b) return; const k=b.dataset.w; e.stopPropagation(); if(k==='fsexit'||k==='rest'){ w4PopClose(); return; } A.w4FromFull=true; try{ w4Click(e); } finally{ A.w4FromFull=false; } w4PopRender(); },true);
   d.addEventListener('dblclick',()=>{ try{ d.documentElement.requestFullscreen(); }catch(_){ } });
   w.addEventListener('beforeunload',()=>{ A.w4Win=null; });
   w4PopRender(); return true; }
-function w4PopClose(){ const w=A.w4Win; A.w4Win=null; try{ if(w&&!w.closed) w.close(); }catch(_){ } if(A.w4WinVid){ try{ A.w4WinVid.pause(); }catch(_){ } A.w4WinVid=null; } }
+function w4PopClose(){ const w=A.w4Win; A.w4Win=null; A.w4v='rest'; A.w4End=null; try{ if(A.pip) A.pip.focus(); }catch(_){ } try{ if(w&&!w.closed) w.close(); }catch(_){ } if(A.w4WinVid){ try{ A.w4WinVid.pause(); }catch(_){ } A.w4WinVid=null; } }
 function w4PopRender(){ const w=A.w4Win; if(!w) return; if(w.closed){ A.w4Win=null; return; } const z=w4State(); if(!z||z.k==='pick'){ w4PopClose(); return; }
   const d=w.document, root=d.getElementById('w4'); if(!root) return;
   const was=A.w4v; A.w4v='card'; let h=w4Html(); A.w4v=was;
