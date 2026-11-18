@@ -21,7 +21,8 @@ test('tapping Roomie shows one word per tool; words with › open their options'
 });
 test('Roomie’s Full screen button shows where to tap',()=>{ assert.ok(html.includes('data-w="fshint"')); assert.ok(html.includes('in the bar above Roomie, then tap')); });
 test('Roomie always opens small, not at the last size Chrome remembers',()=>{ assert.ok(html.includes('preferInitialWindowPlacement:true')); });
-test('Full screen is one tap from Roomie, ends by itself, and Roomie shows Back to your work',()=>{
- assert.ok(html.includes("w4FullStart(true).then(ok=>"));
+test('Full screen grows Roomie over the lesson (never switches to the Roomie tab) and Back to Roomie puts it back',()=>{
+ assert.ok(html.includes("if(w==='fshint'){ w4BigToggle(); return; }"));
+ assert.ok(html.includes('function w4MoveBack(){'));
  assert.ok(html.includes("Back to your work"));
 });

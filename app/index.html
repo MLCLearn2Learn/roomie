@@ -6047,9 +6047,12 @@ function w4Now(){ const P=A.P||phaseAt(now()); const b=P.block; const left=P.to?
   const t=P.phase==='routine'&&P.routine?P.routine.name:P.phase==='lesson'&&b?b.name:P.phase==='break'&&b?b.name:''; return {t,left}; }
 function w4VidMain(){ const el=Music.playing&&Music.fileAudio; return el&&el.tagName==='VIDEO'?el:null; }
 function w4SizeKey(){ const v=A.w4v||'rest'; if(v==='end') return A.w4Size||'rest'; if(v!=='card') return v; const z=w4State(); if(!z) return 'rest'; if(z.k==='routine') return w4VidMain()?'routineVid':'routine'; return z.k; }
+function w4BigToggle(){ const P=A.pip; if(!P) return; if(!A.w4Big){ A.w4Pos=[P.screenX,P.screenY]; A.w4Big=true; A.w4Size=null; w4Fit(); const z=w4BigSize(), sx=(screen.availLeft||0)+Math.round(((screen.availWidth||z[0])-z[0])/2), sy=(screen.availTop||0)+Math.round(((screen.availHeight||z[1])-z[1])/2); try{ P.moveTo(sx,sy); }catch(_){ } }
+  else { A.w4Big=false; A.w4Size=null; w4Fit(); w4MoveBack(); } w4Render(); }
+function w4MoveBack(){ const P=A.pip, q=A.w4Pos; if(!P||!q) return; try{ P.moveTo(q[0],q[1]); }catch(_){ } A.w4Pos=null; }
 function w4BigSize(){ const W=(screen.availWidth||1366), H=(screen.availHeight||768); return [Math.round(W*0.8),Math.round(H*0.8)]; }
 function w4Fit(){ if(!A.pip) return; let k=w4SizeKey(), z=W4_SIZES[k]||W4_SIZES.rest; if(A.w4Big&&A.w4v==='card'&&k!=='rest'){ z=w4BigSize(); k='big'; } if(A.w4Size===k) return; try{ A.pip.resizeTo(z[0],z[1]); A.w4Size=k; }catch(_){ } }
-function w4Go(v){ if(v!=='card') A.w4Big=false; A.w4v=v; A.w4Pop=Date.now()+420; w4Fit(); w4Render(); setTimeout(w4Render,450); }
+function w4Go(v){ if(v!=='card'&&A.w4Big){ A.w4Big=false; A.w4Size=null; w4Fit(); w4MoveBack(); } A.w4v=v; A.w4Pop=Date.now()+420; w4Fit(); w4Render(); setTimeout(w4Render,450); }
 const W4_CSS=`
 *{box-sizing:border-box}body{margin:0;background:#FFF6E0;color:#2A1E3D;font:800 15px Nunito,system-ui,sans-serif;overflow:hidden}
 #w4{position:fixed;inset:0;display:flex;flex-direction:column}
@@ -6123,7 +6126,7 @@ function w4Html(){ const v=A.w4v||'rest', z=w4State(), pop=Date.now()<(A.w4Pop||
     else l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">Tickets</span></div><div class="grid2'+pop+'"><button class="pill" style="background:#FFE0D6" data-w="ticket" data-kind="entry">Entry ticket<small>Start of the lesson</small></button><button class="pill" style="background:#FFE0D6" data-w="ticket" data-kind="exit">Exit ticket<small>End of the lesson</small></button></div>';
     const n=w4Now(); return '<div class="menu"><div class="l">'+l+'</div><div class="r"><button class="me" data-w="rest" title="Tuck away">'+birdSVG()+'</button>'+(n.left?'<span class="chip">'+esc(n.left)+'</span>':'')+'<div class="hint">Tap me to tuck away</div></div></div>'; }
   /* cards */
-  const x='<button class="pill q bg" data-w="fshint" title="Show this full screen">Full screen</button><button class="x" data-w="rest" aria-label="Tuck Roomie away" title="Tuck Roomie away">✕</button>';
+  const x='<button class="pill q bg" data-w="fshint" title="'+(A.w4Big?'Back to normal size':'Make Roomie as big as possible')+'">'+(A.w4Big?'Smaller':'Full screen')+'</button><button class="x" data-w="rest" aria-label="Tuck Roomie away" title="Tuck Roomie away">✕</button>';
   const hd=(t,tm)=>'<div class="hd">'+w4Me()+'<h1>'+esc(t)+'</h1>'+(tm?'<span class="tm">'+esc(tm)+'</span>':'')+x+'</div>';
   if(z.k==='attn') return '<div class="card p">'+hd('Eyes this way','')+'<p class="huge">'+esc(z.call)+'</p><p class="sub">'+esc(z.resp)+'</p><div class="ft"><button class="pill go" style="background:#fff;color:#2A1E3D" data-w="attention">Thank you</button></div></div>';
   if(z.k==='done') return '<div class="card g">'+hd(z.name,'')+'<p class="huge">'+esc(z.h)+'</p><p class="sub">'+esc(z.sub)+'</p><div class="ft"><span class="sp"></span><button class="pill" data-w="rest">Back to Roomie</button></div></div>';
@@ -6157,7 +6160,7 @@ function w4Click(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) re
   const card=()=>w4Go('card');
   if(['menu','routines','tickets','timers','brains','rest'].includes(w)){ A.w4End=null; if(w==='rest'&&A.overlay==='ready') closeOverlay(); return w4Go(w); }
   if(w==='card') return card();
-  if(w==='fshint'){ w4FullStart(true).then(ok=>{ if(!ok){ A.w4Hint=Date.now()+7000; setTimeout(w4Render,7100); w4Render(); } }); return; }
+  if(w==='fshint'){ w4BigToggle(); return; }
   if(w==='big'){ A.w4Big=!A.w4Big; A.w4Size=null; w4Fit(); return w4Render(); }
   if(w==='attention'){ attention(); return A.attnClose?card():w4Go('rest'); }
   if(w==='run'){ fresh(); runRoutine(b.dataset.id); return card(); }
@@ -6228,8 +6231,7 @@ function w4FullStart(){ let host=document.getElementById('w4full'); if(!host){ h
 function w4FullStop(){ const host=document.getElementById('w4full'); if(!host||host.hidden) return; if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); host.hidden=true; A.w4FullSeen=w4StateKey(); const v=w4VidMain(); if(v&&A.w4FsHome&&v.parentNode!==A.w4FsHome) A.w4FsHome.appendChild(v); A.w4FsHome=null; }
 function w4StateKey(){ const z=w4State(); return z?z.k+(z.R?':'+z.R.id:''):''; }
 /* When the teacher brings the Roomie tab forward (Chrome's ⤢ in Roomie's title bar) during an activity, the tab shows it big. */
-document.addEventListener('visibilitychange',()=>{ if(W4&&!document.hidden&&w4State()&&A.w4FullSeen!==w4StateKey()) w4FullStart(); });
-window.addEventListener('focus',()=>{ if(W4&&w4State()&&A.w4FullSeen!==w4StateKey()) w4FullStart(); });
+
 
 })();
 </script>
