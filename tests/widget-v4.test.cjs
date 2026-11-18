@@ -27,3 +27,4 @@ test('Full screen opens its own window; closing it returns to the lesson underne
  assert.ok(html.includes('function w4MoveBack(){'));
  assert.ok(html.includes("Back to your work"));
 });
+test('Roomie starts in the bottom-right corner and grows from the corner it sits in',()=>{ assert.ok(html.includes('function w4Corner(){')); assert.ok(html.includes('if(ox+ow/2>L+W/2) nx=ox+ow-nw;')); });

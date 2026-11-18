@@ -6051,7 +6051,12 @@ function w4BigToggle(){ const P=A.pip; if(!P) return; if(!A.w4Big){ A.w4Pos=[P.s
   else { A.w4Big=false; A.w4Size=null; w4Fit(); w4MoveBack(); } w4Render(); }
 function w4MoveBack(){ const P=A.pip, q=A.w4Pos; if(!P||!q) return; try{ P.moveTo(q[0],q[1]); }catch(_){ } A.w4Pos=null; }
 function w4BigSize(){ const W=(screen.availWidth||1366), H=(screen.availHeight||768); return [Math.round(W*0.8),Math.round(H*0.8)]; }
-function w4Fit(){ if(!A.pip) return; let k=w4SizeKey(), z=W4_SIZES[k]||W4_SIZES.rest; if(A.w4Big&&A.w4v==='card'&&k!=='rest'){ z=w4BigSize(); k='big'; } if(A.w4Size===k) return; try{ A.pip.resizeTo(z[0],z[1]); A.w4Size=k; }catch(_){ } }
+function w4Fit(){ if(!A.pip) return; let k=w4SizeKey(), z=W4_SIZES[k]||W4_SIZES.rest; if(A.w4Big&&A.w4v==='card'&&k!=='rest'){ z=w4BigSize(); k='big'; } if(A.w4Size===k) return; const P=A.pip, ow=P.outerWidth, oh=P.outerHeight, ox=P.screenX, oy=P.screenY;
+  try{ P.resizeTo(z[0],z[1]); A.w4Size=k; }catch(_){ return; }
+  try{ const L=screen.availLeft||0, T=screen.availTop||0, W=screen.availWidth, H=screen.availHeight, nw=z[0]+(ow-P.innerWidth||0), nh=z[1]+(oh-P.innerHeight||0);
+    let nx=ox, ny=oy; if(ox+ow/2>L+W/2) nx=ox+ow-nw; if(oy+oh/2>T+H/2) ny=oy+oh-nh;
+    nx=Math.max(L,Math.min(nx,L+W-nw)); ny=Math.max(T,Math.min(ny,T+H-nh)); if(nx!==ox||ny!==oy) P.moveTo(nx,ny); }catch(_){ } }
+function w4Corner(){ const P=A.pip; if(!P) return; try{ const z=W4_SIZES.rest, L=screen.availLeft||0, T=screen.availTop||0; P.moveTo(L+screen.availWidth-z[0]-24,T+screen.availHeight-z[1]-70); }catch(_){ } }
 function w4Go(v){ if(A.w4FromFull&&v!=='rest'){ A.w4v='rest'; w4Render(); return; } if(v!=='card'&&A.w4Big){ A.w4Big=false; A.w4Size=null; w4Fit(); w4MoveBack(); } A.w4v=v; A.w4Pop=Date.now()+420; w4Fit(); w4Render(); setTimeout(w4Render,450); }
 const W4_CSS=`
 *{box-sizing:border-box}body{margin:0;background:#FFF6E0;color:#2A1E3D;font:800 15px Nunito,system-ui,sans-serif;overflow:hidden}
@@ -6209,7 +6214,7 @@ if(W4){
   pipViewPref=function(){ return 'rest'; };
   pipSizeFor=function(){ return W4_SIZES[w4SizeKey()]||W4_SIZES.rest; };
   pipRender=function(){ try{ w4Render(); }catch(e){ console.warn(e); } try{ w4Home(); }catch(_){ } try{ w4FullRender(); }catch(_){ } try{ w4PopRender(); }catch(_){ } };
-  { const f=floatOpen; floatOpen=async function(){ A.w4v='rest'; A.w4Size=null; A.w4Big=false; const dp=window.documentPictureInPicture, rq=dp&&dp.requestWindow, own=rq&&Object.prototype.hasOwnProperty.call(dp,'requestWindow'); if(rq&&!A.pip){ try{ dp.requestWindow=function(o){ return rq.call(dp,Object.assign({},o,{preferInitialWindowPlacement:true})); }; }catch(_){ } } let r; try{ r=await f.apply(this,arguments); } finally{ try{ if(own) dp.requestWindow=rq; else delete dp.requestWindow; }catch(_){ } } if(A.pip){ A.w4Size=null; w4Fit(); } w4Home(); return r; }; }
+  { const f=floatOpen; floatOpen=async function(){ A.w4v='rest'; A.w4Size=null; A.w4Big=false; const dp=window.documentPictureInPicture, rq=dp&&dp.requestWindow, own=rq&&Object.prototype.hasOwnProperty.call(dp,'requestWindow'); if(rq&&!A.pip){ try{ dp.requestWindow=function(o){ return rq.call(dp,Object.assign({},o,{preferInitialWindowPlacement:true})); }; }catch(_){ } } let r; try{ r=await f.apply(this,arguments); } finally{ try{ if(own) dp.requestWindow=rq; else delete dp.requestWindow; }catch(_){ } } if(A.pip){ A.w4Size=null; w4Fit(); w4Corner(); } w4Home(); return r; }; }
   { const f=markFloat; markFloat=function(){ f(); try{ w4Home(); }catch(_){ } }; }
   setInterval(()=>{ try{ w4Home(); }catch(_){ } },2000); setTimeout(w4Home,0);
   setInterval(()=>{ try{ w4FullRender(); if(!w4State()) A.w4FullSeen=''; w4PopRender(); }catch(_){ } },500);
