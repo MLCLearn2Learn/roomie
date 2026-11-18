@@ -6022,6 +6022,185 @@ document.addEventListener('keydown',e=>{ if(e.defaultPrevented||e.ctrlKey||e.met
 { const oo=openOverlay; openOverlay=function(name){ const was=A.overlay; const out=oo.apply(this,arguments); if(name&&!was&&S.fullActivities!==false&&!document.body.classList.contains('full-view')) setFullView(true,{auto:true}); return out; }; }
 { const r0=render; render=function(){ const out=r0.apply(this,arguments); if(FV.auto&&!A.overlay&&document.body.classList.contains('full-view')) setFullView(false); return out; }; }
 
+/* ==== Roomie widget (v4). Turned on by ?widget in the address (the /widget/ link).
+   The widget is Roomie: a tiny character in the corner that pops out a menu and set-size cards.
+   The Roomie tab is only a setup page. The engine (timetable, routines, records, music) is the same as the board's. ==== */
+const W4=/[?&]widget\b/.test(location.search);
+if(W4){ document.documentElement.classList.add('w4'); }
+const W4_SIZES={rest:[132,146],menu:[420,290],routines:[420,370],tickets:[420,350],timers:[420,350],
+  routine:[500,380],routineVid:[660,400],done:[480,300],warning:[440,260],timer:[380,156],pick:[340,156],attn:[440,230],brain:[500,330],checkin:[580,320],ticket:[540,360]};
+function w4State(){ const P=A.P||phaseAt(now()), o=A.overlay, rem=MT.remaining();
+  if(A.attnClose){ const p=typeof attentionPreset==='function'?attentionPreset():null; return {k:'attn',call:p?p.call:'Eyes this way',resp:p?p.response:''}; }
+  if(o==='ready'&&A.ready){ const r=A.ready; return {k:'done',name:r.name,h:r.rec&&r.rec.record?'New class record!':r.spare?'We beat the song!':'Well done, everyone!',sub:[r.rec?'Ready in '+fmtLeft(r.rec.secs):'',r.spare?fmtLeft(r.spare)+' of the song to spare':''].filter(Boolean).join(' · ')}; }
+  if(o==='manualRoutine'&&A.mr){ const R=routineById(A.mr.id); if(R) return {k:'routine',R,st:stepsOf(R),i:A.mr.step,tm:rem>0?fmtLeft(rem):'',manual:true}; }
+  if(o==='practise'&&A.pr){ const R=routineById(A.pr.id); if(R){ if(A.pr.done) return {k:'done',name:R.name,h:'Practice done!',sub:'Done in '+fmtLeft(A.pr.done)+(R.best?' · record '+fmtLeft(R.best):'')}; return {k:'routine',R,st:stepsOf(R),i:-1,tm:fmtLeft((Date.now()-A.pr.t0)/1000),practise:true}; } }
+  if(o==='timer'&&(MT.running||rem>0)) return {k:'timer',tm:fmtLeft(rem),paused:!MT.running};
+  if(o==='brain'&&A.brain){ const b=A.brain; return {k:'brain',name:b.name,call:b.calls?b.calls[A.callIdx||0]:(b.freeze?'Dance!':b.how||'Go!'),tm:rem>0?fmtLeft(rem):''}; }
+  if(o==='checkin') return {k:'checkin'};
+  if(o==='ticket'&&A.xo) return {k:'ticket',st:A.xo,tm:rem>0?fmtLeft(rem):'',live:false};
+  if(!o&&(P.phase==='exit'||P.phase==='entry')){ const st=exitState(P); return {k:'ticket',st,tm:P.to?fmtLeft((P.to-P.mins)*60):'',live:true}; }
+  if(!o&&P.phase==='routine'&&P.routine) return {k:'routine',R:P.routine,st:stepsOf(P.routine),i:stepIndexFor(P),tm:P.to?fmtLeft((P.to-P.mins)*60):'',timetable:true};
+  if(!o&&P.phase==='warning') return {k:'warning',tm:P.to?fmtLeft((P.to-P.mins)*60):'',steps:finishSteps(P)};
+  if(A.w4Pick) return {k:'pick',name:A.w4Pick};
+  return null; }
+function w4Now(){ const P=A.P||phaseAt(now()); const b=P.block; const left=P.to?fmtLeft((P.to-P.mins)*60):'';
+  const t=P.phase==='routine'&&P.routine?P.routine.name:P.phase==='lesson'&&b?b.name:P.phase==='break'&&b?b.name:''; return {t,left}; }
+function w4VidMain(){ const el=Music.playing&&Music.fileAudio; return el&&el.tagName==='VIDEO'?el:null; }
+function w4SizeKey(){ const v=A.w4v||'rest'; if(v!=='card') return v; const z=w4State(); if(!z) return 'rest'; if(z.k==='routine') return w4VidMain()?'routineVid':'routine'; return z.k; }
+function w4Fit(){ if(!A.pip) return; const k=w4SizeKey(), z=W4_SIZES[k]||W4_SIZES.rest; if(A.w4Size===k) return; try{ A.pip.resizeTo(z[0],z[1]); A.w4Size=k; }catch(_){ } }
+function w4Go(v){ A.w4v=v; A.w4Pop=Date.now()+420; w4Fit(); w4Render(); setTimeout(w4Render,450); }
+const W4_CSS=`
+*{box-sizing:border-box}body{margin:0;background:#FFF6E0;color:#2A1E3D;font:800 15px Nunito,system-ui,sans-serif;overflow:hidden}
+#w4{position:fixed;inset:0;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;cursor:pointer}
+.pill{border:2px solid #2A1E3D;background:#fff;border-radius:999px;padding:7px 13px;font-size:14px;line-height:1.1;white-space:nowrap}
+.pill.y{background:#FFD84D}.pill.p{background:#F2785C;color:#fff;border-color:#F2785C}.pill.k{background:#2A1E3D;color:#FFD84D}.pill.q{background:transparent;border-color:rgba(42,30,61,.35)}
+.pill small{display:block;font-size:10px;opacity:.75;margin-top:1px}
+.lbl{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:#6A5F80;margin:2px 0 -2px}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.me{border:0;background:none;padding:0;display:block}.me svg{width:100%;height:100%;display:block}
+.chip{display:inline-block;background:#fff;border:2px solid #2A1E3D;border-radius:999px;padding:1px 9px;font:800 15px/1.2 "Baloo 2",system-ui,sans-serif;font-variant-numeric:tabular-nums;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* rest */
+.rest{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px}
+.rest .me{width:96px;height:100px;transition:transform .15s}.rest .me:hover{transform:scale(1.05) rotate(-3deg)}
+.rest.busy{background:#FFD84D}.rest.busy .chip{background:#2A1E3D;color:#FFD84D}
+.rest.attn{background:#F2785C}
+/* menu */
+.menu{flex:1;display:flex;gap:8px;padding:10px 10px 10px 12px;min-height:0}.menu .pill{font-size:13px;padding:5px 10px}.menu .big{font-size:17px;padding:9px 12px}.menu .row{gap:5px}.menu .grid2 .pill{padding:6px 10px}
+.menu .l{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0;overflow:auto}
+.menu .r{width:76px;flex:none;display:flex;flex-direction:column;align-items:center;gap:4px}
+.menu .r .me{width:72px;height:76px}.menu .r .hint{font-size:10.5px;color:#6A5F80;text-align:center;line-height:1.15}
+.big{width:100%;font-size:18px;padding:10px 12px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.grid2 .pill{white-space:normal;text-align:left;border-radius:16px}
+.pop .pill{animation:pop .24s cubic-bezier(.3,1.5,.6,1) backwards}.pop .pill:nth-child(2){animation-delay:.03s}.pop .pill:nth-child(3){animation-delay:.06s}.pop .pill:nth-child(n+4){animation-delay:.09s}
+@keyframes pop{from{transform:scale(.5);opacity:0}}
+/* cards */
+.card{flex:1;display:flex;flex-direction:column;gap:clamp(6px,1.8vh,12px);padding:clamp(10px,2.4vw,16px) clamp(12px,2.8vw,18px);min-height:0}
+.card.y{background:#FFE7A8}.card.g{background:#B8F0C8}.card.p{background:#F2785C;color:#fff}.card.b{background:#D9EEFF}
+.hd{display:flex;align-items:center;gap:10px}.hd .me{width:clamp(38px,9vw,54px);height:clamp(38px,9vw,54px);flex:none}
+.hd h1{margin:0;flex:1;min-width:0;font:800 clamp(20px,5.6vw,34px)/1.05 "Baloo 2",system-ui,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd .tm{font:800 clamp(28px,8vw,52px)/1 "Baloo 2",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.x{width:32px;height:32px;padding:0;border-radius:50%;flex:none;border:2px solid rgba(42,30,61,.35);background:transparent;font-size:15px}
+.card.p .x{border-color:rgba(255,255,255,.6);color:#fff}
+.goal{display:flex;flex-wrap:wrap;gap:6px}.goal span{background:#fff;border-radius:999px;padding:3px 10px;font-size:clamp(12px,2.6vw,15px)}
+.mid{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);gap:12px}.mid.v{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+.now{background:#fff;border:3px solid #2A1E3D;border-radius:18px;padding:clamp(8px,2vw,14px);font-size:clamp(20px,5vw,34px);line-height:1.1}
+.now small{display:block;font-size:11px;letter-spacing:.08em;opacity:.6;margin-bottom:3px}
+.nx{font-size:clamp(12px,2.6vw,16px);opacity:.85;margin-top:6px}
+.vid{min-height:0;display:flex;align-items:center;justify-content:center}.vid video{max-width:100%;max-height:100%;border-radius:14px;display:block}
+.ft{display:flex;gap:6px;align-items:center;flex-wrap:nowrap}.ft .sp{flex:1}
+.go{font-size:clamp(17px,4.2vw,24px);padding:clamp(8px,1.6vw,12px) clamp(16px,3.4vw,28px)}
+.huge{font:800 clamp(30px,9vw,56px)/1.05 "Baloo 2",system-ui,sans-serif;margin:auto 0 0}
+.sub{font-size:clamp(14px,3.4vw,20px);margin:0 0 auto}
+.feel{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;flex:1;min-height:0}
+.feel button{border:2px solid #2A1E3D;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:13px;padding:6px;line-height:1.1;text-align:center}
+.feel svg{width:clamp(30px,7vw,48px);height:clamp(30px,7vw,48px)}
+.tk{background:#fff;border:2px dashed #2A1E3D;border-radius:14px;padding:10px 14px;flex:1;min-height:0;overflow:auto}
+.tk h2{margin:0 0 4px;font:800 clamp(18px,4.4vw,26px)/1.1 "Baloo 2",system-ui,sans-serif}.tk p{margin:0;font-size:clamp(13px,2.8vw,16px)}.tk ol{margin:6px 0 0;padding-left:20px;font-size:14px}
+.small{flex:1;display:flex;align-items:center;gap:12px;padding:10px 14px}.small .me{width:72px;height:76px;flex:none}.small .bd{flex:1;min-width:0}
+.small .k{font-size:11px;letter-spacing:.08em;color:#6A5F80}.small .v{font:800 46px/1 "Baloo 2",system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.small .row{margin-top:6px}.small .pill{padding:4px 10px;font-size:12px}
+`;
+function w4Me(){ return '<span class="me" aria-hidden="true">'+birdSVG()+'</span>'; }
+function w4Routines(){ return (S.routines||[]); }
+function w4Html(){ const v=A.w4v||'rest', z=w4State(), pop=Date.now()<(A.w4Pop||0)?' pop':'';
+  if(v==='rest'||(v==='card'&&!z)){ const n=w4Now(), busy=!!z&&!A.attnClose, lbl=A.attnClose?'Eyes this way':z?(z.k==='routine'?z.R.name:z.k==='ticket'?'Ticket':z.k==='warning'?'2 minutes':z.k==='timer'?z.tm:z.k==='pick'?z.name:'Tap me'):(n.left||n.t||'Tap me');
+    return '<div class="rest'+(busy?' busy':'')+(A.attnClose?' attn':'')+'"><button class="me" data-w="'+(A.attnClose?'attention':busy?'card':'menu')+'" title="Tap Roomie">'+birdSVG()+'</button><span class="chip" data-w="'+(busy?'card':'menu')+'">'+esc(lbl)+'</span></div>'; }
+  if(v==='menu'||v==='routines'||v==='tickets'||v==='timers'){ let l='';
+    const running=z&&z.k!=='pick'?'<button class="pill k big" data-w="card">Back to '+esc(z.k==='routine'?z.R.name:z.k==='timer'?'the timer':z.k==='brain'?'the brain break':z.k==='checkin'?'the check-in':z.k==='ticket'?'the ticket':z.k==='warning'?'finishing up':'it')+'</button>':'';
+    if(v==='menu'){ const R=w4Routines(); const top=R.filter(r=>r.best).concat(R.filter(r=>!r.best)).slice(0,3);
+      l=running+'<button class="pill p big" data-w="attention">Attention</button>'+
+        '<div class="lbl">Routines</div><div class="row'+pop+'">'+top.map(r=>'<button class="pill y" data-w="run" data-id="'+esc(r.id)+'">'+esc(r.name)+'</button>').join('')+'<button class="pill" data-w="routines">All ›</button></div>'+
+        '<div class="lbl">Timer</div><div class="row'+pop+'">'+[[60,'1 min'],[120,'2 min'],[300,'5 min']].map(([s,t])=>'<button class="pill" data-w="time" data-s="'+s+'">'+t+'</button>').join('')+'<button class="pill" data-w="timers">More ›</button></div>'+
+        '<div class="lbl">Tools</div><div class="row'+pop+'"><button class="pill" style="background:#E4D7FF" data-w="pick">Pick a name</button><button class="pill" style="background:#C9EBD8" data-w="brain">Brain break</button><button class="pill" style="background:#D9EEFF" data-w="checkin">Check-in</button><button class="pill" style="background:#FFE0D6" data-w="tickets">Tickets</button><button class="pill" data-w="point">+1 point</button></div>'; }
+    else if(v==='routines') l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">All routines</span></div><div class="grid2'+pop+'">'+w4Routines().map(r=>'<button class="pill y" data-w="run" data-id="'+esc(r.id)+'">'+esc(r.name)+'<small>'+(r.best?'Record '+fmtLeft(r.best):'No record yet')+'</small></button>').join('')+'</div>'+
+        '<div class="lbl">Practise (not timed for the record)</div><div class="row">'+w4Routines().map(r=>'<button class="pill q" data-w="prac" data-id="'+esc(r.id)+'">'+esc(r.name)+'</button>').join('')+'</div>';
+    else if(v==='timers') l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">Timer</span></div><div class="grid2'+pop+'">'+[[30,'30 sec'],[60,'1 min'],[120,'2 min'],[180,'3 min'],[300,'5 min'],[600,'10 min'],[900,'15 min'],[1200,'20 min']].map(([s,t])=>'<button class="pill" data-w="time" data-s="'+s+'">'+t+'</button>').join('')+'</div>';
+    else l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">Tickets</span></div><div class="grid2'+pop+'"><button class="pill" style="background:#FFE0D6" data-w="ticket" data-kind="entry">Entry ticket<small>Start of the lesson</small></button><button class="pill" style="background:#FFE0D6" data-w="ticket" data-kind="exit">Exit ticket<small>End of the lesson</small></button></div>';
+    const n=w4Now(); return '<div class="menu"><div class="l">'+l+'</div><div class="r"><button class="me" data-w="rest" title="Tuck away">'+birdSVG()+'</button>'+(n.left?'<span class="chip">'+esc(n.left)+'</span>':'')+'<div class="hint">Tap me to tuck away</div></div></div>'; }
+  /* cards */
+  const x='<button class="x" data-w="rest" aria-label="Tuck Roomie away" title="Tuck Roomie away">✕</button>';
+  const hd=(t,tm)=>'<div class="hd">'+w4Me()+'<h1>'+esc(t)+'</h1>'+(tm?'<span class="tm">'+esc(tm)+'</span>':'')+x+'</div>';
+  if(z.k==='attn') return '<div class="card p">'+hd('Eyes this way','')+'<p class="huge">'+esc(z.call)+'</p><p class="sub">'+esc(z.resp)+'</p><div class="ft"><button class="pill go" style="background:#fff;color:#2A1E3D" data-w="attention">Thank you</button></div></div>';
+  if(z.k==='done') return '<div class="card g">'+hd(z.name,'')+'<p class="huge">'+esc(z.h)+'</p><p class="sub">'+esc(z.sub)+'</p><div class="ft"><span class="sp"></span><button class="pill" data-w="rest">Back to Roomie</button></div></div>';
+  if(z.k==='routine'){ const R=z.R, st=z.st, i=z.i, song=wSongLeft(), vid=!!w4VidMain(), goal=[];
+    if(R.best) goal.push('Record '+fmtLeft(R.best)); if(song) goal.push('Beat the song: '+fmtLeft(song));
+    const cur=i>=0?st[i]:'Go! Everyone ready as fast as you can', nx=i>=0&&st[i+1]?'Next: '+st[i+1]:'';
+    return '<div class="card y">'+hd((z.practise?'Practise: ':'')+R.name,z.tm)+(goal.length?'<div class="goal">'+goal.map(g=>'<span>'+esc(g)+'</span>').join('')+'</div>':'')+
+      '<div class="mid'+(vid?' v':'')+'"><div><div class="now">'+(i>=0?'<small>STEP '+(i+1)+' OF '+st.length+'</small>':'')+esc(cur)+'</div>'+(nx?'<div class="nx">'+esc(nx)+'</div>':'')+'</div>'+(vid?'<div class="vid" id="w4vid"></div>':'')+'</div>'+
+      '<div class="ft"><button class="pill k go" data-w="ready">'+(z.practise?'We’re done!':'We’re ready!')+'</button>'+(z.manual?'<button class="pill q" data-w="back"'+(i?'':' disabled')+'>Back</button><button class="pill q" data-w="next">'+(i>=st.length-1?'Finish':'Next')+'</button>':'')+'<span class="sp"></span><button class="pill q" data-w="stop">Stop</button></div></div>'; }
+  if(z.k==='warning') return '<div class="card y">'+hd('2 minutes to finish up',z.tm)+'<div class="now">'+z.steps.map(s=>esc(s)).join('<br>')+'</div><div class="ft"><button class="pill k go" data-w="startNow">Start now</button><button class="pill" data-w="plus5">+5 min</button></div></div>';
+  if(z.k==='timer') return '<div class="small">'+w4Me()+'<div class="bd"><div class="k">TIMER'+(z.paused?' · PAUSED':'')+'</div><div class="v">'+esc(z.tm)+'</div><div class="row"><button class="pill" data-w="tplus">+1 min</button><button class="pill" data-w="tpause">'+(z.paused?'Resume':'Pause')+'</button><button class="pill q" data-w="stop">Stop</button></div></div>'+x+'</div>';
+  if(z.k==='pick') return '<div class="small">'+w4Me()+'<div class="bd"><div class="k">PICK A NAME</div><div class="v" style="font-size:40px">'+esc(z.name)+'</div><div class="row"><button class="pill" data-w="pick">Pick again</button><button class="pill q" data-w="unpick">Done</button></div></div></div>';
+  if(z.k==='brain') return '<div class="card" style="background:#C9EBD8">'+hd(z.name,z.tm)+'<p class="huge" style="margin:auto 0">'+esc(z.call)+'</p><div class="ft"><button class="pill" data-w="brain">Another one</button><span class="sp"></span><button class="pill q" data-w="stop">Stop</button></div></div>';
+  if(z.k==='checkin'){ const B=feelBucket(), tot=Object.values(B).reduce((a,b)=>a+b,0);
+    return '<div class="card b">'+hd('How are you feeling?','')+'<div class="feel">'+FEELS.map(([f,n,c])=>'<button data-w="feel" data-f="'+f+'" style="background:'+c+'">'+feelFace(f)+'<span>'+esc(n)+'</span></button>').join('')+'</div><div class="ft"><span style="font-size:13px">'+(tot?tot+' checked in · ':'')+'Anonymous. Only numbers, never names.</span><span class="sp"></span><button class="pill" data-w="stop">Done</button></div></div>'; }
+  if(z.k==='ticket'){ const st=z.st, T=ticketById(st.id)||{t:'',b:''}, K=TK[st.kind];
+    return '<div class="card" style="background:#FFE0D6">'+hd(K.name,z.tm)+'<div class="tk"><h2>'+esc(T.t)+'</h2><p>'+esc(T.b)+'</p>'+(T.l?'<ol>'+T.l.map(i=>'<li>'+esc(i)+'</li>').join('')+'</ol>':'')+'</div><div style="font-size:13px">'+esc(K.hand)+'</div><div class="ft">'+(z.live?'<button class="pill k go" data-w="exitDone">We’re done</button>':'')+'<button class="pill" data-w="exitAgain">Another ticket</button><span class="sp"></span>'+(z.live?'':'<button class="pill q" data-w="stop">Done</button>')+'</div></div>'; }
+  return ''; }
+function w4Render(){ const d=A.pipDoc; if(!d) return; if(!d.getElementById('w4CSS')){ const c=d.createElement('style'); c.id='w4CSS'; c.textContent=W4_CSS; d.head.appendChild(c); }
+  let root=d.getElementById('w4'); if(!root){ root=d.createElement('div'); root.id='w4'; d.body.appendChild(root); d.addEventListener('click',w4Click,true); }
+  [...d.body.children].forEach(el=>{ if(el!==root&&el.tagName!=='STYLE'&&el.tagName!=='LINK'&&el.tagName!=='SCRIPT') el.style.display='none'; });
+  if((A.w4v||'rest')==='card'&&!w4State()){ A.w4v='rest'; }
+  w4Fit(); const h=w4Html(); if(root.dataset.h!==h){ root.innerHTML=h; root.dataset.h=h; }
+  const slot=d.getElementById('w4vid'), main=w4VidMain();
+  if(slot&&main){ if(!A.w4Vid||A.w4Vid.ownerDocument!==d){ const v=d.createElement('video'); v.muted=true; v.playsInline=true; A.w4Vid=v; }
+    const v=A.w4Vid; if(main.currentSrc&&v.dataset.src!==main.currentSrc){ v.src=main.currentSrc; v.dataset.src=main.currentSrc; } if(v.parentNode!==slot) slot.appendChild(v);
+    if(Math.abs((v.currentTime||0)-(main.currentTime||0))>0.4){ try{ v.currentTime=main.currentTime; }catch(_){ } } if(main.paused){ if(!v.paused) v.pause(); } else if(v.paused) v.play().catch(()=>{}); }
+  else if(A.w4Vid&&!A.w4Vid.paused){ try{ A.w4Vid.pause(); }catch(_){ } } }
+function w4Click(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) return; e.stopPropagation(); const w=b.dataset.w, fresh=()=>{ if(navHasActivity()) navStopActivity(false); };
+  const card=()=>w4Go('card');
+  if(['menu','routines','tickets','timers','rest'].includes(w)){ if(w==='rest'&&A.overlay==='ready') closeOverlay(); return w4Go(w); }
+  if(w==='card') return card();
+  if(w==='attention'){ attention(); return A.attnClose?card():w4Go('rest'); }
+  if(w==='run'){ fresh(); runRoutine(b.dataset.id); return card(); }
+  if(w==='prac'){ fresh(); startPractise(b.dataset.id); return card(); }
+  if(w==='time'){ fresh(); navStartTimer(Number(b.dataset.s)); return card(); }
+  if(w==='pick'){ if(!names().length){ A.w4Pick='Add your class in setup'; return card(); } pickQuiet(); A.w4Pick=A.pipPicked; return card(); }
+  if(w==='unpick'){ A.w4Pick=null; A.pipPicked=null; return w4Go('rest'); }
+  if(w==='brain'){ fresh(); startBrain(); return card(); }
+  if(w==='checkin'){ fresh(); openOverlay('checkin'); return card(); }
+  if(w==='feel'){ A.feel=feelBucket(); A.feel[b.dataset.f]++; blip(); b.animate&&b.animate([{transform:'scale(1.12)'},{transform:'scale(1)'}],{duration:220}); return w4Render(); }
+  if(w==='ticket'){ fresh(); A.tp={kind:b.dataset.kind,live:false,form:false}; useTicket(''); return card(); }
+  if(w==='exitAgain'||w==='exitDone'){ exitAct(w); return w==='exitDone'?w4Go('rest'):w4Render(); }
+  if(w==='point'){ act('point'); return w4Go('rest'); }
+  if(w==='ready'){ weAreReadyKey(); A.w4v='card'; A.w4Size=null; w4Fit(); w4Render(); clearTimeout(A.w4T); A.w4T=setTimeout(()=>{ if(A.w4v==='card'){ const z=w4State(); if(!z||z.k==='done'){ if(A.overlay==='ready') closeOverlay(); w4Go('rest'); } } },4000); return; }
+  if(w==='next') act('mrNext'); else if(w==='back') act('mrBack'); else if(w==='startNow') act('startNow'); else if(w==='plus5') act('plus5');
+  else if(w==='tplus') MT.add(60); else if(w==='tpause'){ MT.running?MT.pause():MT.resume(); }
+  else if(w==='stop'){ navStopActivity(false); if(A.overlay) closeOverlay(); return w4Go('rest'); }
+  w4Render(); }
+/* The Roomie tab: a setup page with one big Open Roomie button. */
+function w4HomeHTML(){ const open=!!A.pip, R=w4Routines();
+  const card=(t,d,tb)=>'<button class="w4c" type="button" data-w4tab="'+tb+'"><b>'+t+'</b><span>'+d+'</span></button>';
+  return '<div class="w4in"><div class="w4hero">'+birdSVG()+'<div><h1>'+(open?'Roomie is open':'Open Roomie')+'</h1><p>'+(open?'Roomie is sitting on top of your other windows. Keep this tab open in the background; you can teach from OneNote, SEQTA or your slides as usual.':'Roomie sits in the corner of OneNote, SEQTA or your slides, with your routines, timer, attention signal and tools. Open it once at the start of the day.')+'</p></div><button class="w4open" type="button" data-tool="float">'+(open?'Close Roomie':'Open Roomie')+'</button></div>'+
+    '<h2>Set up</h2><div class="w4grid">'+card('My class','Class name and student names','class')+card('My day','Timetable and when routines run','plan')+card('Routines','Steps, songs and videos','routines')+card('Attention signal','Your call and response','signals')+card('Look and sound','Roomie’s colours, sounds and music','look')+card('Privacy and backup','Back up or move Roomie','privacy')+'</div>'+
+    '<h2>Class records</h2><div class="w4rec">'+(R.map(r=>'<div><b>'+esc(r.name)+'</b><span>'+(r.best?'Record '+fmtLeft(r.best):'No record yet')+'</span></div>').join('')||'<p>No routines yet.</p>')+'</div>'+
+    '<p class="w4foot"><a href="./">Go back to the full board</a></p></div>'; }
+function w4Home(){ if(!W4) return; let h=document.getElementById('w4home'); if(!h){ h=document.createElement('div'); h.id='w4home'; document.body.appendChild(h);
+    h.addEventListener('click',e=>{ const c=e.target.closest('[data-w4tab]'); if(c){ tab=c.dataset.w4tab; openSetup(); } }); }
+  const x=w4HomeHTML(); if(h.dataset.h!==x){ h.innerHTML=x; h.dataset.h=x; } }
+if(W4){
+  const st=document.createElement('style'); st.textContent=`html.w4 #app,html.w4 #overlayHost{display:none!important}
+#w4home{min-height:100vh;background:#FFF6E0;color:#2A1E3D;font-family:Nunito,system-ui,sans-serif;font-weight:800;padding:32px 20px}
+#w4home .w4in{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+#w4home .w4hero{display:flex;align-items:center;gap:20px;background:#2A1E3D;color:#fff;border-radius:24px;padding:22px 26px}
+#w4home .w4hero>svg{width:96px;height:96px;flex:none}#w4home h1{color:#fff;margin:0;font:800 34px/1.1 "Baloo 2",system-ui,sans-serif}#w4home .w4hero p{margin:4px 0 0;font-weight:700;opacity:.9;max-width:520px}
+#w4home .w4open{margin-left:auto;flex:none;font:800 20px Nunito,system-ui,sans-serif;background:#FFD84D;color:#2A1E3D;border:0;border-radius:999px;padding:16px 28px;cursor:pointer}
+#w4home h2{margin:10px 0 0;font:800 26px "Baloo 2",system-ui,sans-serif}
+#w4home .w4grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+#w4home .w4c{display:flex;flex-direction:column;gap:2px;text-align:left;background:#fff;border:2px solid #E5DCC7;border-radius:16px;padding:14px 16px;font:inherit;color:inherit;cursor:pointer}
+#w4home .w4c b{font-size:18px}#w4home .w4c span{font-weight:700;font-size:14px;color:#6A5F80}#w4home .w4c:hover{border-color:#2A1E3D}
+#w4home .w4rec{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}#w4home .w4rec div{background:#fff;border-radius:14px;padding:10px 14px;display:flex;flex-direction:column}#w4home .w4rec span{font-weight:700;color:#6A5F80;font-size:14px}
+#w4home .w4foot{font-weight:700;font-size:14px}#w4home a{color:#2A1E3D}
+@media(max-width:640px){#w4home .w4hero{flex-wrap:wrap}#w4home .w4open{margin-left:0}}`; document.head.appendChild(st);
+  pipViewPref=function(){ return 'rest'; };
+  pipSizeFor=function(){ return W4_SIZES[w4SizeKey()]||W4_SIZES.rest; };
+  pipRender=function(){ try{ w4Render(); }catch(e){ console.warn(e); } try{ w4Home(); }catch(_){ } };
+  { const f=floatOpen; floatOpen=async function(){ A.w4v='rest'; A.w4Size=null; const r=await f.apply(this,arguments); if(A.pip) A.w4Size='rest'; w4Home(); return r; }; }
+  { const f=markFloat; markFloat=function(){ f(); try{ w4Home(); }catch(_){ } }; }
+  setInterval(()=>{ try{ w4Home(); }catch(_){ } },2000); setTimeout(w4Home,0);
+}
+
 })();
 </script>
 
