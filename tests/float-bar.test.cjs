@@ -17,7 +17,7 @@ test('changeovers change the bar colour and offer the right next button',()=>{
 });
 test('the float shows the teacher’s own bottom bar and opens other tools inside the float',()=>{
  assert.ok(html.includes("function pbarTools(){ return uiDockKeys(dockOrder(),S.dockHide||[],dockPresetNow()).filter(k=>DOCK_NAMES[k]); }"));
- assert.ok(html.includes("else row=pbarTools().map(k=>"),'tools follow the board order and hidden tools');
+ assert.ok(html.includes("pbarTools().filter(k=>k!=='routines').map(k=>"),'tools follow the board order and hidden tools');
  assert.ok(html.includes("db.click(); if(A.overlay){ A.pipAuto=true; pipSetView('screen');"),'tools open in the float');
  assert.ok(html.includes("if(A.pipDoc&&A.pipAuto&&A.pipView==='screen'&&!A.overlay){ A.pipAuto=false; pipSetView('bar'); return; }"),'and it shrinks back when the tool is finished');
 });
