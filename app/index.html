@@ -6028,7 +6028,7 @@ document.addEventListener('keydown',e=>{ if(e.defaultPrevented||e.ctrlKey||e.met
 const W4=/[?&]widget\b/.test(location.search);
 if(W4){ document.documentElement.classList.add('w4'); }
 const W4_SIZES={rest:[132,146],menu:[400,270],brains:[420,230],routines:[420,370],tickets:[420,350],timers:[420,350],
-  routine:[500,380],routineVid:[660,400],done:[480,300],warning:[440,260],timer:[380,156],pick:[340,156],attn:[440,230],brain:[500,330],checkin:[580,320],ticket:[540,360]};
+  routine:[500,380],routineVid:[660,400],done:[480,300],warning:[440,260],timer:[430,156],pick:[340,156],attn:[440,230],brain:[500,330],checkin:[580,320],ticket:[540,360]};
 function w4State(){ const P=A.P||phaseAt(now()), o=A.overlay, rem=MT.remaining();
   if(A.attnClose){ const p=typeof attentionPreset==='function'?attentionPreset():null; return {k:'attn',call:p?p.call:'Eyes this way',resp:p?p.response:''}; }
   if(o==='ready'&&A.ready){ const r=A.ready; return {k:'done',name:r.name,h:r.rec&&r.rec.record?'New class record!':r.spare?'We beat the song!':'Well done, everyone!',sub:[r.rec?'Ready in '+fmtLeft(r.rec.secs):'',r.spare?fmtLeft(r.spare)+' of the song to spare':''].filter(Boolean).join(' · ')}; }
@@ -6100,6 +6100,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .tk{background:#fff;border:2px dashed #2A1E3D;border-radius:14px;padding:10px 14px;flex:1;min-height:0;overflow:auto}
 .tk h2{margin:0 0 4px;font:800 clamp(18px,4.4vw,26px)/1.1 "Baloo 2",system-ui,sans-serif}.tk p{margin:0;font-size:clamp(13px,2.8vw,16px)}.tk ol{margin:6px 0 0;padding-left:20px;font-size:14px}
 .small{flex:1;display:flex;align-items:center;gap:12px;padding:10px 14px}.small .me{width:72px;height:76px;flex:none}.small .bd{flex:1;min-width:0}
+.fsh{position:fixed;top:6px;right:8px;max-width:260px;background:#2A1E3D;color:#fff;border-radius:14px;padding:10px 12px 10px 14px;font-size:14px;line-height:1.3;box-shadow:0 8px 20px rgba(0,0,0,.25);z-index:5}.fsh b{position:absolute;top:-2px;right:14px;font-size:26px;color:#FFD84D;animation:fsb 1s infinite}.fsh span{background:#FFD84D;color:#2A1E3D;border-radius:6px;padding:0 5px}@keyframes fsb{50%{transform:translateY(-5px)}}.fsh{padding-top:26px}
+.sx{display:flex;flex-direction:column;gap:4px;align-items:flex-end;align-self:flex-start;flex:none}.sx .x{order:-1}
 .bg{padding:5px 12px;font-size:13px;flex:none;border-color:#2A1E3D!important;background:#fff!important}.bigm .hd .me{width:90px;height:90px}.bigm .hd h1{font-size:clamp(28px,5vw,64px)}.bigm .hd .tm{font-size:clamp(40px,8vw,110px)}.bigm .goal span{font-size:22px;padding:5px 16px}.bigm .now{font-size:clamp(30px,5.6vw,76px);padding:20px 26px;border-width:4px}.bigm .now small{font-size:16px}.bigm .nx{font-size:clamp(18px,2.4vw,30px)}.bigm .huge{font-size:clamp(48px,9vw,130px)}.bigm .sub{font-size:clamp(20px,3vw,36px)}.bigm .ft .pill{font-size:18px;padding:8px 16px}.bigm .ft .go{font-size:clamp(24px,3vw,40px);padding:14px 40px}.bigm .feel button{font-size:22px}.bigm .feel svg{width:clamp(48px,8vw,110px);height:clamp(48px,8vw,110px)}.bigm .tk h2{font-size:clamp(28px,4vw,56px)}.bigm .tk p{font-size:clamp(18px,2.4vw,30px)}.bigm .tk ol{font-size:24px}.bigm .bg{font-size:15px;padding:6px 14px}.bigm .x{width:42px;height:42px}.small .me{width:clamp(72px,18vw,260px);height:clamp(76px,19vw,270px)}.small .k{font-size:clamp(11px,2vw,22px);letter-spacing:.08em;color:#6A5F80}.small .v{font:800 clamp(46px,14vw,220px)/1 "Baloo 2",system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .small .row{margin-top:6px}.small .pill{padding:4px 10px;font-size:12px}
 `;
@@ -6119,7 +6121,7 @@ function w4Html(){ const v=A.w4v||'rest', z=w4State(), pop=Date.now()<(A.w4Pop||
     else l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">Tickets</span></div><div class="grid2'+pop+'"><button class="pill" style="background:#FFE0D6" data-w="ticket" data-kind="entry">Entry ticket<small>Start of the lesson</small></button><button class="pill" style="background:#FFE0D6" data-w="ticket" data-kind="exit">Exit ticket<small>End of the lesson</small></button></div>';
     const n=w4Now(); return '<div class="menu"><div class="l">'+l+'</div><div class="r"><button class="me" data-w="rest" title="Tuck away">'+birdSVG()+'</button>'+(n.left?'<span class="chip">'+esc(n.left)+'</span>':'')+'<div class="hint">Tap me to tuck away</div></div></div>'; }
   /* cards */
-  const x='<button class="pill q bg" data-w="big" title="'+(A.w4Big?'Make Roomie smaller':'Make Roomie bigger for the class')+'">'+(A.w4Big?'⤡ Smaller':'⤢ Bigger')+'</button><button class="x" data-w="rest" aria-label="Tuck Roomie away" title="Tuck Roomie away">✕</button>';
+  const x='<button class="pill q bg" data-w="big" title="'+(A.w4Big?'Make Roomie smaller':'Make Roomie bigger for the class')+'">'+(A.w4Big?'⤡ Smaller':'⤢ Bigger')+'</button><button class="pill q bg" data-w="fshint" title="How to go full screen">Full screen</button><button class="x" data-w="rest" aria-label="Tuck Roomie away" title="Tuck Roomie away">✕</button>';
   const hd=(t,tm)=>'<div class="hd">'+w4Me()+'<h1>'+esc(t)+'</h1>'+(tm?'<span class="tm">'+esc(tm)+'</span>':'')+x+'</div>';
   if(z.k==='attn') return '<div class="card p">'+hd('Eyes this way','')+'<p class="huge">'+esc(z.call)+'</p><p class="sub">'+esc(z.resp)+'</p><div class="ft"><button class="pill go" style="background:#fff;color:#2A1E3D" data-w="attention">Thank you</button></div></div>';
   if(z.k==='done') return '<div class="card g">'+hd(z.name,'')+'<p class="huge">'+esc(z.h)+'</p><p class="sub">'+esc(z.sub)+'</p><div class="ft"><span class="sp"></span><button class="pill" data-w="rest">Back to Roomie</button></div></div>';
@@ -6130,7 +6132,7 @@ function w4Html(){ const v=A.w4v||'rest', z=w4State(), pop=Date.now()<(A.w4Pop||
       '<div class="mid'+(vid?' v':'')+'"><div><div class="now">'+(i>=0?'<small>STEP '+(i+1)+' OF '+st.length+'</small>':'')+esc(cur)+'</div>'+(nx?'<div class="nx">'+esc(nx)+'</div>':'')+'</div>'+(vid?'<div class="vid" id="w4vid"></div>':'')+'</div>'+
       '<div class="ft"><button class="pill k go" data-w="ready">'+(z.practise?'We’re done!':'We’re ready!')+'</button>'+(z.manual?'<button class="pill q" data-w="back"'+(i?'':' disabled')+'>Back</button><button class="pill q" data-w="next">'+(i>=st.length-1?'Finish':'Next')+'</button>':'')+'<span class="sp"></span><button class="pill q" data-w="stop">Stop</button></div></div>'; }
   if(z.k==='warning') return '<div class="card y">'+hd('2 minutes to finish up',z.tm)+'<div class="now">'+z.steps.map(s=>esc(s)).join('<br>')+'</div><div class="ft"><button class="pill k go" data-w="startNow">Start now</button><button class="pill" data-w="plus5">+5 min</button></div></div>';
-  if(z.k==='timer') return '<div class="small">'+w4Me()+'<div class="bd"><div class="k">TIMER'+(z.paused?' · PAUSED':'')+'</div><div class="v">'+esc(z.tm)+'</div><div class="row"><button class="pill" data-w="tplus">+1 min</button><button class="pill" data-w="tpause">'+(z.paused?'Resume':'Pause')+'</button><button class="pill q" data-w="stop">Stop</button></div></div>'+x+'</div>';
+  if(z.k==='timer') return '<div class="small">'+w4Me()+'<div class="bd"><div class="k">TIMER'+(z.paused?' · PAUSED':'')+'</div><div class="v">'+esc(z.tm)+'</div><div class="row"><button class="pill" data-w="tplus">+1 min</button><button class="pill" data-w="tpause">'+(z.paused?'Resume':'Pause')+'</button><button class="pill q" data-w="stop">Stop</button></div></div><div class="sx">'+x+'</div></div>';
   if(z.k==='pick') return '<div class="small">'+w4Me()+'<div class="bd"><div class="k">PICK A NAME</div><div class="v" style="font-size:40px">'+esc(z.name)+'</div><div class="row"><button class="pill" data-w="pick">Pick again</button><button class="pill q" data-w="unpick">Done</button></div></div></div>';
   if(z.k==='brain') return '<div class="card" style="background:#C9EBD8">'+hd(z.name,z.tm)+'<p class="huge" style="margin:auto 0">'+esc(z.call)+'</p><div class="ft"><button class="pill" data-w="brain">Another one</button><span class="sp"></span><button class="pill q" data-w="stop">Stop</button></div></div>';
   if(z.k==='checkin'){ const B=feelBucket(), tot=Object.values(B).reduce((a,b)=>a+b,0);
@@ -6142,7 +6144,7 @@ function w4Render(){ const d=A.pipDoc; if(!d) return; if(!d.getElementById('w4CS
   let root=d.getElementById('w4'); if(!root){ root=d.createElement('div'); root.id='w4'; d.body.appendChild(root); d.addEventListener('click',w4Click,true); }
   [...d.body.children].forEach(el=>{ if(el!==root&&el.tagName!=='STYLE'&&el.tagName!=='LINK'&&el.tagName!=='SCRIPT') el.style.display='none'; });
   if((A.w4v||'rest')==='card'&&!w4State()){ A.w4v='rest'; }
-  w4Fit(); root.className=A.w4Big&&A.w4v==='card'?'bigm':''; const h=w4Html(); if(root.dataset.h!==h){ root.innerHTML=h; root.dataset.h=h; }
+  w4Fit(); root.className=A.w4Big&&A.w4v==='card'?'bigm':''; let h=w4Html(); if(Date.now()<(A.w4Hint||0)&&A.w4v==='card') h+='<div class="fsh"><b>↑</b>Tap <span>⤢</span> in the bar above Roomie, then tap <span>Full screen</span> on the Roomie tab.</div>'; if(root.dataset.h!==h){ root.innerHTML=h; root.dataset.h=h; }
   const slot=d.getElementById('w4vid'), main=w4VidMain();
   if(slot&&main){ if(!A.w4Vid||A.w4Vid.ownerDocument!==d){ const v=d.createElement('video'); v.muted=true; v.playsInline=true; A.w4Vid=v; }
     const v=A.w4Vid; if(main.currentSrc&&v.dataset.src!==main.currentSrc){ v.src=main.currentSrc; v.dataset.src=main.currentSrc; } if(v.parentNode!==slot) slot.appendChild(v);
@@ -6152,6 +6154,7 @@ function w4Click(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) re
   const card=()=>w4Go('card');
   if(['menu','routines','tickets','timers','brains','rest'].includes(w)){ if(w==='rest'&&A.overlay==='ready') closeOverlay(); return w4Go(w); }
   if(w==='card') return card();
+  if(w==='fshint'){ A.w4Hint=Date.now()+6000; setTimeout(w4Render,6100); return w4Render(); }
   if(w==='big'){ A.w4Big=!A.w4Big; A.w4Size=null; w4Fit(); return w4Render(); }
   if(w==='attention'){ attention(); return A.attnClose?card():w4Go('rest'); }
   if(w==='run'){ fresh(); runRoutine(b.dataset.id); return card(); }

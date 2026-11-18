@@ -20,3 +20,4 @@ test('tapping Roomie shows one word per tool; words with › open their options'
  assert.ok(html.includes("word('brains','Brain break','#C9EBD8',true)"));
  assert.ok(html.includes("startBrain(b.dataset.t||undefined)"));
 });
+test('Roomie’s Full screen button shows where to tap',()=>{ assert.ok(html.includes('data-w="fshint"')); assert.ok(html.includes('in the bar above Roomie, then tap')); });
