@@ -6046,7 +6046,7 @@ function w4State(){ const P=A.P||phaseAt(now()), o=A.overlay, rem=MT.remaining()
 function w4Now(){ const P=A.P||phaseAt(now()); const b=P.block; const left=P.to?fmtLeft((P.to-P.mins)*60):'';
   const t=P.phase==='routine'&&P.routine?P.routine.name:P.phase==='lesson'&&b?b.name:P.phase==='break'&&b?b.name:''; return {t,left}; }
 function w4VidMain(){ const el=Music.playing&&Music.fileAudio; return el&&el.tagName==='VIDEO'?el:null; }
-function w4SizeKey(){ const v=A.w4v||'rest'; if(v!=='card') return v; const z=w4State(); if(!z) return 'rest'; if(z.k==='routine') return w4VidMain()?'routineVid':'routine'; return z.k; }
+function w4SizeKey(){ const v=A.w4v||'rest'; if(v==='end') return A.w4Size||'rest'; if(v!=='card') return v; const z=w4State(); if(!z) return 'rest'; if(z.k==='routine') return w4VidMain()?'routineVid':'routine'; return z.k; }
 function w4BigSize(){ const W=(screen.availWidth||1366), H=(screen.availHeight||768); return [Math.round(W*0.8),Math.round(H*0.8)]; }
 function w4Fit(){ if(!A.pip) return; let k=w4SizeKey(), z=W4_SIZES[k]||W4_SIZES.rest; if(A.w4Big&&A.w4v==='card'&&k!=='rest'){ z=w4BigSize(); k='big'; } if(A.w4Size===k) return; try{ A.pip.resizeTo(z[0],z[1]); A.w4Size=k; }catch(_){ } }
 function w4Go(v){ if(v!=='card') A.w4Big=false; A.w4v=v; A.w4Pop=Date.now()+420; w4Fit(); w4Render(); setTimeout(w4Render,450); }
@@ -6102,13 +6102,15 @@ button{font:inherit;color:inherit;cursor:pointer}
 .small{flex:1;display:flex;align-items:center;gap:12px;padding:10px 14px}.small .me{width:72px;height:76px;flex:none}.small .bd{flex:1;min-width:0}
 .fsh{position:fixed;top:6px;right:8px;max-width:260px;background:#2A1E3D;color:#fff;border-radius:14px;padding:10px 12px 10px 14px;font-size:14px;line-height:1.3;box-shadow:0 8px 20px rgba(0,0,0,.25);z-index:5}.fsh b{position:absolute;top:-2px;right:14px;font-size:26px;color:#FFD84D;animation:fsb 1s infinite}.fsh span{background:#FFD84D;color:#2A1E3D;border-radius:6px;padding:0 5px}@keyframes fsb{50%{transform:translateY(-5px)}}.fsh{padding-top:26px}
 .sx{display:flex;flex-direction:column;gap:4px;align-items:flex-end;align-self:flex-start;flex:none}.sx .x{order:-1}
-.bg{padding:5px 12px;font-size:13px;flex:none;border-color:#2A1E3D!important;background:#fff!important}.bigm .hd .me{width:90px;height:90px}.bigm .hd h1{font-size:clamp(28px,5vw,64px)}.bigm .hd .tm{font-size:clamp(40px,8vw,110px)}.bigm .goal span{font-size:22px;padding:5px 16px}.bigm .now{font-size:clamp(30px,5.6vw,76px);padding:20px 26px;border-width:4px}.bigm .now small{font-size:16px}.bigm .nx{font-size:clamp(18px,2.4vw,30px)}.bigm .huge{font-size:clamp(48px,9vw,130px)}.bigm .sub{font-size:clamp(20px,3vw,36px)}.bigm .ft .pill{font-size:18px;padding:8px 16px}.bigm .ft .go{font-size:clamp(24px,3vw,40px);padding:14px 40px}.bigm .feel button{font-size:22px}.bigm .feel svg{width:clamp(48px,8vw,110px);height:clamp(48px,8vw,110px)}.bigm .tk h2{font-size:clamp(28px,4vw,56px)}.bigm .tk p{font-size:clamp(18px,2.4vw,30px)}.bigm .tk ol{font-size:24px}.bigm .bg{font-size:15px;padding:6px 14px}.bigm .x{width:42px;height:42px}.small .me{width:clamp(72px,18vw,260px);height:clamp(76px,19vw,270px)}.small .k{font-size:clamp(11px,2vw,22px);letter-spacing:.08em;color:#6A5F80}.small .v{font:800 clamp(46px,14vw,220px)/1 "Baloo 2",system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bg{padding:5px 12px;font-size:13px;flex:none;border-color:#2A1E3D!important;background:#fff!important}.bigm .hd .me{width:90px;height:90px}.bigm .hd h1{font-size:clamp(28px,5vw,64px)}.bigm .hd .tm{font-size:clamp(40px,8vw,110px)}.bigm .goal span{font-size:22px;padding:5px 16px}.bigm .now{font-size:clamp(30px,5.6vw,76px);padding:20px 26px;border-width:4px}.bigm .now small{font-size:16px}.bigm .nx{font-size:clamp(18px,2.4vw,30px)}.bigm .huge{font-size:clamp(48px,9vw,130px)}.bigm .sub{font-size:clamp(20px,3vw,36px)}.bigm .ft .pill{font-size:18px;padding:8px 16px}.bigm .ft .go{font-size:clamp(24px,3vw,40px);padding:14px 40px}.bigm .feel button{font-size:22px}.bigm .feel svg{width:clamp(48px,8vw,110px);height:clamp(48px,8vw,110px)}.bigm .tk h2{font-size:clamp(28px,4vw,56px)}.bigm .tk p{font-size:clamp(18px,2.4vw,30px)}.bigm .tk ol{font-size:24px}.bigm .bg{font-size:15px;padding:6px 14px}.bigm .small .pill{font-size:22px;padding:10px 22px}.bigm .small .row{gap:12px;margin-top:16px}.bigm .x{width:42px;height:42px}.small .me{width:clamp(72px,18vw,260px);height:clamp(76px,19vw,270px)}.small .k{font-size:clamp(11px,2vw,22px);letter-spacing:.08em;color:#6A5F80}.small .v{font:800 clamp(46px,14vw,220px)/1 "Baloo 2",system-ui,sans-serif;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .small .row{margin-top:6px}.small .pill{padding:4px 10px;font-size:12px}
 `;
 function w4Me(){ return '<span class="me" aria-hidden="true">'+birdSVG()+'</span>'; }
 function w4Routines(){ return (S.routines||[]); }
 function w4Html(){ const v=A.w4v||'rest', z=w4State(), pop=Date.now()<(A.w4Pop||0)?' pop':'';
-  if(v==='rest'||(v==='card'&&!z)){ const n=w4Now(), busy=!!z&&!A.attnClose, lbl=A.attnClose?'Eyes this way':z?(z.k==='routine'?z.R.name:z.k==='ticket'?'Ticket':z.k==='warning'?'2 minutes':z.k==='timer'?z.tm:z.k==='pick'?z.name:'Tap me'):(n.left||n.t||'Tap me');
+  if(v==='end'&&A.w4End){ const e=A.w4End, msg=e.k==='timer'?'Time’s up!':e.k==='brain'?'Brain break done!':e.k==='routine'?e.name+' is finished':'All done!';
+    return '<div class="card g"><div class="hd">'+w4Me()+'<h1>'+esc(msg)+'</h1></div><p class="huge" style="margin:auto 0">Back to your work</p><div class="ft"><button class="pill k go" data-w="rest">Back to Roomie</button></div></div>'; }
+  if(v==='rest'||v==='end'||(v==='card'&&!z)){ const n=w4Now(), busy=!!z&&!A.attnClose, lbl=A.attnClose?'Eyes this way':z?(z.k==='routine'?z.R.name:z.k==='ticket'?'Ticket':z.k==='warning'?'2 minutes':z.k==='timer'?z.tm:z.k==='pick'?z.name:'Tap me'):(n.left||n.t||'Tap me');
     return '<div class="rest'+(busy?' busy':'')+(A.attnClose?' attn':'')+'"><button class="me" data-w="'+(A.attnClose?'attention':busy?'card':'menu')+'" title="Tap Roomie">'+birdSVG()+'</button><span class="chip" data-w="'+(busy?'card':'menu')+'">'+esc(lbl)+'</span></div>'; }
   if(v==='menu'||v==='routines'||v==='tickets'||v==='timers'||v==='brains'){ let l='';
     const running=z&&z.k!=='pick'?'<button class="pill k big" data-w="card">Back to '+esc(z.k==='routine'?z.R.name:z.k==='timer'?'the timer':z.k==='brain'?'the brain break':z.k==='checkin'?'the check-in':z.k==='ticket'?'the ticket':z.k==='warning'?'finishing up':'it')+'</button>':'';
@@ -6121,7 +6123,7 @@ function w4Html(){ const v=A.w4v||'rest', z=w4State(), pop=Date.now()<(A.w4Pop||
     else l='<div class="row"><button class="pill q" data-w="menu">← Back</button><span class="lbl" style="margin:0">Tickets</span></div><div class="grid2'+pop+'"><button class="pill" style="background:#FFE0D6" data-w="ticket" data-kind="entry">Entry ticket<small>Start of the lesson</small></button><button class="pill" style="background:#FFE0D6" data-w="ticket" data-kind="exit">Exit ticket<small>End of the lesson</small></button></div>';
     const n=w4Now(); return '<div class="menu"><div class="l">'+l+'</div><div class="r"><button class="me" data-w="rest" title="Tuck away">'+birdSVG()+'</button>'+(n.left?'<span class="chip">'+esc(n.left)+'</span>':'')+'<div class="hint">Tap me to tuck away</div></div></div>'; }
   /* cards */
-  const x='<button class="pill q bg" data-w="fshint" title="How to go full screen">Full screen</button><button class="x" data-w="rest" aria-label="Tuck Roomie away" title="Tuck Roomie away">✕</button>';
+  const x='<button class="pill q bg" data-w="fshint" title="Show this full screen">Full screen</button><button class="x" data-w="rest" aria-label="Tuck Roomie away" title="Tuck Roomie away">✕</button>';
   const hd=(t,tm)=>'<div class="hd">'+w4Me()+'<h1>'+esc(t)+'</h1>'+(tm?'<span class="tm">'+esc(tm)+'</span>':'')+x+'</div>';
   if(z.k==='attn') return '<div class="card p">'+hd('Eyes this way','')+'<p class="huge">'+esc(z.call)+'</p><p class="sub">'+esc(z.resp)+'</p><div class="ft"><button class="pill go" style="background:#fff;color:#2A1E3D" data-w="attention">Thank you</button></div></div>';
   if(z.k==='done') return '<div class="card g">'+hd(z.name,'')+'<p class="huge">'+esc(z.h)+'</p><p class="sub">'+esc(z.sub)+'</p><div class="ft"><span class="sp"></span><button class="pill" data-w="rest">Back to Roomie</button></div></div>';
@@ -6143,7 +6145,8 @@ function w4Html(){ const v=A.w4v||'rest', z=w4State(), pop=Date.now()<(A.w4Pop||
 function w4Render(){ const d=A.pipDoc; if(!d) return; if(!d.getElementById('w4CSS')){ const c=d.createElement('style'); c.id='w4CSS'; c.textContent=W4_CSS; d.head.appendChild(c); }
   let root=d.getElementById('w4'); if(!root){ root=d.createElement('div'); root.id='w4'; d.body.appendChild(root); d.addEventListener('click',w4Click,true); }
   [...d.body.children].forEach(el=>{ if(el!==root&&el.tagName!=='STYLE'&&el.tagName!=='LINK'&&el.tagName!=='SCRIPT') el.style.display='none'; });
-  if((A.w4v||'rest')==='card'&&!w4State()){ A.w4v='rest'; }
+  const zz=w4State(); if(zz) A.w4Last={k:zz.k,name:zz.k==='routine'?zz.R.name:zz.k==='brain'?zz.name:''};
+  if((A.w4v||'rest')==='card'&&!zz){ if(A.w4Last&&['timer','brain','routine','ticket','checkin'].includes(A.w4Last.k)){ A.w4End=A.w4Last; A.w4v='end'; } else A.w4v='rest'; A.w4Last=null; }
   w4Fit(); root.className=A.w4Big&&A.w4v==='card'?'bigm':''; let h=w4Html(); if(Date.now()<(A.w4Hint||0)&&A.w4v==='card') h+='<div class="fsh"><b>↑</b>Tap <span>⤢</span> in the bar above Roomie, then tap <span>Full screen</span> on the Roomie tab.</div>'; if(root.dataset.h!==h){ root.innerHTML=h; root.dataset.h=h; }
   const slot=d.getElementById('w4vid'), main=w4VidMain();
   if(slot&&main){ if(!A.w4Vid||A.w4Vid.ownerDocument!==d){ const v=d.createElement('video'); v.muted=true; v.playsInline=true; A.w4Vid=v; }
@@ -6152,9 +6155,9 @@ function w4Render(){ const d=A.pipDoc; if(!d) return; if(!d.getElementById('w4CS
   else if(A.w4Vid&&!A.w4Vid.paused){ try{ A.w4Vid.pause(); }catch(_){ } } }
 function w4Click(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) return; e.stopPropagation(); const w=b.dataset.w, fresh=()=>{ if(navHasActivity()) navStopActivity(false); };
   const card=()=>w4Go('card');
-  if(['menu','routines','tickets','timers','brains','rest'].includes(w)){ if(w==='rest'&&A.overlay==='ready') closeOverlay(); return w4Go(w); }
+  if(['menu','routines','tickets','timers','brains','rest'].includes(w)){ A.w4End=null; if(w==='rest'&&A.overlay==='ready') closeOverlay(); return w4Go(w); }
   if(w==='card') return card();
-  if(w==='fshint'){ A.w4Hint=Date.now()+6000; setTimeout(w4Render,6100); return w4Render(); }
+  if(w==='fshint'){ w4FullStart(true).then(ok=>{ if(!ok){ A.w4Hint=Date.now()+7000; setTimeout(w4Render,7100); w4Render(); } }); return; }
   if(w==='big'){ A.w4Big=!A.w4Big; A.w4Size=null; w4Fit(); return w4Render(); }
   if(w==='attention'){ attention(); return A.attnClose?card():w4Go('rest'); }
   if(w==='run'){ fresh(); runRoutine(b.dataset.id); return card(); }
@@ -6219,7 +6222,9 @@ function w4FullStart(){ let host=document.getElementById('w4full'); if(!host){ h
     sh.innerHTML='<style>'+W4_CSS.replace(/body\{/,':host{').replace('#w4{position:fixed;inset:0;','#w4{position:absolute;inset:0;')+'</style><div id="w4" class="bigm"></div>';
     sh.addEventListener('click',e=>{ const b=e.target.closest('[data-w]'); if(!b) return; const k=b.dataset.w; if(k==='fsgo'){ e.stopPropagation(); host.requestFullscreen().catch(()=>{}); setTimeout(w4FullRender,300); return; } if(k==='fsexit'){ e.stopPropagation(); document.exitFullscreen().catch(()=>{}); setTimeout(w4FullRender,300); return; } if(k==='rest'){ e.stopPropagation(); w4FullStop(); return; } w4Click(e); w4FullRender(); },true);
     document.addEventListener('fullscreenchange',()=>setTimeout(w4FullRender,50)); }
-  if(host.hidden!==false){ host.hidden=false; host.shadowRoot.getElementById('w4').dataset.h=''; } w4FullRender(); }
+  if(host.hidden!==false){ host.hidden=false; host.shadowRoot.getElementById('w4').dataset.h=''; } w4FullRender();
+  if(arguments[0]) return host.requestFullscreen().then(()=>{ A.w4FullSeen=''; w4FullRender(); return true; }).catch(()=>{ host.hidden=true; return false; });
+  return Promise.resolve(true); }
 function w4FullStop(){ const host=document.getElementById('w4full'); if(!host||host.hidden) return; if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); host.hidden=true; A.w4FullSeen=w4StateKey(); const v=w4VidMain(); if(v&&A.w4FsHome&&v.parentNode!==A.w4FsHome) A.w4FsHome.appendChild(v); A.w4FsHome=null; }
 function w4StateKey(){ const z=w4State(); return z?z.k+(z.R?':'+z.R.id:''):''; }
 /* When the teacher brings the Roomie tab forward (Chrome's ⤢ in Roomie's title bar) during an activity, the tab shows it big. */
