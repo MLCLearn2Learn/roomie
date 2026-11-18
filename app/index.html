@@ -6047,7 +6047,7 @@ function w4Now(){ const P=A.P||phaseAt(now()); const b=P.block; const left=P.to?
   const t=P.phase==='routine'&&P.routine?P.routine.name:P.phase==='lesson'&&b?b.name:P.phase==='break'&&b?b.name:''; return {t,left}; }
 function w4VidMain(){ const el=Music.playing&&Music.fileAudio; return el&&el.tagName==='VIDEO'?el:null; }
 function w4SizeKey(){ const v=A.w4v||'rest'; if(v!=='card') return v; const z=w4State(); if(!z) return 'rest'; if(z.k==='routine') return w4VidMain()?'routineVid':'routine'; return z.k; }
-function w4BigSize(){ const W=(screen.availWidth||1366), H=(screen.availHeight||768); return [Math.round(Math.min(W*0.8,1400)),Math.round(Math.min(H*0.8,900))]; }
+function w4BigSize(){ const W=(screen.availWidth||1366), H=(screen.availHeight||768); return [Math.round(W*0.8),Math.round(H*0.8)]; }
 function w4Fit(){ if(!A.pip) return; let k=w4SizeKey(), z=W4_SIZES[k]||W4_SIZES.rest; if(A.w4Big&&A.w4v==='card'&&k!=='rest'){ z=w4BigSize(); k='big'; } if(A.w4Size===k) return; try{ A.pip.resizeTo(z[0],z[1]); A.w4Size=k; }catch(_){ } }
 function w4Go(v){ if(v!=='card') A.w4Big=false; A.w4v=v; A.w4Pop=Date.now()+420; w4Fit(); w4Render(); setTimeout(w4Render,450); }
 const W4_CSS=`
@@ -6183,6 +6183,7 @@ function w4Home(){ if(!W4) return; let h=document.getElementById('w4home'); if(!
   const x=w4HomeHTML(); if(h.dataset.h!==x){ h.innerHTML=x; h.dataset.h=x; } }
 if(W4){
   const st=document.createElement('style'); st.textContent=`html.w4 #app,html.w4 #overlayHost{display:none!important}
+#w4full{position:fixed;inset:0;z-index:99999;background:#FFE7A8}#w4full[hidden]{display:none}
 #w4home{min-height:100vh;background:#FFF6E0;color:#2A1E3D;font-family:Nunito,system-ui,sans-serif;font-weight:800;padding:32px 20px}
 #w4home .w4in{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
 #w4home .w4hero{display:flex;align-items:center;gap:20px;background:#2A1E3D;color:#fff;border-radius:24px;padding:22px 26px}
@@ -6195,13 +6196,33 @@ if(W4){
 #w4home .w4rec{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}#w4home .w4rec div{background:#fff;border-radius:14px;padding:10px 14px;display:flex;flex-direction:column}#w4home .w4rec span{font-weight:700;color:#6A5F80;font-size:14px}
 #w4home .w4foot{font-weight:700;font-size:14px}#w4home a{color:#2A1E3D}
 @media(max-width:640px){#w4home .w4hero{flex-wrap:wrap}#w4home .w4open{margin-left:0}}`; document.head.appendChild(st);
+  setFullView=function(){ document.body.classList.remove('full-view'); };
   pipViewPref=function(){ return 'rest'; };
   pipSizeFor=function(){ return W4_SIZES[w4SizeKey()]||W4_SIZES.rest; };
-  pipRender=function(){ try{ w4Render(); }catch(e){ console.warn(e); } try{ w4Home(); }catch(_){ } };
-  { const f=floatOpen; floatOpen=async function(){ A.w4v='rest'; A.w4Size=null; A.w4Big=false; const dp=window.documentPictureInPicture, rq=dp&&dp.requestWindow; if(rq&&!A.pip) dp.requestWindow=function(o){ return rq.call(dp,Object.assign({},o,{disallowReturnToOpener:true})); }; let r; try{ r=await f.apply(this,arguments); } finally{ if(rq) dp.requestWindow=rq; } if(A.pip) A.w4Size='rest'; w4Home(); return r; }; }
+  pipRender=function(){ try{ w4Render(); }catch(e){ console.warn(e); } try{ w4Home(); }catch(_){ } try{ w4FullRender(); }catch(_){ } };
+  { const f=floatOpen; floatOpen=async function(){ A.w4v='rest'; A.w4Size=null; A.w4Big=false; const r=await f.apply(this,arguments); if(A.pip) A.w4Size='rest'; w4Home(); return r; }; }
   { const f=markFloat; markFloat=function(){ f(); try{ w4Home(); }catch(_){ } }; }
   setInterval(()=>{ try{ w4Home(); }catch(_){ } },2000); setTimeout(w4Home,0);
+  setInterval(()=>{ try{ w4FullRender(); if(!w4State()) A.w4FullSeen=''; }catch(_){ } },500);
 }
+
+/* Full screen: the floating window can't go full screen, so the same card is shown full screen on the Roomie tab. */
+function w4FullOn(){ const h=document.getElementById('w4full'); return !!h&&!h.hidden; }
+function w4FullRender(){ const host=document.getElementById('w4full'); if(!host||!w4FullOn()) return; const sh=host.shadowRoot; const root=sh.getElementById('w4');
+  const z=w4State(); if(!z){ w4FullStop(); return; }
+  const was=A.w4v; A.w4v='card'; let h=w4Html(); A.w4v=was; h=h.replace(/<button class="pill q bg"[^>]*>[^<]*<\/button>/,document.fullscreenElement?'<button class="pill q bg" data-w="fsexit">Exit full screen</button>':'<button class="pill q bg" data-w="fsgo">Full screen</button>');
+  if(root.dataset.h!==h){ root.innerHTML=h; root.dataset.h=h; }
+  const slot=sh.getElementById('w4vid'), main=w4VidMain(); if(slot&&main&&main.parentNode!==slot){ A.w4FsHome=A.w4FsHome||main.parentNode; slot.appendChild(main); } }
+function w4FullStart(){ let host=document.getElementById('w4full'); if(!host){ host=document.createElement('div'); host.id='w4full'; document.body.appendChild(host); const sh=host.attachShadow({mode:'open'});
+    sh.innerHTML='<style>'+W4_CSS.replace(/body\{/,':host{').replace('#w4{position:fixed;inset:0;','#w4{position:absolute;inset:0;')+'</style><div id="w4" class="bigm"></div>';
+    sh.addEventListener('click',e=>{ const b=e.target.closest('[data-w]'); if(!b) return; const k=b.dataset.w; if(k==='fsgo'){ e.stopPropagation(); host.requestFullscreen().catch(()=>{}); setTimeout(w4FullRender,300); return; } if(k==='fsexit'){ e.stopPropagation(); document.exitFullscreen().catch(()=>{}); setTimeout(w4FullRender,300); return; } if(k==='rest'){ e.stopPropagation(); w4FullStop(); return; } w4Click(e); w4FullRender(); },true);
+    document.addEventListener('fullscreenchange',()=>setTimeout(w4FullRender,50)); }
+  if(host.hidden!==false){ host.hidden=false; host.shadowRoot.getElementById('w4').dataset.h=''; } w4FullRender(); }
+function w4FullStop(){ const host=document.getElementById('w4full'); if(!host||host.hidden) return; if(document.fullscreenElement) document.exitFullscreen().catch(()=>{}); host.hidden=true; A.w4FullSeen=w4StateKey(); const v=w4VidMain(); if(v&&A.w4FsHome&&v.parentNode!==A.w4FsHome) A.w4FsHome.appendChild(v); A.w4FsHome=null; }
+function w4StateKey(){ const z=w4State(); return z?z.k+(z.R?':'+z.R.id:''):''; }
+/* When the teacher brings the Roomie tab forward (Chrome's ⤢ in Roomie's title bar) during an activity, the tab shows it big. */
+document.addEventListener('visibilitychange',()=>{ if(W4&&!document.hidden&&w4State()&&A.w4FullSeen!==w4StateKey()) w4FullStart(); });
+window.addEventListener('focus',()=>{ if(W4&&w4State()&&A.w4FullSeen!==w4StateKey()) w4FullStart(); });
 
 })();
 </script>
