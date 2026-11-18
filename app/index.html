@@ -335,7 +335,7 @@ body.full-view .fv-bar{display:flex}
 .fv-bar button{font:inherit;font-weight:800;font-size:16px;border:2.5px solid var(--ink,#2A1E3D);border-radius:999px;padding:7px 16px;background:#fff;color:var(--ink,#2A1E3D);cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.15)}
 .fv-bar .fv-att{background:#FF8FA3}
 #fsBtn[aria-pressed="true"]{background:var(--gum,#FF8CC6)}
-body.calm-screen .top-r [data-tool="float"],body.calm-screen .top-r [data-tool="remote"],body.calm-screen .top-r [data-tour="start"],body.calm-screen #micBtn:not(.on),body.calm-screen #liveBtn:not(.on){display:none!important}
+body.calm-screen .top-r [data-tool="remote"],body.calm-screen .top-r [data-tour="start"],body.calm-screen #micBtn:not(.on),body.calm-screen #liveBtn:not(.on){display:none!important}
 .cs-menu{position:fixed;z-index:60;background:#fff;border:2.5px solid var(--ink,#2A1E3D);border-radius:18px;padding:8px;display:flex;flex-direction:column;min-width:250px;box-shadow:0 10px 30px rgba(0,0,0,.18)}.cs-menu button{border:0;background:none;text-align:left;font:inherit;font-size:18px;font-weight:700;padding:11px 14px;border-radius:12px;color:var(--ink,#2A1E3D)}.cs-menu button:hover,.cs-menu button:focus-visible{background:#FFF1A8;outline:none}.cs-menu small{display:block;font-weight:500;font-size:14px;color:#6E625B}
 .rr-launch,.rr-back,.rr-strip{grid-column:1/-1}.rr-strip{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;background:#FFF6D6;border:2px solid #F5B700;border-radius:14px;padding:8px 14px}.rr-strip small{flex-basis:100%;font-weight:800;font-size:13px;color:#8C5A00;letter-spacing:.03em;text-transform:uppercase}.rr-strip b{font-size:20px}.rr-strip .rr-hint{flex:1 1 220px;color:#5B4F48}.rr-strip .rr-btns{display:flex;gap:8px;flex-wrap:wrap}
 .rr-launch{background:#FFF6D6;border:3px solid #F5B700;border-radius:20px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}.rr-launch:not(:has(.rr-steps)){flex-direction:row;align-items:center;justify-content:space-between;gap:18px}.rr-launch h2{font-size:26px;margin:2px 0}.rr-launch p{margin:0}.rr-steps{margin:0;padding-left:24px;display:grid;gap:8px}.rr-steps li{font-size:18px}.rr-steps .btn{margin-left:10px}.rr-dots{display:flex;gap:6px}.rr-dots i{width:22px;height:8px;border-radius:4px;background:#EADFC2}.rr-dots i.done{background:#2F8F6B}.rr-dots i.cur{background:#F5B700}.rr-tick{font-size:16px;color:#2F8F6B;white-space:nowrap}
@@ -1206,6 +1206,7 @@ body.ui-calm-look .mascot *,body.ui-calm-look .bigbird *,body.ui-calm-look .stk 
 /* Teaching layout pass: preserve the existing artwork, fonts and colour choices. */
 #stage .card:has(>.qr-wrap)>h1.big{font-size:clamp(40px,5.2vw,76px);line-height:1.05}
 #stage .card:has(>.qr-wrap)>.lead{margin:4px 0}
+.w-open{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left}.w-open small{font-size:13px;font-weight:700;opacity:.8}
 .qr-wrap{display:flex;flex-direction:column;gap:8px;margin:6px 0 10px}
 .qr-head{justify-content:space-between;align-items:center}
 .qr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
@@ -1437,7 +1438,7 @@ body.fun-calm .celebration-character,body.fun-calm .celebration-stars span{anima
       <button class="hero-badge" id="heroBadge" type="button" data-tool="hero" hidden>★ Mystery Hero is watching</button>
       <span class="clock" id="clock">--:--</span>
       <button class="ibtn" id="fsBtn" type="button" aria-label="Full screen"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><i class="lbl">Full screen</i></button>
-      <button class="ibtn" data-tool="float" type="button" aria-label="Float over my slides" title="Float over my slides"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="15" rx="2"/><rect x="12" y="11" width="7" height="5.5" rx="1" fill="currentColor"/></svg><i class="lbl">Float</i></button>
+      <button class="ibtn" data-tool="float" type="button" aria-label="Float over my slides" title="Float over my slides"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4" width="19" height="15" rx="2"/><rect x="12" y="11" width="7" height="5.5" rx="1" fill="currentColor"/></svg><i class="lbl">Widget</i></button>
       <button class="ibtn micbtn" id="micBtn" type="button" aria-label="Hey Roomie voice commands"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/></svg><i class="lbl">Voice</i></button>
       <button class="ibtn" data-tool="remote" type="button" aria-label="Phone remote" title="Use your phone as a remote"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="7" width="10" height="15" rx="2"/><path d="M11 18.5h2"/><path d="M8.5 4.2a5 5 0 0 1 7 0"/><path d="M6.4 2.2a8 8 0 0 1 11.2 0"/></svg><i class="lbl">Remote</i></button>
       <button class="livebtn" id="liveBtn" type="button" title="Student devices"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M11 18h2"/></svg><span>Student devices</span></button>
@@ -1977,7 +1978,7 @@ function renderHome(P,full){ if(!full) return;
 
 /* Routines first: every home screen offers one-tap routines with the class record to beat. */
 function quickRoutinesHTML(){ const L=(S.routines||[]).slice(0,8); if(!L.length) return '';
-  return '<div class="qr-wrap"><div class="row qr-head"><span class="eyebrow">Run a routine</span><button class="linkbtn" type="button" data-tool="routines">All routines, practise and records</button></div><div class="qr-grid">'+L.map(r=>'<button class="qr" type="button" data-run="'+esc(r.id)+'"><b>'+esc(r.name)+'</b><small>'+(r.best?'Record '+fmtLeft(r.best)+' · beat it!':r.minutes+' min · no record yet')+'</small></button>').join('')+'</div></div>'; }
+  return '<div class="qr-wrap"><div class="row qr-head"><span class="eyebrow">Run a routine</span><button class="linkbtn" type="button" data-tool="routines">All routines, practise and records</button></div>'+(A.pip?'':'<button class="btn gold w-open" type="button" data-tool="float">Open the Roomie widget<small>Sits on top of OneNote, SEQTA or your slides, with every routine and tool</small></button>')+'<div class="qr-grid">'+L.map(r=>'<button class="qr" type="button" data-run="'+esc(r.id)+'"><b>'+esc(r.name)+'</b><small>'+(r.best?'Record '+fmtLeft(r.best)+' · beat it!':r.minutes+' min · no record yet')+'</small></button>').join('')+'</div></div>'; }
 function greeting(){ const h=now().getHours(); return h<12?'Good morning':(h<17?'Good afternoon':'Good evening'); }
 function renderLesson(P,full){
   const b=P.block, left=(P.to-P.mins)*60, total=(P.to-P.from)*60;
@@ -2186,7 +2187,7 @@ async function floatOpen(){
     markFloat(); pipRender(true);
   }catch(e){ toast('Roomie couldn’t open the floating window here. Try it on your Roomie website in Chrome or Edge.'); }
 }
-function markFloat(){ const b=document.querySelector('[data-tool="float"]'); if(b){ b.classList.toggle('on',!!A.pip); const label=b.querySelector('.lbl'); if(label) label.textContent=A.pip?'Close float':'Float'; const hint=A.pip?'Close floating window':'Float over my slides'; b.setAttribute('aria-label',hint); b.title=hint; } }
+function markFloat(){ const b=document.querySelector('[data-tool="float"]'); if(b){ b.classList.toggle('on',!!A.pip); const label=b.querySelector('.lbl'); if(label) label.textContent=A.pip?'Close widget':'Widget'; const hint=A.pip?'Close the Roomie widget':'Open the Roomie widget over OneNote, SEQTA or your slides'; b.setAttribute('aria-label',hint); b.title=hint; } }
 function pickQuiet(){ const all=names(); if(!all.length) return; if(!A.pickPool.length) A.pickPool=all.slice(); const i=Math.floor(Math.random()*A.pickPool.length); A.picked=A.pickPool.splice(i,1)[0]; chime(1); A.pipPicked=A.picked; pipRender(true); }
 const PIP_CSS='.mir{display:flex;justify-content:space-between;align-items:center;gap:6px;background:#4A3F38;color:#fff;border-radius:10px;padding:4px 8px;font-size:12px}.mir.on{background:#B5306A}.mir i{display:inline-block;width:8px;height:8px;border-radius:50%;background:#FF6B6B;margin-right:6px;animation:mb 1.2s infinite}@keyframes mb{50%{opacity:.3}}.mir .mb{display:flex;gap:4px}.mir button{font:inherit;font-size:12px;padding:3px 8px;border-radius:8px;border:0;background:#fff;color:#4A3F38;cursor:pointer}.mir b{font-size:11px}.mir em{font-style:normal}body{margin:0;font-family:Nunito,system-ui,sans-serif;font-weight:800;background:#FFF6E0;color:#4A3F38}#pip{position:relative;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-height:100vh;box-sizing:border-box}#pip.warn{background:#F5B700;color:#2A1E00}#pip.attn{background:#F2785C}.r{display:flex;align-items:center;justify-content:space-between;gap:10px}.k{font-size:12px;letter-spacing:.08em;opacity:.85}.t{font-family:"Baloo 2",sans-serif;font-size:24px;line-height:1.05}.big{font-family:"Baloo 2",sans-serif;font-size:44px;line-height:1;font-variant-numeric:tabular-nums}.chips{display:flex;gap:6px;flex-wrap:wrap}.chips span{background:rgba(74,63,56,.1);border-radius:999px;padding:3px 10px;font-size:13px}#pip.warn .chips span{background:rgba(255,255,255,.6)}.meter{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}.meter i{height:9px;border-radius:4px;background:rgba(74,63,56,.14)}.meter i.g{background:#F5B700}.meter i.y{background:#FFE08A}.meter i.r{background:#F2785C}.btns{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:auto}button{font:inherit;font-size:13px;border:0;border-radius:10px;padding:9px 4px;background:rgba(74,63,56,.1);color:inherit;cursor:pointer}button.a{background:#E2558F;color:#fff}#pip.warn button{background:rgba(255,255,255,.7)}#pip.warn button.go{background:#FFF6E0;color:#4A3F38}ol{margin:0;padding-left:20px;font-size:16px;line-height:1.4}.lid{transform-box:fill-box;transform-origin:50% 0;transform:scaleY(0)}.notes,.zz{opacity:0}#pip.mini{padding:8px;align-items:center;justify-content:center;gap:4px;text-align:center}.roo{background:transparent!important;padding:0;width:120px;height:120px;border-radius:50%;animation:bob 2.4s ease-in-out infinite}.roo svg{width:100%;height:100%;overflow:visible}.roo:hover{transform:scale(1.06)}@keyframes bob{50%{translate:0 -4px}}.mt{font-family:"Baloo 2",sans-serif;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}.ms{font-size:13px;opacity:.9;max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hint2{font-size:11px;opacity:.7}.shr{padding:5px 10px!important;font-size:12px!important;background:transparent!important;text-decoration:underline;opacity:.85}';
 function pipRender(force){ if(!A.pipDoc) return; const P=A.P||phaseAt(now()); let cls='', html='';
@@ -5012,29 +5013,31 @@ const PBAR_CSS='#pb2{position:fixed;inset:0;display:flex;flex-direction:column;g
  '#pb2 .ac{display:flex;gap:6px;align-items:center;overflow-x:auto;scrollbar-width:none}#pb2 .ac::-webkit-scrollbar{display:none}'+
  '#pb2 button{flex:none;font:800 13px Nunito,system-ui,sans-serif;border:2px solid #2A1E3D;border-radius:999px;padding:6px 11px;background:#fff;color:#2A1E3D;cursor:pointer;white-space:nowrap}'+
  '#pb2 button.a{background:#F2785C;color:#fff;border-color:#F2785C}#pb2 button.g{background:#FFD84D}#pb2 button.q{background:transparent;border-color:rgba(42,30,61,.35)}#pb2.attn button{border-color:#fff}'+
- '#pb2 .sp{flex:1}#pb2 .pk{border:0;background:#fff;border-radius:999px;padding:2px 10px;margin-left:6px;font-size:14px;vertical-align:middle}'+'#pb2 .vw{flex:none;display:flex;flex-direction:column;gap:4px}#pb2 .vw button{padding:2px 9px;font-size:11px}'+'#pb2 .tl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;align-content:flex-start}#pb2 .tl button{font-size:14px;padding:6px 12px}#pb2 .tl .sp{flex:1 0 8px}#pb2 .tl button.on{outline:3px solid #2A1E3D;outline-offset:1px}#pb2 .ex{display:flex;gap:6px;flex:none}'+'#pb2.menu .ln{display:none}#pb2.menu .ac{flex-wrap:wrap;overflow:visible;align-content:flex-start}#pb2.menu .roo{width:32px;height:32px}#pb2.menu .tm{font-size:30px}';
+ '#pb2 .sp{flex:1}#pb2 .pk{border:0;background:#fff;border-radius:999px;padding:2px 10px;margin-left:6px;font-size:14px;vertical-align:middle}'+'#pb2 .vw{flex:none;display:flex;flex-direction:column;gap:4px}#pb2 .vw button{padding:2px 9px;font-size:11px}'+'#pb2 .tl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;align-content:flex-start}#pb2 .tl button{font-size:14px;padding:6px 12px}#pb2 .tl .sp{flex:1 0 8px}#pb2 .tl button.on{outline:3px solid #2A1E3D;outline-offset:1px}#pb2 .ex{display:flex;gap:6px;flex:none}'+'#pb2 .rt,#pb2 .tw{display:flex;flex-wrap:wrap;gap:6px;align-items:center}#pb2 .lb{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-right:2px}#pb2 .rc{background:#FFD84D;font-size:15px;padding:6px 12px}#pb2 .rc i{font-style:normal;font-size:11px;margin-left:6px;background:#fff;border-radius:999px;padding:1px 6px}#pb2 .tl{flex-direction:column;align-items:stretch;flex-wrap:nowrap;gap:8px}#pb2 .tw .sp{flex:1 0 8px}'+'#pb2.menu .ln{display:none}#pb2.menu .ac{flex-wrap:wrap;overflow:visible;align-content:flex-start}#pb2.menu .roo{width:32px;height:32px}#pb2.menu .tm{font-size:30px}';
 function pbarState(){ const P=A.P||phaseAt(now()), o=A.overlay, rem=MT.remaining();
   if(A.attnClose){ const sig=typeof attentionPreset==='function'?attentionPreset():null; return {cls:'attn',k:'ATTENTION',t:'Eyes this way',ln:sig?sig.call+' · '+sig.response:'',tm:''}; }
-  if(o==='manualRoutine'&&A.mr){ const R=routineById(A.mr.id); if(R){ const st=stepsOf(R); return {cls:'go',k:'ROUTINE · STEP '+(A.mr.step+1)+' OF '+st.length,t:R.name,ln:st[A.mr.step]||'',tm:rem>0?fmtLeft(rem):'',extra:'<button data-pb="ready" class="g">We’re ready!</button><button data-pb="mrBack" class="q">Back</button><button data-pb="mrNext" class="q">'+(A.mr.step>=st.length-1?'Finish':'Next')+'</button>'}; } }
+  if(o==='manualRoutine'&&A.mr){ const R=routineById(A.mr.id); if(R){ const st=stepsOf(R); return {cls:'go',k:'ROUTINE · STEP '+(A.mr.step+1)+' OF '+st.length,t:R.name,ln:st[A.mr.step]||'',tm:rem>0?fmtLeft(rem):'',extra:'<button data-pb="grow" class="g">Show the class</button><button data-pb="ready" class="g">We’re ready!</button><button data-pb="mrBack" class="q">Back</button><button data-pb="mrNext" class="q">'+(A.mr.step>=st.length-1?'Finish':'Next')+'</button>'}; } }
   if(o==='practise'&&A.pr){ const R=routineById(A.pr.id); return {cls:'go',k:'PRACTISE',t:R?R.name:'Practise',ln:A.pr.done?'Done in '+fmtLeft(A.pr.done):'Go! Tap We’re done when everyone is ready.',tm:A.pr.done?'':fmtLeft((Date.now()-A.pr.t0)/1000),extra:A.pr.done?'':'<button data-pb="ready" class="g">We’re done</button>'}; }
   if(o==='timer'&&(MT.running||rem>0)) return {cls:rem<=10&&MT.running?'go':'',k:MT.running?'COUNTDOWN':'COUNTDOWN · PAUSED',t:'Timer',ln:'',tm:fmtLeft(rem),extra:'<button data-pb="tplus" class="q">+1 min</button><button data-pb="tpause" class="q">'+(MT.running?'Pause':'Resume')+'</button>'};
   if(o==='brain'&&A.brain){ const c=A.brain.calls?A.brain.calls[A.callIdx||0]:''; return {cls:'go',k:'BRAIN BREAK',t:A.brain.name,ln:c||A.brain.how||'',tm:rem>0?fmtLeft(rem):''}; }
-  if(o&&o!=='routines'&&o!=='brainpick') return {cls:'',k:'ON THE BOARD',t:NAV_LABELS[o]||'Activity',ln:'Tap Bigger to show it here.',tm:''};
+  if(o==='ready'&&A.ready){ const r=A.ready; return {cls:'go',k:r.rec&&r.rec.record?'NEW CLASS RECORD':'WELL DONE',t:r.name,ln:(r.rec?'Done in '+fmtLeft(r.rec.secs):'')+(r.spare?' · beat the song by '+fmtLeft(r.spare):''),tm:''}; }
+  if(o&&o!=='routines'&&o!=='brainpick') return {cls:'',k:'ON THE BOARD',t:NAV_LABELS[o]||'Activity',ln:'Tap Board to show it here.',tm:''};
   const left=P.to?fmtLeft((P.to-P.mins)*60):'';
   if(P.phase==='warning'){ const f=finishSteps(P); return {cls:'warn',k:'2 MINUTES',t:'Time to finish up',ln:f.slice(0,2).join(' · '),tm:left,extra:'<button data-pb="startNow" class="g">Start now</button><button data-pb="plus5" class="q">+5 min</button>'}; }
-  if(P.phase==='routine'&&P.routine) return {cls:'go',k:'NOW',t:P.routine.name,ln:stepsOf(P.routine)[stepIndexFor(P)]||'',tm:left,extra:'<button data-pb="ready" class="g">We’re ready!</button>'};
+  if(P.phase==='routine'&&P.routine) return {cls:'go',k:'NOW',t:P.routine.name,ln:stepsOf(P.routine)[stepIndexFor(P)]||'',tm:left,extra:'<button data-pb="grow" class="g">Show the class</button><button data-pb="ready" class="g">We’re ready!</button>'};
   const b=P.block; return {cls:'',k:P.phase==='lesson'?'NOW':'',t:P.phase==='exit'?'Exit ticket':P.phase==='entry'?'Entry ticket':(b?b.name:S.room||'Roomie'),ln:P.phase==='lesson'||P.phase==='break'?'Next: '+nextLabel(P):'',tm:left}; }
 function pbarHTML(){ const z=pbarState(), m=A.pbMenu;
   let row;
   if(m==='routines') row=S.routines.map(r=>'<button data-pb="run" data-id="'+esc(r.id)+'">'+esc(r.name)+'</button>').join('');
+  else if(m==='practise') row='<span class="lb">Practise a routine (not timed against the record)</span>'+wRoutines().map(r=>'<button data-pb="prac" data-id="'+esc(r.id)+'">'+esc(r.name)+'</button>').join('');
   else if(m==='timer') row=[[60,'1 min'],[120,'2 min'],[180,'3 min'],[300,'5 min'],[600,'10 min'],[900,'15 min']].map(([sec,l])=>'<button data-pb="time" data-s="'+sec+'">'+l+'</button>').join('');
   else if(m==='more') row='<button data-pb="door">At the door</button>'+(S.mode==='tools'?'':'<button data-pb="sched">'+(SCHED.paused?'Resume timetable':'Pause timetable')+'</button>')+(navHasActivity()?'<button data-pb="stop">Stop activity</button>':'');
   if(m) row='<button data-pb="menu" class="q" aria-label="Close">✕</button>'+row;
-  else row=pbarTools().map(k=>{ const db=document.querySelector('#dock .tool[data-tool="'+k+'"]'), cs=db&&getComputedStyle(db), on=db&&db.classList.contains('on');
+  else row='<div class="rt"><span class="lb">Routines</span>'+wRoutines().map(r=>'<button data-pb="run" data-id="'+esc(r.id)+'" class="rc">'+esc(r.name)+(r.best?'<i>'+fmtLeft(r.best)+'</i>':'')+'</button>').join('')+'<button data-pb="practise" class="q">Practise</button></div><div class="tw">'+pbarTools().filter(k=>k!=='routines').map(k=>{ const db=document.querySelector('#dock .tool[data-tool="'+k+'"]'), cs=db&&getComputedStyle(db), on=db&&db.classList.contains('on');
       const style=cs?' style="background:'+cs.backgroundColor+';color:'+cs.color+'"':'';
       return '<button data-pb="tool" data-k="'+k+'"'+style+(on?' class="on"':'')+'>'+esc(DOCK_NAMES[k])+'</button>'; }).join('')+
-    '<span class="sp"></span>'+(navHasActivity()?'<button data-pb="stop" class="q">Stop activity</button>':'')+'<button data-pb="menu" data-m="more" class="q">⋯</button><button data-pb="point">+1 point</button><button data-pb="reset">Reset room</button><button data-pb="attention" class="a">Attention</button>';
-  return {cls:z.cls+(m?' menu':''),html:'<div class="st"><div class="roo">'+birdSVG()+'</div><div class="tx">'+(z.k?'<div class="k">'+esc(z.k)+'</div>':'')+'<div class="t">'+esc(z.t)+(A.pipPicked?'<button class="pk" data-pb="unpick" title="Clear">Ask '+esc(A.pipPicked)+' ✕</button>':'')+'</div>'+(z.ln?'<div class="ln">'+esc(z.ln)+'</div>':'')+'</div>'+(z.extra&&!m?'<div class="ex">'+z.extra+'</div>':'')+(z.tm?'<div class="tm">'+esc(z.tm)+'</div>':'')+'<div class="vw"><button data-pb="bigger" class="q" title="Show the whole board here">Bigger</button><button data-pb="mini" class="q" title="Shrink to a tiny Roomie">Mini</button></div></div><div class="'+(m?'ac':'tl')+'">'+row+'</div>'}; }
+    '<span class="sp"></span>'+(navHasActivity()?'<button data-pb="stop" class="q">Stop activity</button>':'')+'<button data-pb="menu" data-m="more" class="q">⋯</button><button data-pb="point">+1 point</button><button data-pb="reset">Reset room</button><button data-pb="attention" class="a">Attention</button></div>';
+  return {cls:z.cls+(m?' menu':''),html:'<div class="st"><div class="roo">'+birdSVG()+'</div><div class="tx">'+(z.k?'<div class="k">'+esc(z.k)+'</div>':'')+'<div class="t">'+esc(z.t)+(A.pipPicked?'<button class="pk" data-pb="unpick" title="Clear">Ask '+esc(A.pipPicked)+' ✕</button>':'')+'</div>'+(z.ln?'<div class="ln">'+esc(z.ln)+'</div>':'')+'</div>'+(z.extra&&!m?'<div class="ex">'+z.extra+'</div>':'')+(z.tm?'<div class="tm">'+esc(z.tm)+'</div>':'')+'<div class="vw"><button data-pb="bigger" class="q" title="Show the whole Roomie board here">Board</button><button data-pb="mini" class="q" title="Shrink to a tiny Roomie">Mini</button></div></div><div class="'+(m?'ac':'tl')+'">'+row+'</div>'}; }
 function pbarSetup(){ const d=A.pipDoc; if(!d||d.getElementById('pb2CSS')) return; const c=d.createElement('style'); c.id='pb2CSS'; c.textContent=PBAR_CSS; d.head.appendChild(c);
   const root=d.createElement('div'); root.id='pb2'; root.hidden=true; d.body.appendChild(root);
   d.addEventListener('click',e=>{ const b=e.target.closest('#pb2 [data-pb]'); if(!b) return; e.stopPropagation(); const v=b.dataset.pb;
@@ -5042,12 +5045,15 @@ function pbarSetup(){ const d=A.pipDoc; if(!d||d.getElementById('pb2CSS')) retur
     if(v==='menu'){ A.pbMenu=b.dataset.m&&A.pbMenu!==b.dataset.m?b.dataset.m:null; }
     else if(v==='tool'){ const k=b.dataset.k;
       if(k==='routines'||k==='timer'){ A.pbMenu=A.pbMenu===k?null:k; }
-      else if(k==='brain'){ fresh(); A.pbMenu=null; startBrain(); }
+      else if(k==='brain'){ fresh(); A.pbMenu=null; startBrain(); if(A.overlay==='brain'){ wGrow(); return; } }
       else if(k==='pick'){ A.pbMenu=null; pickQuiet(); }
       else { const db=document.querySelector('#dock .tool[data-tool="'+k+'"]'); if(!db) return; if(!b.classList.contains('on')) fresh(); A.pbMenu=null; db.click(); if(A.overlay){ A.pipAuto=true; pipSetView('screen'); S.floatView='bar'; save(); return; } } }
     else if(v==='attention') attention();
-    else if(v==='run'){ fresh(); A.pbMenu=null; runRoutine(b.dataset.id); }
-    else if(v==='time'){ fresh(); A.pbMenu=null; navStartTimer(Number(b.dataset.s)); }
+    else if(v==='run'){ fresh(); A.pbMenu=null; runRoutine(b.dataset.id); if(A.overlay==='manualRoutine'){ wGrow(); return; } }
+    else if(v==='practise'){ A.pbMenu=A.pbMenu==='practise'?null:'practise'; }
+    else if(v==='prac'){ fresh(); A.pbMenu=null; startPractise(b.dataset.id); if(A.overlay==='practise'){ wGrow(); return; } }
+    else if(v==='grow'){ wGrow(); return; }
+    else if(v==='time'){ fresh(); A.pbMenu=null; navStartTimer(Number(b.dataset.s)); wGrow(); return; }
     else if(v==='brain'){ fresh(); A.pbMenu=null; startBrain(); }
     else if(v==='pick'){ A.pbMenu=null; pickQuiet(); } else if(v==='unpick'){ A.pipPicked=null; }
     else if(v==='point'){ act('point'); A.pbMenu=null; } else if(v==='reset'){ A.pbMenu=null; resetRoom(); } else if(v==='door'){ A.pbMenu=null; openOverlay('door'); }
@@ -5062,6 +5068,116 @@ function pbarRender(){ const d=A.pipDoc; pbarSetup(); const root=d.getElementByI
 { const f=pipRender; pipRender=function(force){ if(A.pipDoc&&A.pipAuto&&A.pipView==='screen'&&!A.overlay){ A.pipAuto=false; pipSetView('bar'); return; } if(A.pipDoc&&A.pipView==='bar'){ try{ pbarRender(); }catch(e){ console.warn(e); } return; } const r=A.pipDoc&&A.pipDoc.getElementById('pb2'); if(r) r.hidden=true; return f.apply(this,arguments); }; }
 /* keep the copy live: re-copy when the screen changes */
 { let q=0; const mo=new MutationObserver(()=>{ if(!A.pipDoc||A.pipView!=='screen') return; cancelAnimationFrame(q); q=requestAnimationFrame(()=>pipRender(true)); }); const st=document.getElementById('stage'); if(st) mo.observe(st,{subtree:true,childList:true,characterData:true,attributes:true}); }
+
+/* ---- v3: Widget-first. The Roomie widget sits over OneNote or SEQTA all day: routines first, tools beside them.
+   Starting a routine grows it into a class view; We're ready! saves the time, celebrates and shrinks it back. ---- */
+const WIDGET_CLASS=[820,560];
+function wRoutines(){ return (S.routines||[]); }
+function wChipW(t,extra){ return 18+String(t).length*8.2+(extra||0); }
+function wRows(widths,avail){ let rows=1,x=0; widths.forEach(w=>{ if(x&&x+w>avail){ rows++; x=0; } x+=w+6; }); return rows; }
+function wBarSize(){ const avail=820-24, rw=wRows(wRoutines().map(r=>wChipW(r.name,r.best?44:0)).concat([80]),avail), tl=pbarTools().filter(k=>k!=='routines');
+  const tw=wRows(tl.map(k=>wChipW(DOCK_NAMES[k])).concat([wChipW('⋯'),wChipW('+1 point'),wChipW('Reset room'),wChipW('Attention')]),avail);
+  return [820,Math.min(420,76+rw*40+tw*38+24)]; }
+pipSizeFor=function(v){ if(v==='bar') return wBarSize(); if(v==='class') return WIDGET_CLASS; return PIP_SIZES[v]||PIP_SIZES.bar; };
+function wResize(v){ const z=pipSizeFor(v); try{ A.pip.resizeTo(z[0],z[1]); }catch(_){ } }
+function wGrow(){ if(!A.pipDoc) return; A.pipView='class'; A.pbMenu=null; wResize('class'); A.pipSig=''; pipRender(true); }
+function wShrink(){ if(!A.pipDoc) return; A.pipView='bar'; A.pbMenu=null; wResize('bar'); A.pipSig=''; pipRender(true); }
+function wSongLeft(){ const el=Music.playing&&Music.fileAudio; if(!el||el.loop||!Number.isFinite(el.duration)) return 0; return Math.max(0,Math.round(el.duration-el.currentTime)); }
+/* What the class sees while something is running. Returns null when nothing is running. */
+function wClassState(){ const P=A.P||phaseAt(now()), o=A.overlay, rem=MT.remaining();
+  if(o==='ready'&&A.ready){ const r=A.ready; return {done:true,h:r.rec&&r.rec.record?'New class record!':r.spare?'We beat the song!':'Well done, everyone!',t:r.name,sub:(r.rec?'Done in '+fmtLeft(r.rec.secs):'')+(r.spare?' · '+fmtLeft(r.spare)+' of the song to spare':'')}; }
+  if(o==='manualRoutine'&&A.mr){ const R=routineById(A.mr.id); if(!R) return null; return {R,st:stepsOf(R),i:A.mr.step,tm:rem>0?fmtLeft(rem):'',manual:true}; }
+  if(o==='practise'&&A.pr){ const R=routineById(A.pr.id); if(!R) return null; if(A.pr.done) return {done:true,h:'Practice done!',t:R.name,sub:'Done in '+fmtLeft(A.pr.done)+(R.best?' · record '+fmtLeft(R.best):'')}; return {R,st:stepsOf(R),i:-1,tm:fmtLeft((Date.now()-A.pr.t0)/1000),practise:true}; }
+  if(!o&&P.phase==='routine'&&P.routine) return {R:P.routine,st:stepsOf(P.routine),i:stepIndexFor(P),tm:P.to?fmtLeft((P.to-P.mins)*60):'',timetable:true};
+  if(o==='timer'&&(MT.running||rem>0)) return {timer:true,tm:fmtLeft(rem),paused:!MT.running};
+  if(o==='brain'&&A.brain){ const c=A.brain.calls?A.brain.calls[A.callIdx||0]:''; return {brain:true,t:A.brain.name,sub:c||A.brain.how||'',tm:rem>0?fmtLeft(rem):''}; }
+  return null; }
+const WCLASS_CSS='#wc{position:fixed;inset:0;display:flex;flex-direction:column;gap:12px;padding:16px 20px;box-sizing:border-box;background:#FFE7A8;color:#2A1E3D;font-family:Nunito,system-ui,sans-serif;font-weight:800}'+
+ '#wc.done{background:#B8F0C8}#wc .hd{display:flex;align-items:center;gap:14px}#wc .roo{width:56px;height:56px;flex:none}#wc .roo svg{width:100%;height:100%}#wc h1{margin:0;flex:1;font:800 44px/1 "Baloo 2",system-ui,sans-serif}'+
+ '#wc .tm{font:800 64px/1 "Baloo 2",system-ui,sans-serif;font-variant-numeric:tabular-nums}#wc ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;flex:1;min-height:0;overflow:auto}'+
+ '#wc li{display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.55);border-radius:16px;padding:10px 14px;font-size:24px;line-height:1.15}#wc li i{flex:none;width:34px;height:34px;border-radius:50%;background:#fff;display:grid;place-items:center;font-style:normal;font-size:18px}'+
+ '#wc li.on{background:#fff;box-shadow:0 0 0 4px #2A1E3D;font-size:28px}#wc li.past{opacity:.5}#wc .goal{display:flex;gap:10px;flex-wrap:wrap;font-size:18px}#wc .goal span{background:#fff;border-radius:999px;padding:4px 14px}'+
+ '#wc .ft{display:flex;gap:8px;align-items:center}#wc button{font:800 15px Nunito,system-ui,sans-serif;border:2px solid #2A1E3D;border-radius:999px;padding:8px 14px;background:#fff;color:#2A1E3D;cursor:pointer}'+
+ '#wc button.go{font-size:26px;padding:12px 30px;background:#2A1E3D;color:#FFD84D}#wc button.q{background:transparent;border-color:rgba(42,30,61,.4)}#wc .sp{flex:1}#wc .big{font:800 56px/1.05 "Baloo 2",system-ui,sans-serif;margin:auto 0 0}#wc .sub{font-size:26px;margin:0 0 auto}';
+function wClassHTML(z){ const head=t=>'<div class="hd"><div class="roo">'+birdSVG()+'</div><h1>'+esc(t)+'</h1>'+(z.tm?'<div class="tm">'+esc(z.tm)+'</div>':'')+'</div>';
+  const shrink='<span class="sp"></span><button class="q" data-wc="shrink">Back to Roomie</button>';
+  if(z.done) return {cls:'done',html:head(z.t)+'<p class="big">'+esc(z.h)+'</p><p class="sub">'+esc(z.sub)+'</p><div class="ft"><span class="sp"></span><button data-wc="shrink">Back to Roomie</button></div>'};
+  if(z.timer) return {cls:'',html:head('Timer').replace('<div class="tm">'+esc(z.tm)+'</div>','')+'<p class="big" style="font-size:140px;text-align:center;margin:auto">'+esc(z.tm)+'</p><div class="ft"><button data-wc="tplus">+1 min</button><button data-wc="tpause">'+(z.paused?'Resume':'Pause')+'</button><button class="q" data-wc="stop">Stop</button>'+shrink+'</div>'};
+  if(z.brain) return {cls:'',html:head(z.t)+'<p class="big" style="margin:auto 0">'+esc(z.sub)+'</p><div class="ft"><button class="q" data-wc="stop">Stop</button>'+shrink+'</div>'};
+  const R=z.R, song=wSongLeft(), goal=[];
+  if(R.best) goal.push('Class record '+fmtLeft(R.best)); if(song) goal.push('Beat the song: '+fmtLeft(song)+' left');
+  const steps='<ol>'+z.st.map((s,j)=>'<li class="'+(j===z.i?'on':j<z.i?'past':'')+'"><i>'+(j+1)+'</i>'+esc(s)+'</li>').join('')+'</ol>';
+  const ctl=z.manual?'<button class="q" data-wc="back"'+(z.i?'':' disabled')+'>Back</button><button class="q" data-wc="next">'+(z.i>=z.st.length-1?'Finish':'Next step')+'</button><button class="q" data-wc="stop">Stop</button>':'<button class="q" data-wc="stop">Stop</button>';
+  return {cls:'',html:head((z.practise?'Practise: ':'')+R.name)+(goal.length?'<div class="goal">'+goal.map(g=>'<span>'+esc(g)+'</span>').join('')+'</div>':'')+steps+'<div class="ft"><button class="go" data-wc="ready">'+(z.practise?'We’re done!':'We’re ready!')+'</button>'+ctl+shrink+'</div>'}; }
+function wClassSetup(){ const d=A.pipDoc; if(!d||d.getElementById('wcCSS')) return; const c=d.createElement('style'); c.id='wcCSS'; c.textContent=WCLASS_CSS; d.head.appendChild(c);
+  const root=d.createElement('div'); root.id='wc'; root.hidden=true; d.body.appendChild(root);
+  d.addEventListener('click',e=>{ const b=e.target.closest('#wc [data-wc]'); if(!b) return; e.stopPropagation(); const v=b.dataset.wc;
+    if(v==='ready'){ weAreReadyKey(); A.pipView='class'; A.pipSig=''; pipRender(true); clearTimeout(A.wShrinkT); A.wShrinkT=setTimeout(()=>{ if(A.pipView==='class') wShrink(); },3500); return; }
+    if(v==='next') act('mrNext'); else if(v==='back') act('mrBack'); else if(v==='tplus') MT.add(60); else if(v==='tpause'){ MT.running?MT.pause():MT.resume(); }
+    else if(v==='stop'){ navStopActivity(false); wShrink(); return; } else if(v==='shrink'){ if(A.overlay==='ready') closeOverlay(); wShrink(); return; }
+    A.pipSig=''; pipRender(true); if(!wClassState()) wShrink(); },true); }
+function wClassRender(){ const d=A.pipDoc; wClassSetup(); const z=wClassState(); const root=d.getElementById('wc');
+  if(!z){ root.hidden=true; A.pipView='roo'; return false; }
+  ['pip','pscr','pbar'].forEach(id=>{ const el=d.getElementById(id); if(el) el.hidden=true; }); const pip=d.getElementById('pip'); if(pip) pip.style.display='none'; const pb=d.getElementById('pb2'); if(pb) pb.hidden=true;
+  root.hidden=false; const h=wClassHTML(z); if(root.dataset.h!==h.cls+h.html){ root.className=h.cls; root.innerHTML=h.html; root.dataset.h=h.cls+h.html; } return true; }
+{ const f=pipRender; pipRender=function(force){ if(A.pipDoc){ const wc=A.pipDoc.getElementById('wc'); if(A.pipView==='class'){ if(wClassRender()) return; if(A.pipView==='roo'){ wRestRender(); return; } } else if(wc) wc.hidden=true; } return f.apply(this,arguments); }; }
+
+/* The widget is Roomie: a small character card, not a long bar. Roomie on top says what's happening;
+   routines and tools sit in a tidy grid underneath. */
+const WROO=[340,480];
+pipSizeFor=function(v){ if(v==='bar') return WROO; if(v==='class') return WIDGET_CLASS; return PIP_SIZES[v]||PIP_SIZES.bar; };
+pbarHTML=function(){ const z=pbarState(), m=A.pbMenu, tab=A.wTab||'routines';
+  let body;
+  if(m==='timer') body=[[60,'1 min'],[120,'2 min'],[180,'3 min'],[300,'5 min'],[600,'10 min'],[900,'15 min']].map(([sec,l])=>'<button data-pb="time" data-s="'+sec+'">'+l+'</button>').join('');
+  else if(m==='practise') body=wRoutines().map(r=>'<button data-pb="prac" data-id="'+esc(r.id)+'">'+esc(r.name)+'</button>').join('');
+  else if(m==='more') body='<button data-pb="door">At the door</button>'+(S.mode==='tools'?'':'<button data-pb="sched">'+(SCHED.paused?'Resume timetable':'Pause timetable')+'</button>')+'<button data-pb="practise">Practise a routine</button><button data-pb="bigger">Show the whole board</button>'+(navHasActivity()?'<button data-pb="stop">Stop activity</button>':'');
+  else if(tab==='routines') body=wRoutines().map(r=>'<button data-pb="run" data-id="'+esc(r.id)+'" class="rc"><b>'+esc(r.name)+'</b><i>'+(r.best?'Record '+fmtLeft(r.best):'No record yet')+'</i></button>').join('');
+  else body=pbarTools().filter(k=>k!=='routines').map(k=>{ const db=document.querySelector('#dock .tool[data-tool="'+k+'"]'), cs=db&&getComputedStyle(db), on=db&&db.classList.contains('on');
+      return '<button data-pb="tool" data-k="'+k+'"'+(cs?' style="background:'+cs.backgroundColor+';color:'+cs.color+'"':'')+(on?' class="on"':'')+'>'+esc(DOCK_NAMES[k])+'</button>'; }).join('');
+  const tabs=m?'<div class="tabs"><button data-pb="menu" class="on">← Back</button><span class="mt">'+(m==='timer'?'Pick a time':m==='practise'?'Practise (not timed for the record)':'More')+'</span></div>'
+    :'<div class="tabs"><button data-pb="wtab" data-t="routines"'+(tab==='routines'?' class="on"':'')+'>Routines</button><button data-pb="wtab" data-t="tools"'+(tab==='tools'?' class="on"':'')+'>Tools</button><button data-pb="menu" data-m="more" class="q" aria-label="More">⋯</button></div>';
+  return {cls:z.cls+(m?' menu':''),html:'<div class="hd"><div class="roo">'+birdSVG()+'</div><div class="bub">'+(z.k?'<div class="k">'+esc(z.k)+'</div>':'')+'<div class="t">'+esc(z.t)+'</div>'+(z.tm?'<div class="tm">'+esc(z.tm)+'</div>':'')+(z.ln?'<div class="ln">'+esc(z.ln)+'</div>':'')+(A.pipPicked?'<button class="pk" data-pb="unpick" title="Clear">Ask '+esc(A.pipPicked)+' ✕</button>':'')+'</div></div>'+(z.extra?'<div class="ex">'+z.extra+'</div>':'')+tabs+'<div class="gd">'+body+'</div><div class="ft"><button data-pb="point">+1 point</button><button data-pb="reset">Reset room</button><button data-pb="attention" class="a">Attention</button></div>'}; };
+const PROO_CSS='#pb2{gap:8px;padding:10px;background:#FFF6E0}#pb2 .hd{display:flex;align-items:flex-start;gap:8px;flex:none}#pb2 .hd .roo{width:76px;height:76px;flex:none}'+
+ '#pb2 .bub{position:relative;flex:1;min-width:0;background:#fff;border:2px solid #2A1E3D;border-radius:18px;padding:7px 11px}#pb2 .bub:before{content:"";position:absolute;left:-9px;top:22px;border:8px solid transparent;border-right-color:#2A1E3D;border-left:0}'+
+ '#pb2 .bub .t{font-size:21px;white-space:normal}#pb2 .bub .tm{font:800 34px/1 "Baloo 2",system-ui,sans-serif;font-variant-numeric:tabular-nums}#pb2 .bub .ln{font-size:13px;white-space:normal;max-height:2.5em}'+
+ '#pb2 .ex{display:flex;flex-wrap:wrap;gap:6px}#pb2 .ex button{flex:1}#pb2 .tabs{display:flex;gap:6px;align-items:center;flex:none}#pb2 .tabs button{flex:1;padding:6px}#pb2 .tabs button.on{background:#2A1E3D;color:#fff}#pb2 .tabs button.q{flex:none;width:40px}#pb2 .tabs .mt{flex:3;font-size:12px;opacity:.75}'+
+ '#pb2 .gd{flex:1;min-height:0;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start;scrollbar-width:thin}#pb2 .gd button{white-space:normal;border-radius:14px;padding:8px 8px;font-size:14px;line-height:1.15;text-align:left}'+
+ '#pb2 .gd .rc{background:#FFD84D;display:flex;flex-direction:column;gap:2px}#pb2 .gd .rc i{font-style:normal;font-size:11px;opacity:.75}#pb2 .gd button.on{outline:3px solid #2A1E3D}'+
+ '#pb2 .ft{display:flex;gap:6px;flex:none}#pb2 .ft button{flex:1;padding:7px 4px}#pb2 .ft .a{flex:1.4;font-size:15px}#pb2.go .bub,#pb2.warn .bub{background:#FFF6E0}';
+{ const f=pbarSetup; pbarSetup=function(){ const d=A.pipDoc; const fresh=d&&!d.getElementById('pb2CSS'); f(); if(fresh){ const c=d.createElement('style'); c.id='prooCSS'; c.textContent=PROO_CSS; d.head.appendChild(c);
+    d.addEventListener('click',e=>{ const b=e.target.closest('#pb2 [data-pb="wtab"]'); if(!b) return; e.stopPropagation(); A.wTab=b.dataset.t; A.wPopUntil=Date.now()+400; setTimeout(()=>{ A.pipSig=''; pipRender(true); },450); A.pipSig=''; pipRender(true); },true); } }; }
+
+/* Resting widget = just Roomie. Tap Roomie and bubbles pop out (the card above); pick one and they tuck away again. */
+const WREST=[200,250];
+pipViewPref=function(){ return 'roo'; };
+{ const f=pipSizeFor; pipSizeFor=function(v){ return v==='roo'?WREST:f(v); }; }
+{ const f=pipSetView; pipSetView=function(v){ return f(v==='bar'&&!A.wOpening?'roo':v); }; }
+function wOpen(){ if(!A.pipDoc) return; A.wPopUntil=Date.now()+400; setTimeout(()=>{ A.pipSig=''; pipRender(true); },450); A.wOpening=true; A.pbMenu=null; A.pipView='bar'; wResize('bar'); A.wOpening=false; A.pipSig=''; pipRender(true); }
+function wRest(){ if(!A.pipDoc) return; A.pbMenu=null; A.pipView='roo'; wResize('roo'); A.pipSig=''; pipRender(true); }
+wShrink=wRest;
+const WREST_CSS='#wr{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:8px;box-sizing:border-box;background:#FFF6E0;color:#2A1E3D;font-family:Nunito,system-ui,sans-serif;font-weight:800}'+
+ '#wr .me{border:0;background:none;padding:0;cursor:pointer;width:150px;height:150px;transition:transform .15s}#wr .me:hover{transform:scale(1.05) rotate(-3deg)}#wr .me svg{width:100%;height:100%}'+
+ '#wr .pill{max-width:100%;text-align:center;background:#fff;border:2px solid #2A1E3D;border-radius:999px;padding:3px 12px;font-size:14px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}'+
+ '#wr .pill b{font:800 20px/1 "Baloo 2",system-ui,sans-serif;font-variant-numeric:tabular-nums;margin-left:6px}#wr.go{background:#FFD84D}#wr.go .pill{background:#2A1E3D;color:#FFD84D}#wr.warn{background:#FFD84D}#wr.attn{background:#F2785C}'+
+ '#wr .hint{font-size:11px;opacity:.6}';
+function wRestRender(){ const d=A.pipDoc; if(!d.getElementById('wrCSS')){ const c=d.createElement('style'); c.id='wrCSS'; c.textContent=WREST_CSS; d.head.appendChild(c); const r=d.createElement('div'); r.id='wr'; d.body.appendChild(r);
+    d.addEventListener('click',e=>{ const b=e.target.closest('#wr [data-wr]'); if(!b) return; e.stopPropagation(); if(A.attnClose){ attention(); return; } wOpen(); },true); }
+  ['pip','pscr','pbar','pb2','wc'].forEach(id=>{ const el=d.getElementById(id); if(el) el.hidden=true; }); const pip=d.getElementById('pip'); if(pip) pip.style.display='none';
+  const z=pbarState(), root=d.getElementById('wr'); root.hidden=false;
+  const busy=z.cls==='go'||z.cls==='warn', label=A.attnClose?'Eyes this way':z.t;
+  const h=z.cls+'|<button class="me" data-wr="open" title="Tap Roomie for routines and tools">'+birdSVG()+'</button><div class="pill" data-wr="open">'+esc(label)+(z.tm?'<b>'+esc(z.tm)+'</b>':'')+'</div>'+(A.attnClose?'':'<div class="hint">'+(busy?'Tap me to show the class':'Tap me')+'</div>');
+  if(root.dataset.h!==h){ root.className=z.cls; root.innerHTML=h.slice(h.indexOf('|')+1); root.dataset.h=h; } }
+{ const f=pipRender; pipRender=function(force){ if(A.pipDoc){ const wr=A.pipDoc.getElementById('wr'); if(A.pipView==='roo'){ try{ wRestRender(); return; }catch(e){ console.warn(e); } } else if(wr) wr.hidden=true; } return f.apply(this,arguments); }; }
+/* in the bubbles: tap Roomie (or ✕) to tuck them away; picking something tucks them away too */
+{ const f=pbarSetup; pbarSetup=function(){ const d=A.pipDoc, fresh=d&&!d.getElementById('wrBub'); f(); if(fresh){ const c=d.createElement('style'); c.id='wrBub'; c.textContent=
+   '#pb2 .hd .roo{cursor:pointer}#pb2 .x{position:absolute;top:8px;right:8px;width:30px;height:30px;padding:0;border-radius:50%}#pb2 .gd button{border-radius:999px;padding:8px 12px}#pb2.pop .gd button{animation:bub .22s ease-out backwards}#pb2 .gd .rc{border-radius:20px}'+
+   '#pb2.pop .gd button:nth-child(2){animation-delay:.03s}#pb2.pop .gd button:nth-child(3){animation-delay:.06s}#pb2.pop .gd button:nth-child(4){animation-delay:.09s}#pb2.pop .gd button:nth-child(n+5){animation-delay:.12s}@keyframes bub{from{transform:scale(.4);opacity:0}}#pb2 .bub{margin-right:34px}';
+   d.head.appendChild(c);
+   d.addEventListener('click',e=>{ const b=e.target.closest('#pb2 [data-pb]'); if(!b) return; const v=b.dataset.pb;
+     if(v==='collapse'){ e.stopPropagation(); wRest(); return; }
+     if(['point','reset','attention','pick','door','sched','stop','unpick'].includes(v)) setTimeout(()=>{ if(A.pipView==='bar') wRest(); },0);
+     if(v==='tool'&&['pick'].includes(b.dataset.k)) setTimeout(()=>{ if(A.pipView==='bar') wRest(); },0); },true); } }; }
+{ const f=pbarHTML; pbarHTML=function(){ const r=f(); if(Date.now()<(A.wPopUntil||0)) r.cls+=' pop'; r.html=r.html.replace('<div class="roo">','<div class="roo" data-pb="collapse" title="Tuck the bubbles away">')+'<button class="x q" data-pb="collapse" aria-label="Close">✕</button>'; return r; }; }
 
 /* ---- v2.5: Your own pictures. Teachers upload a school crest/logo and pictures for any screen. Stored in this browser only. ---- */
 const PIC_SLOTS=[['crest','School crest or logo','Shows on the welcome screen and, if you like, next to your class name on every screen.'],
