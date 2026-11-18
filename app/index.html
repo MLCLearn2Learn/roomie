@@ -6057,7 +6057,7 @@ function w4Fit(){ if(!A.pip) return; let k=w4SizeKey(), z=W4_SIZES[k]||W4_SIZES.
     let nx=ox, ny=oy; if(ox+ow/2>L+W/2) nx=ox+ow-nw; if(oy+oh/2>T+H/2) ny=oy+oh-nh;
     nx=Math.max(L,Math.min(nx,L+W-nw)); ny=Math.max(T,Math.min(ny,T+H-nh)); if(nx!==ox||ny!==oy) P.moveTo(nx,ny); }catch(_){ } }
 function w4Corner(){ const P=A.pip; if(!P) return; try{ const z=W4_SIZES.rest, L=screen.availLeft||0, T=screen.availTop||0; P.moveTo(L+screen.availWidth-z[0]-24,T+screen.availHeight-z[1]-70); }catch(_){ } }
-function w4Go(v){ if(A.w4FromFull&&v!=='rest'){ A.w4v='rest'; w4Render(); return; } if(v!=='card'&&A.w4Big){ A.w4Big=false; A.w4Size=null; w4Fit(); w4MoveBack(); } A.w4v=v; A.w4Pop=Date.now()+420; w4Fit(); w4Render(); setTimeout(w4Render,450); }
+function w4Go(v){ if(v!=='rest') A.w4FsReady=false; if(A.w4FromFull&&v!=='rest'){ A.w4v='rest'; w4Render(); return; } if(v!=='card'&&A.w4Big){ A.w4Big=false; A.w4Size=null; w4Fit(); w4MoveBack(); } A.w4v=v; A.w4Pop=Date.now()+420; w4Fit(); w4Render(); setTimeout(w4Render,450); }
 const W4_CSS=`
 *{box-sizing:border-box}body{margin:0;background:#FFF6E0;color:#2A1E3D;font:800 15px Nunito,system-ui,sans-serif;overflow:hidden}
 #w4{position:fixed;inset:0;display:flex;flex-direction:column}
@@ -6074,6 +6074,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .rest .me{width:96px;height:100px;transition:transform .15s}.rest .me:hover{transform:scale(1.05) rotate(-3deg)}
 .rest.busy{background:#FFD84D}.rest.busy .chip{background:#2A1E3D;color:#FFD84D}
 .rest.attn{background:#F2785C}
+.fsgo{font-size:13px;padding:6px 10px;animation:glow 1.2s ease-in-out infinite}@keyframes glow{50%{box-shadow:0 0 0 6px rgba(255,216,77,.9)}}
 /* menu */
 .menu{flex:1;display:flex;gap:8px;padding:10px 10px 10px 12px;min-height:0}.menu .pill{font-size:13px;padding:5px 10px}.menu .big{font-size:17px;padding:9px 12px}.menu .row{gap:5px}.menu .grid2 .pill{padding:6px 10px}
 .menu .l{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0;overflow:auto}
@@ -6119,7 +6120,7 @@ function w4Html(){ const v=A.w4v||'rest', z=w4State(), pop=Date.now()<(A.w4Pop||
   if(v==='end'&&A.w4End){ const e=A.w4End, msg=e.k==='timer'?'Time’s up!':e.k==='brain'?'Brain break done!':e.k==='routine'?e.name+' is finished':'All done!';
     return '<div class="card g"><div class="hd">'+w4Me()+'<h1>'+esc(msg)+'</h1></div><p class="huge" style="margin:auto 0">Back to your work</p><div class="ft"><button class="pill k go" data-w="rest">Back to Roomie</button></div></div>'; }
   if(v==='rest'||v==='end'||(v==='card'&&!z)){ const n=w4Now(), busy=!!z&&!A.attnClose, lbl=A.attnClose?'Eyes this way':z?(z.k==='routine'?z.R.name:z.k==='ticket'?'Ticket':z.k==='warning'?'2 minutes':z.k==='timer'?z.tm:z.k==='pick'?z.name:'Tap me'):(n.left||n.t||'Tap me');
-    return '<div class="rest'+(busy?' busy':'')+(A.attnClose?' attn':'')+'"><button class="me" data-w="'+(A.attnClose?'attention':'menu')+'" title="Tap Roomie">'+birdSVG()+'</button><span class="chip" data-w="'+(busy?'card':'menu')+'">'+esc(lbl)+'</span></div>'; }
+    return '<div class="rest'+(busy?' busy':'')+(A.attnClose?' attn':'')+'"><button class="me" data-w="'+(A.attnClose?'attention':'menu')+'" title="Tap Roomie">'+birdSVG()+'</button>'+(A.w4FsReady&&z?'<button class="pill k fsgo" data-w="fsgo2">⛶ Full screen</button>':Date.now()<(A.w4FsBlocked||0)?'<span class="chip" style="font-size:11px;white-space:normal">Allow pop-ups for this site</span>':'<span class="chip" data-w="'+(busy?'card':'menu')+'">'+esc(lbl)+'</span>')+'</div>'; }
   if(v==='menu'||v==='routines'||v==='tickets'||v==='timers'||v==='brains'){ let l='';
     const running=z&&z.k!=='pick'?'<button class="pill k big" data-w="card">Back to '+esc(z.k==='routine'?z.R.name:z.k==='timer'?'the timer':z.k==='brain'?'the brain break':z.k==='checkin'?'the check-in':z.k==='ticket'?'the ticket':z.k==='warning'?'finishing up':'it')+'</button>':'';
     if(v==='menu'){ const word=(w,t,c,more)=>'<button class="pill wd" data-w="'+w+'" style="background:'+c+'">'+t+(more?'<i>›</i>':'')+'</button>';
@@ -6165,7 +6166,8 @@ function w4Click(e){ const b=e.target.closest('[data-w]'); if(!b||b.disabled) re
   const card=()=>w4Go('card');
   if(['menu','routines','tickets','timers','brains','rest'].includes(w)){ A.w4End=null; if(w==='rest'&&A.overlay==='ready') closeOverlay(); return w4Go(w); }
   if(w==='card') return card();
-  if(w==='fshint'){ if(A.w4Big){ w4BigToggle(); return; } if(A.w4Win&&!A.w4Win.closed){ w4PopClose(); return; } w4Go('rest'); if(w4PopOpen()) return; w4Go('card'); w4BigToggle(); return; }
+  if(w==='fshint'){ if(A.w4Big){ w4BigToggle(); return; } if(A.w4Win&&!A.w4Win.closed){ w4PopClose(); return; } A.w4FsReady=true; w4Go('rest'); return; }
+  if(w==='fsgo2'){ A.w4FsReady=false; if(!w4PopOpen()){ A.w4FsBlocked=Date.now()+8000; setTimeout(w4Render,8100); } return w4Render(); }
   if(w==='big'){ A.w4Big=!A.w4Big; A.w4Size=null; w4Fit(); return w4Render(); }
   if(w==='attention'){ attention(); return A.attnClose?card():w4Go('rest'); }
   if(w==='run'){ fresh(); runRoutine(b.dataset.id); return card(); }
