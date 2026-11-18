@@ -20,3 +20,4 @@ test('tapping Roomie shows one word per tool; words with › open their options'
  assert.ok(html.includes("startBrain(b.dataset.t||undefined)"));
 });
 test('Roomie’s Full screen button shows where to tap',()=>{ assert.ok(html.includes('data-w="fshint"')); assert.ok(html.includes('in the bar above Roomie, then tap')); });
+test('Roomie always opens small, not at the last size Chrome remembers',()=>{ assert.ok(html.includes('preferInitialWindowPlacement:true')); });
