@@ -6241,7 +6241,7 @@ function w4StateKey(){ const z=w4State(); return z?z.k+(z.R?':'+z.R.id:''):''; }
 
 /* Full screen in its own window: closing it returns the teacher to whatever was underneath (OneNote, SEQTA, slides). */
 function w4PopOpen(){ const W=screen.availWidth||1366, H=screen.availHeight||768, L=screen.availLeft||0, T=screen.availTop||0;
-  let w=null; try{ w=(A.pip||window).open('','roomieFull','popup=yes,left='+L+',top='+T+',width='+W+',height='+H); }catch(_){ w=null; }
+  let w=null; try{ w=window.open('','roomieFull','popup=yes,left='+L+',top='+T+',width='+W+',height='+H); }catch(_){ w=null; }
   if(!w) return false; A.w4Win=w; const d=w.document;
   d.open(); d.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Roomie</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@700;800&display=swap"><style>'+W4_CSS+'#w4{background:#FFE7A8}</style></head><body><div id="w4" class="bigm"></div></body></html>'); d.close();
   try{ w.moveTo(L,T); w.resizeTo(W,H); }catch(_){ }
