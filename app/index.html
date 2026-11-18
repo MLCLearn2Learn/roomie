@@ -5165,7 +5165,7 @@ function wRestRender(){ const d=A.pipDoc; if(!d.getElementById('wrCSS')){ const 
   ['pip','pscr','pbar','pb2','wc'].forEach(id=>{ const el=d.getElementById(id); if(el) el.hidden=true; }); const pip=d.getElementById('pip'); if(pip) pip.style.display='none';
   const z=pbarState(), root=d.getElementById('wr'); root.hidden=false;
   const busy=z.cls==='go'||z.cls==='warn', label=A.attnClose?'Eyes this way':z.t;
-  const h=z.cls+'|<button class="me" data-wr="open" title="Tap Roomie for routines and tools">'+birdSVG()+'</button><div class="pill" data-wr="open">'+esc(label)+(z.tm?'<b>'+esc(z.tm)+'</b>':'')+'</div>'+(A.attnClose?'':'<div class="hint">'+(busy?'Tap me to show the class':'Tap me')+'</div>');
+  const h=z.cls+'|<button class="me" data-wr="open" title="Tap Roomie for routines and tools">'+birdSVG()+'</button><div class="pill" data-wr="open">'+(z.tm&&!A.attnClose?'<b style="margin:0">'+esc(z.tm)+'</b>':esc(label))+'</div>'+(A.attnClose?'':'<div class="hint">'+(busy?'Tap me to show the class':'Tap me')+'</div>');
   if(root.dataset.h!==h){ root.className=z.cls; root.innerHTML=h.slice(h.indexOf('|')+1); root.dataset.h=h; } }
 { const f=pipRender; pipRender=function(force){ if(A.pipDoc){ const wr=A.pipDoc.getElementById('wr'); if(A.pipView==='roo'){ try{ wRestRender(); return; }catch(e){ console.warn(e); } } else if(wr) wr.hidden=true; } return f.apply(this,arguments); }; }
 /* in the bubbles: tap Roomie (or ✕) to tuck them away; picking something tucks them away too */
@@ -5178,6 +5178,57 @@ function wRestRender(){ const d=A.pipDoc; if(!d.getElementById('wrCSS')){ const 
      if(['point','reset','attention','pick','door','sched','stop','unpick'].includes(v)) setTimeout(()=>{ if(A.pipView==='bar') wRest(); },0);
      if(v==='tool'&&['pick'].includes(b.dataset.k)) setTimeout(()=>{ if(A.pipView==='bar') wRest(); },0); },true); } }; }
 { const f=pbarHTML; pbarHTML=function(){ const r=f(); if(Date.now()<(A.wPopUntil||0)) r.cls+=' pop'; r.html=r.html.replace('<div class="roo">','<div class="roo" data-pb="collapse" title="Tuck the bubbles away">')+'<button class="x q" data-pb="collapse" aria-label="Close">✕</button>'; return r; }; }
+
+/* Roomie ring: resting Roomie is tiny; tap Roomie and option bubbles pop out in a ring around it. */
+const WTINY=[128,164];
+function wRingItems(){ const lv=A.wRing||'main', z=pbarState(), it=[];
+  if(lv==='main'){
+    if(z.extra&&/data-pb="grow"/.test(z.extra)) it.push({g:'grow',l:'Show the class',c:'#2A1E3D',f:'#FFD84D'});
+    if(z.extra&&/data-pb="ready"/.test(z.extra)) it.push({g:'ready',l:'We’re ready!',c:'#FFD84D'});
+    it.push({g:'lv',v:'routines',l:'Routines',c:'#FFD84D'},{g:'lv',v:'tools',l:'Tools',c:'#BFE3FF'},{g:'lv',v:'timer',l:'Timer',c:'#FFF0A8'},{g:'attention',l:'Attention',c:'#F2785C',f:'#fff'},{g:'pick',l:'Pick a name',c:'#E4D7FF'},{g:'point',l:'+1 point',c:'#fff'},{g:'reset',l:'Reset room',c:'#C9EBD8'},{g:'lv',v:'more',l:'More',c:'#fff'}); }
+  else if(lv==='routines') wRoutines().forEach(r=>it.push({g:'run',id:r.id,l:r.name,s:r.best?'Record '+fmtLeft(r.best):'',c:'#FFD84D'}));
+  else if(lv==='practise') wRoutines().forEach(r=>it.push({g:'prac',id:r.id,l:r.name,s:'Practise',c:'#FFF0A8'}));
+  else if(lv==='timer') [[60,'1 min'],[120,'2 min'],[180,'3 min'],[300,'5 min'],[600,'10 min'],[900,'15 min']].forEach(([s,l])=>it.push({g:'time',s2:s,l,c:'#FFF0A8'}));
+  else if(lv==='tools') pbarTools().filter(k=>!['routines','timer','pick'].includes(k)).forEach(k=>{ const db=document.querySelector('#dock .tool[data-tool="'+k+'"]'), cs=db&&getComputedStyle(db); it.push({g:'tool',k,l:DOCK_NAMES[k],c:cs?cs.backgroundColor:'#fff',f:cs?cs.color:''}); });
+  else if(lv==='more'){ it.push({g:'door',l:'At the door',c:'#fff'}); if(S.mode!=='tools') it.push({g:'sched',l:SCHED.paused?'Resume timetable':'Pause timetable',c:'#fff'}); it.push({g:'lv',v:'practise',l:'Practise a routine',c:'#FFF0A8'},{g:'board',l:'Whole board',c:'#fff'}); if(navHasActivity()) it.push({g:'stop',l:'Stop activity',c:'#FFD3C8'}); }
+  if(lv!=='main') it.push({g:'lv',v:'main',l:'← Back',c:'#2A1E3D',f:'#fff'});
+  return it; }
+function wRingLayout(n){ const inner=n<=8?n:n<=12?Math.ceil(n/2.4):6, outer=n-inner, R1=n<=8?122:108, R2=196, B=n<=8?84:80;
+  const size=outer?2*R2+B+20:2*R1+B+20; return {inner,outer,R1,R2,B,size}; }
+function wRingSize(){ const L=wRingLayout(wRingItems().length); return [L.size,L.size+12]; }
+{ const f=pipSizeFor; pipSizeFor=function(v){ if(v==='roo') return WTINY; if(v==='ring') return wRingSize(); return f(v); }; }
+wOpen=function(){ if(!A.pipDoc) return; A.wRing='main'; A.wPopUntil=Date.now()+450; A.pipView='ring'; wResize('ring'); A.pipSig=''; pipRender(true); setTimeout(()=>{ A.pipSig=''; pipRender(true); },500); };
+function wLevel(v){ A.wRing=v; A.wPopUntil=Date.now()+450; wResize('ring'); A.pipSig=''; pipRender(true); setTimeout(()=>{ A.pipSig=''; pipRender(true); },500); }
+const WRING_CSS='#wg{position:fixed;inset:0;background:#FFF6E0;color:#2A1E3D;font-family:Nunito,system-ui,sans-serif;font-weight:800;overflow:hidden}'+
+ '#wg .ctr{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;padding:0;cursor:pointer;z-index:2}#wg .ctr svg{width:84px;height:84px}'+
+ '#wg .ctr .tm{font:800 18px/1 "Baloo 2",system-ui,sans-serif;font-variant-numeric:tabular-nums;background:#fff;border:2px solid #2A1E3D;border-radius:999px;padding:2px 9px;max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'+
+ '#wg .b{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-radius:50%;border:2px solid #2A1E3D;box-shadow:0 3px 0 rgba(42,30,61,.25);font:800 13px/1.1 Nunito,system-ui,sans-serif;cursor:pointer;padding:6px;box-sizing:border-box;color:#2A1E3D;transform:translate(-50%,-50%)}'+
+ '#wg .b small{font-size:10px;opacity:.8;margin-top:2px}#wg .b:hover{filter:brightness(1.05);transform:translate(-50%,-50%) scale(1.06)}#wg.pop .b{animation:wpop .28s cubic-bezier(.3,1.5,.6,1) backwards}'+
+ '@keyframes wpop{from{left:50%;top:50%;transform:translate(-50%,-50%) scale(.2);opacity:0}}';
+function wRingRender(){ const d=A.pipDoc; if(!d.getElementById('wgCSS')){ const c=d.createElement('style'); c.id='wgCSS'; c.textContent=WRING_CSS; d.head.appendChild(c); const r=d.createElement('div'); r.id='wg'; d.body.appendChild(r);
+    d.addEventListener('click',e=>{ const b=e.target.closest('#wg [data-g]'); if(!b) return; e.stopPropagation(); wRingAct(b.dataset); },true); }
+  ['pip','pscr','pbar','pb2','wc','wr'].forEach(id=>{ const el=d.getElementById(id); if(el) el.hidden=true; }); const pip=d.getElementById('pip'); if(pip) pip.style.display='none';
+  const root=d.getElementById('wg'); root.hidden=false; const it=wRingItems(), L=wRingLayout(it.length), z=pbarState(), W=d.documentElement.clientWidth||L.size, H=d.documentElement.clientHeight||L.size, cx=W/2, cy=H/2;
+  const pos=(i)=>{ const inRing=i<L.inner, n=inRing?L.inner:L.outer, j=inRing?i:i-L.inner, R=inRing?L.R1:L.R2, a=-Math.PI/2+2*Math.PI*j/n+(inRing?0:Math.PI/n); return [cx+R*Math.cos(a),cy+R*Math.sin(a)]; };
+  const html=it.map((x,i)=>{ const [l,t]=pos(i); return '<button class="b" data-g="'+x.g+'"'+(x.v?' data-v="'+x.v+'"':'')+(x.id?' data-id="'+esc(x.id)+'"':'')+(x.k?' data-k="'+x.k+'"':'')+(x.s2?' data-s="'+x.s2+'"':'')+' style="left:'+Math.round(l)+'px;top:'+Math.round(t)+'px;width:'+L.B+'px;height:'+L.B+'px;background:'+x.c+(x.f?';color:'+x.f:'')+(x.l.length>14?';font-size:11px':'')+';animation-delay:'+(i*0.025).toFixed(3)+'s">'+esc(x.l)+(x.s?'<small>'+esc(x.s)+'</small>':'')+'</button>'; }).join('')+
+    '<button class="ctr" data-g="close" title="Tuck the bubbles away">'+birdSVG()+'<span class="tm">'+esc(A.attnClose?'Eyes this way':(z.tm||z.t))+'</span></button>';
+  const cls=Date.now()<(A.wPopUntil||0)?'pop':''; const h=cls+html; if(root.dataset.h!==h){ root.className=cls; root.innerHTML=html; root.dataset.h=h; } }
+function wRingAct(o){ const g=o.g, fresh=()=>{ if(navHasActivity()) navStopActivity(false); };
+  if(g==='close') return wRest(); if(g==='lv') return wLevel(o.v);
+  if(g==='grow') return wGrow(); if(g==='ready'){ weAreReadyKey(); A.pipView='class'; wResize('class'); A.pipSig=''; pipRender(true); clearTimeout(A.wShrinkT); A.wShrinkT=setTimeout(()=>{ if(A.pipView==='class') wShrink(); },3500); return; }
+  if(g==='run'){ fresh(); runRoutine(o.id); return A.overlay==='manualRoutine'?wGrow():wRest(); }
+  if(g==='prac'){ fresh(); startPractise(o.id); return A.overlay==='practise'?wGrow():wRest(); }
+  if(g==='time'){ fresh(); navStartTimer(Number(o.s)); return wGrow(); }
+  if(g==='tool'){ const k=o.k; if(k==='brain'){ fresh(); startBrain(); return A.overlay==='brain'?wGrow():wRest(); }
+    const db=document.querySelector('#dock .tool[data-tool="'+k+'"]'); if(!db) return; if(!db.classList.contains('on')) fresh(); db.click(); if(A.overlay){ A.pipAuto=true; A.pipView='screen'; S.floatView='bar'; wResize('screen'); A.pipSig=''; pipRender(true); return; } return wRest(); }
+  if(g==='attention') attention(); else if(g==='pick') pickQuiet(); else if(g==='point') act('point'); else if(g==='reset') resetRoom(); else if(g==='door') openOverlay('door');
+  else if(g==='sched'){ SCHED.paused?resumeTimetable():pauseTimetable(); } else if(g==='stop') navStopActivity(false);
+  else if(g==='board'){ A.pipView='screen'; wResize('screen'); A.pipSig=''; pipRender(true); return; }
+  wRest(); }
+{ const f=pipRender; pipRender=function(force){ if(A.pipDoc){ const wg=A.pipDoc.getElementById('wg'); if(A.pipView==='ring'){ try{ wRingRender(); return; }catch(e){ console.warn(e); } } else if(wg) wg.hidden=true; } return f.apply(this,arguments); }; }
+/* tiny resting Roomie */
+const WTINY_CSS='body #wr{gap:3px;padding:4px;justify-content:flex-start}body #wr .me{width:100px;height:112px;flex:none}body #wr .pill{font-size:12px;padding:2px 8px}body #wr .pill b{font-size:15px;margin-left:4px}body #wr .hint{display:none}';
+{ const f=wRestRender; wRestRender=function(){ const d=A.pipDoc; if(!d.getElementById('wtCSS')){ const c=d.createElement('style'); c.id='wtCSS'; c.textContent=WTINY_CSS; d.head.appendChild(c); } return f(); }; }
 
 /* ---- v2.5: Your own pictures. Teachers upload a school crest/logo and pictures for any screen. Stored in this browser only. ---- */
 const PIC_SLOTS=[['crest','School crest or logo','Shows on the welcome screen and, if you like, next to your class name on every screen.'],

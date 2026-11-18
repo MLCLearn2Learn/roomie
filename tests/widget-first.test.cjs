@@ -17,3 +17,9 @@ test('the board leads with opening the widget',()=>{
  assert.ok(html.includes('Open the Roomie widget<small>'));
  assert.ok(html.includes('<i class="lbl">Widget</i>'));
 });
+test('resting Roomie is tiny and options pop out in a ring around it',()=>{
+ assert.ok(html.includes('const WTINY=[128,164];'));
+ assert.ok(html.includes("wOpen=function(){ if(!A.pipDoc) return; A.wRing='main';"));
+ assert.ok(html.includes("{g:'lv',v:'routines',l:'Routines'"));
+ assert.ok(html.includes('@keyframes wpop'));
+});
