@@ -6202,7 +6202,7 @@ if(W4){
   pipViewPref=function(){ return 'rest'; };
   pipSizeFor=function(){ return W4_SIZES[w4SizeKey()]||W4_SIZES.rest; };
   pipRender=function(){ try{ w4Render(); }catch(e){ console.warn(e); } try{ w4Home(); }catch(_){ } try{ w4FullRender(); }catch(_){ } };
-  { const f=floatOpen; floatOpen=async function(){ A.w4v='rest'; A.w4Size=null; A.w4Big=false; const r=await f.apply(this,arguments); if(A.pip) A.w4Size='rest'; w4Home(); return r; }; }
+  { const f=floatOpen; floatOpen=async function(){ A.w4v='rest'; A.w4Size=null; A.w4Big=false; const dp=window.documentPictureInPicture, rq=dp&&dp.requestWindow, own=rq&&Object.prototype.hasOwnProperty.call(dp,'requestWindow'); if(rq&&!A.pip){ try{ dp.requestWindow=function(o){ return rq.call(dp,Object.assign({},o,{preferInitialWindowPlacement:true})); }; }catch(_){ } } let r; try{ r=await f.apply(this,arguments); } finally{ try{ if(own) dp.requestWindow=rq; else delete dp.requestWindow; }catch(_){ } } if(A.pip){ A.w4Size=null; w4Fit(); } w4Home(); return r; }; }
   { const f=markFloat; markFloat=function(){ f(); try{ w4Home(); }catch(_){ } }; }
   setInterval(()=>{ try{ w4Home(); }catch(_){ } },2000); setTimeout(w4Home,0);
   setInterval(()=>{ try{ w4FullRender(); if(!w4State()) A.w4FullSeen=''; }catch(_){ } },500);
