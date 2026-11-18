@@ -6071,7 +6071,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .chip{display:inline-block;background:#fff;border:2px solid #2A1E3D;border-radius:999px;padding:1px 9px;font:800 15px/1.2 "Baloo 2",system-ui,sans-serif;font-variant-numeric:tabular-nums;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* rest */
 .rest{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px}
-.rest .me{width:96px;height:100px;transition:transform .15s}.rest .me:hover{transform:scale(1.05) rotate(-3deg)}
+.rest .me{width:min(96px,62vh);height:min(100px,66vh);transition:transform .15s;flex:none}
+@media (min-aspect-ratio:3/2){.rest{flex-direction:row;gap:12px}.rest .me{width:min(110px,80vh);height:min(116px,84vh)}.rest .chip{font-size:20px;padding:3px 14px}.rest .fsgo{font-size:16px;padding:10px 16px}}.rest .me:hover{transform:scale(1.05) rotate(-3deg)}
 .rest.busy{background:#FFD84D}.rest.busy .chip{background:#2A1E3D;color:#FFD84D}
 .rest.attn{background:#F2785C}
 .fsgo{font-size:13px;padding:6px 10px;animation:glow 1.2s ease-in-out infinite}@keyframes glow{50%{box-shadow:0 0 0 6px rgba(255,216,77,.9)}}
