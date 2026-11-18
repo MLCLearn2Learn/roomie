@@ -5230,6 +5230,35 @@ function wRingAct(o){ const g=o.g, fresh=()=>{ if(navHasActivity()) navStopActiv
 const WTINY_CSS='body #wr{gap:3px;padding:4px;justify-content:flex-start}body #wr .me{width:100px;height:112px;flex:none}body #wr .pill{font-size:12px;padding:2px 8px}body #wr .pill b{font-size:15px;margin-left:4px}body #wr .hint{display:none}';
 { const f=wRestRender; wRestRender=function(){ const d=A.pipDoc; if(!d.getElementById('wtCSS')){ const c=d.createElement('style'); c.id='wtCSS'; c.textContent=WTINY_CSS; d.head.appendChild(c); } return f(); }; }
 
+/* Class view v2: fits whatever size the browser gives the window, shows the current step big, and plays the song's video. */
+function wMainVideo(){ const el=Music.playing&&Music.fileAudio; return el&&el.tagName==='VIDEO'?el:null; }
+function wVidSync(d){ const main=wMainVideo(), slot=d.getElementById('wcvSlot');
+  if(!main||!slot){ if(A.wVid){ try{ A.wVid.pause(); }catch(_){ } } return; }
+  if(!A.wVid||A.wVid.ownerDocument!==d){ const v=d.createElement('video'); v.muted=true; v.playsInline=true; v.setAttribute('playsinline',''); A.wVid=v; }
+  const v=A.wVid; if(v.dataset.src!==main.currentSrc&&main.currentSrc){ v.src=main.currentSrc; v.dataset.src=main.currentSrc; }
+  if(v.parentNode!==slot) slot.appendChild(v);
+  if(Math.abs((v.currentTime||0)-(main.currentTime||0))>0.4){ try{ v.currentTime=main.currentTime; }catch(_){ } }
+  if(main.paused){ if(!v.paused) v.pause(); } else if(v.paused){ v.play().catch(()=>{}); } }
+const WCLASS2_CSS='#wc{padding:clamp(8px,2.2vw,16px) clamp(10px,2.6vw,20px);gap:clamp(6px,1.6vh,12px)}#wc .hd{gap:10px}#wc .roo{width:clamp(36px,9vw,56px);height:clamp(36px,9vw,56px)}'+
+ '#wc h1{font-size:clamp(22px,6.5vw,44px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}#wc .tm{font-size:clamp(30px,10vw,64px)}'+
+ '#wc .goal{font-size:clamp(12px,2.6vw,18px);gap:6px}#wc .goal span{padding:3px 10px}'+
+ '#wc .mid{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(8px,2vw,14px)}#wc .mid.v{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}'+
+ '@media (max-aspect-ratio:1/1){#wc .mid.v{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}}'+
+ '#wc .stepc{display:flex;flex-direction:column;gap:8px;min-height:0}#wc .now{background:#fff;border:3px solid #2A1E3D;border-radius:18px;padding:clamp(8px,2vw,16px);font-size:clamp(20px,5.4vw,40px);line-height:1.1}'+
+ '#wc .now small{display:block;font-size:12px;letter-spacing:.08em;opacity:.65;margin-bottom:4px}#wc .nx{font-size:clamp(13px,2.8vw,18px);opacity:.85}'+
+ '#wcvSlot{min-height:0;display:flex;align-items:center;justify-content:center;border-radius:16px;overflow:hidden}#wcvSlot video{max-width:100%;max-height:100%;width:auto;height:auto;border-radius:16px;display:block}'+
+ '#wc .ft{flex-wrap:nowrap;gap:6px}#wc .ft button{white-space:nowrap;padding:6px 10px;font-size:clamp(12px,2.4vw,15px)}#wc button.go{font-size:clamp(17px,4.4vw,26px);padding:clamp(8px,1.6vw,12px) clamp(14px,3.4vw,30px)}#wc .ft .x{width:34px;height:34px;padding:0;flex:none}';
+function wRoutineHTML(z){ const R=z.R, song=wSongLeft(), goal=[], vid=!!wMainVideo(), st=z.st, i=z.i;
+  if(R.best) goal.push('Record '+fmtLeft(R.best)); if(song) goal.push('Beat the song: '+fmtLeft(song));
+  const cur=i>=0?st[i]:'Go! Everyone ready as fast as you can', nx=i>=0&&st[i+1]?'Next: '+st[i+1]:'';
+  const ctl=(z.manual?'<button class="q" data-wc="back"'+(i?'':' disabled')+'>Back</button><button class="q" data-wc="next">'+(i>=st.length-1?'Finish':'Next')+'</button>':'')+'<button class="q" data-wc="stop">Stop</button>';
+  return {cls:'',html:'<div class="hd"><div class="roo">'+birdSVG()+'</div><h1>'+esc((z.practise?'Practise: ':'')+R.name)+'</h1>'+(z.tm?'<div class="tm">'+esc(z.tm)+'</div>':'')+'</div>'+
+    (goal.length?'<div class="goal">'+goal.map(g=>'<span>'+esc(g)+'</span>').join('')+'</div>':'')+
+    '<div class="mid'+(vid?' v':'')+'"><div class="stepc"><div class="now">'+(i>=0?'<small>STEP '+(i+1)+' OF '+st.length+'</small>':'')+esc(cur)+'</div>'+(nx?'<div class="nx">'+esc(nx)+'</div>':'')+'</div>'+(vid?'<div id="wcvSlot"></div>':'')+'</div>'+
+    '<div class="ft"><button class="go" data-wc="ready">'+(z.practise?'We’re done!':'We’re ready!')+'</button>'+ctl+'<span class="sp"></span><button class="q x" data-wc="shrink" aria-label="Back to Roomie" title="Back to Roomie">✕</button></div>'}; }
+{ const f=wClassHTML; wClassHTML=function(z){ if(z&&z.R&&!z.done) return wRoutineHTML(z); const r=f(z); r.html=r.html.replace('<button class="q" data-wc="shrink">Back to Roomie</button>','<button class="q x" data-wc="shrink" aria-label="Back to Roomie" title="Back to Roomie">✕</button>'); return r; }; }
+{ const f=wClassRender; wClassRender=function(){ const d=A.pipDoc; if(d&&!d.getElementById('wc2CSS')){ const c=d.createElement('style'); c.id='wc2CSS'; c.textContent=WCLASS2_CSS; d.head.appendChild(c); } const r=f(); try{ wVidSync(d); }catch(_){ } return r; }; }
+
 /* ---- v2.5: Your own pictures. Teachers upload a school crest/logo and pictures for any screen. Stored in this browser only. ---- */
 const PIC_SLOTS=[['crest','School crest or logo','Shows on the welcome screen and, if you like, next to your class name on every screen.'],
  ['arrival','Welcome screen (Good morning)',''],['brainpick','Brain breaks list',''],['brain','Every brain break',''],['routines','Routines list',''],
