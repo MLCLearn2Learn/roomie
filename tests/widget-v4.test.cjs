@@ -15,3 +15,8 @@ test('Roomie has its own Bigger button, and the Roomie tab shows the activity bi
  assert.ok(html.includes("if(w==='big'){ A.w4Big=!A.w4Big;"));
  assert.ok(html.includes('function w4BigSize(){'));
 });
+test('tapping Roomie shows one word per tool; words with › open their options',()=>{
+ assert.ok(html.includes("word('routines','Routines','#FFD84D',true)"));
+ assert.ok(html.includes("word('brains','Brain break','#C9EBD8',true)"));
+ assert.ok(html.includes("startBrain(b.dataset.t||undefined)"));
+});
